@@ -76,3 +76,5 @@
 - 2026-10-10 — تحصين CI (موافقة المستخدم): كل إجراءات GitHub Actions مثبتة ببصمة SHA مع رقم الإصدار تعليقاً، وDependabot أسبوعي (الأحد 06:00 الرياض) لـ npm وإجراءات Actions.
 - 2026-10-10 — البحث العام لمدخل البيانات يقتصر على موردينه المسندين (موافقة المستخدم)، والاستثناء الوحيد اسم المورد في التحذير الصارم.
 - 2026-10-10 — مشروع Firebase: `raseed-dhtrd`. رفع القواعد عبر GitHub Actions (`deploy-rules.yml`) بعد الدمج في main ونجاح اختبارات المحاكي، بمفتاح حساب خدمة في السر `FIREBASE_SERVICE_ACCOUNT` (لا يمر عبر الجلسة ولا git). إعدادات الويب في متغيرات `VITE_FIREBASE_*` (ليست أسراراً، لكنها خارج git لأن gitleaks يرصد صيغة مفتاح Google).
+- 2026-10-10 — أول رفع للقواعد إلى `raseed-dhtrd` نجح (Actions run 38081186815): «released rules firestore.rules to cloud.firestore» + الفهارس. حساب الخدمة `raseed-ci-deployer@raseed-dhtrd` بأربعة أدوار: Firebase Rules Admin، Cloud Datastore Index Admin، Service Usage Consumer، Service Usage Viewer (الأخير لازم لفحص تفعيل الخدمات في firebase-tools). الفرع الافتراضي `main` أنشأه المستخدم؛ العمل لاحقاً عبر PR إلى main.
+- 2026-10-10 — المرحلة 1 معتمدة ومكتملة (موافقة المستخدم + CI وCodeQL أخضران على main + القواعد مرفوعة).
