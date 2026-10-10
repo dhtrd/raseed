@@ -6,6 +6,8 @@
 - CI: `.github/workflows/ci.yml` (lint، typecheck، unit، build، rules، e2e على 3 متصفحات، audit، gitleaks) و`codeql.yml`.
 - النماذج المعتمدة: `proposals/2026-10-10-fields-excel-components.html` (الإصدار 3).
 
+**جلسة جديدة؟** اقرأ `docs/NEXT-SESSION.md` أولاً (حالة المستودع، الروابط، خطة المرحلة 2).
+
 **الخطوة التالية:** المرحلة 2 — تبدأ بنماذج تفاعلية لشاشة الدخول وإدارة المستخدمين (2–3 خيارات) قبل أي كود، ثم الدخول والصلاحيات وسجل التدقيق. العمل على فرع Claude ثم PR إلى main.
 
 **مفتوح:** 6 PRs من Dependabot موجّهة لفرع Claude (أُنشئت قبل main) — تُراجع وتُعاد إلى main.
