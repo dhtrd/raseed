@@ -1,0 +1,132 @@
+{
+ "_public_copy": "نسخة عامة: أسماء الموردين بأكواد (المورد أ..) وبلا مبالغ. الأصل الكامل في private/KNOWN-ISSUES.json خارج git، وسكربت النقل يقرأ الأصل.",
+ "source_file": "data/ (ملف الإكسل بتاريخ 2026-10-10)",
+ "row_numbers": "أرقام صفوف Excel في الملف الجديد (بعد ترتيبه)",
+ "decision": "تُنقل كما هي وتُعلَّم needs_manual_fix وتظهر في مركز المراجعة؛ لا تصحيح آلي",
+ "issues": [
+  {
+   "sheet": "المورد (د)",
+   "row": 57,
+   "date": "2026-02-08",
+   "likely_date": "2026-08-02",
+   "main_ref": "0156",
+   "voucher": 6004,
+   "issue": "swapped_day_month"
+  },
+  {
+   "sheet": "المورد (ج)",
+   "row": 136,
+   "date": "2026-02-08",
+   "likely_date": "2026-08-02",
+   "main_ref": "0159",
+   "voucher": 6007,
+   "issue": "swapped_day_month"
+  },
+  {
+   "sheet": "المورد (ج)",
+   "row": 210,
+   "date": "2026-04-08",
+   "likely_date": "2026-08-04",
+   "main_ref": "0161",
+   "voucher": 6009,
+   "issue": "swapped_day_month"
+  },
+  {
+   "sheet": "المورد (هـ)",
+   "row": 174,
+   "date": "2026-04-08",
+   "likely_date": "2026-08-04",
+   "main_ref": "0162",
+   "voucher": 6010,
+   "issue": "swapped_day_month"
+  },
+  {
+   "sheet": "المورد (هـ)",
+   "row": 182,
+   "date": "2026-05-08",
+   "likely_date": "2026-08-05",
+   "main_ref": "0168",
+   "voucher": 6016,
+   "issue": "swapped_day_month"
+  },
+  {
+   "sheet": "المورد (هـ)",
+   "row": 199,
+   "date": "2026-07-08",
+   "likely_date": "2026-08-07",
+   "main_ref": "0183",
+   "voucher": 6031,
+   "issue": "swapped_day_month"
+  },
+  {
+   "sheet": "المورد (ج)",
+   "row": 253,
+   "date": "2026-07-08",
+   "likely_date": "2026-08-07",
+   "main_ref": "0184",
+   "voucher": 6032,
+   "issue": "swapped_day_month"
+  },
+  {
+   "sheet": "المورد (د)",
+   "row": 162,
+   "date": "2026-10-08",
+   "likely_date": "2026-08-10",
+   "main_ref": "0328",
+   "voucher": 6046,
+   "issue": "swapped_day_month"
+  },
+  {
+   "sheet": "المورد (ج)",
+   "row": 237,
+   "date": "2026-06-08",
+   "main_ref": "0178",
+   "voucher": 6025,
+   "issue": "duplicate_of_row_291",
+   "note": "نفس السند والمبلغ مسجّل صحيحاً في الصف 291 بتاريخ 2026-08-06"
+  },
+  {
+   "sheet": "المورد (ج)",
+   "rows": [
+    303,
+    305
+   ],
+   "date": "2026-08-17",
+   "main_refs": [
+    "0399",
+    "0339"
+   ],
+   "voucher": 6080,
+   "issue": "same_voucher_two_refs",
+   "note": "الأرجح أن 0339 خطأ كتابة لـ 0399"
+  },
+  {
+   "sheets": [
+    "المورد (ج)",
+    "المورد (هـ)"
+   ],
+   "rows": [
+    352,
+    249
+   ],
+   "date": "2026-09-18",
+   "ref": "MISC/2026/09/0440",
+   "voucher": 6227,
+   "issue": "same_voucher_two_suppliers",
+   "note": "صحيح فقط إن كان قيداً واحداً موزعاً"
+  }
+ ],
+ "also_flag": [
+  "كل رقم مرجعي مكرر (8 أرقام في 16 حركة)",
+  "كل حركة بلا نوع مستند (20)",
+  "أي تاريخ مستقبلي أو مقلوب"
+ ],
+ "baseline_numbers": {
+  "rows": 2603,
+  "invoices": 1507,
+  "journals": 1076,
+  "untyped": 20,
+  "alltime_balance": "[مخفي: private/KNOWN-ISSUES.json]",
+  "q3_2026": "[مخفي: private/KNOWN-ISSUES.json]"
+ }
+}

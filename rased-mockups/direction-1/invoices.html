@@ -1,0 +1,175 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رصيد — فهرس الفواتير</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<link rel="stylesheet" href="../shared/riyal.css">
+<link rel="stylesheet" href="style.css">
+<script src="../shared/core.js"></script>
+<script src="app.js" defer></script>
+</head>
+<body class="pg-inv" data-page="inv">
+<a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+<header class="masthead">
+  <a class="brand" href="dashboard.html"><svg class="mark" viewBox="0 0 120 120" aria-hidden="true"><rect x="30" y="36" width="76" height="16" rx="8" class="mk-ink"/><rect x="14" y="68" width="76" height="16" rx="8" class="mk-acc"/></svg><span class="wordmark">رصيد</span></a>
+  <nav class="tabs" aria-label="أقسام الدفتر"><a href="dashboard.html">الأرصدة</a><a href="statement.html">كشف الحساب</a><a href="invoices.html" aria-current="page">الفواتير</a><a href="add-entry.html">إضافة حركة</a><a href="review.html">المراجعة</a></nav>
+  <div class="tools">
+    <select class="role-sel" data-role-select aria-label="عرض بصلاحية"><option value="owner">المالك</option><option value="admin">الإدارة</option><option value="entry">مدخل البيانات</option></select>
+    <button type="button" class="icon-btn" data-theme-toggle aria-label="التبديل إلى الوضع الداكن"><svg class="ic ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="ic ic-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+  </div>
+</header>
+<div class="shell">
+  <aside class="index" id="index" aria-label="فهرس الموردين">
+    <div class="index-head">
+      <h2 class="index-title">الموردون</h2>
+      <button type="button" class="collapse-btn" data-collapse aria-controls="index-body" aria-expanded="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span class="lbl">طيّ</span></button>
+    </div>
+    <div class="index-body" id="index-body">
+      <ul class="ix-list">
+        <li><a class="ix-item" href="invoices.html" aria-current="page"><span>المورد (أ)</span><span class="num neg">-6,499.13</span></a></li>
+        <li><span class="ix-off">المورد (ب)</span></li><li><span class="ix-off">المورد (ج)</span></li><li><span class="ix-off">المورد (د)</span></li><li><span class="ix-off">المورد (هـ)</span></li><li><span class="ix-off">المورد (و)</span></li><li><span class="ix-off">المورد (ز)</span></li><li><span class="ix-off">المورد (ح)</span></li><li><span class="ix-off">المورد (ط)</span></li>
+      </ul>
+      <p class="ix-note">فواتير بقية الموردين غير مضمّنة في هذا النموذج.</p></div>
+  </aside>
+  <main id="main" class="main" tabindex="-1">
+
+    <div class="page-head">
+      <div class="ph-title">
+        <h1>فهرس الفواتير</h1>
+        <p class="ph-sub">حالة إدخال كل فاتورة في Odoo</p>
+      </div>
+      <dl class="counters">
+        <div><dt>إجمالي الفواتير</dt><dd class="num">1,468</dd></div>
+        <div><dt>لم تدخل Odoo</dt><dd class="num">[العدد]</dd></div>
+      </dl>
+    </div>
+    <div class="inv-bar">
+      <div class="strip"><div class="seg" role="group" aria-label="تصفية حسب حالة Odoo">
+        <button type="button" data-filter="all" aria-pressed="true">الكل</button>
+        <button type="button" data-filter="in" aria-pressed="false">دخلت</button>
+        <button type="button" data-filter="out" aria-pressed="false">لم تدخل</button>
+      </div></div>
+      <div class="bulk not-m">
+        <label class="chk"><input type="checkbox" id="pickAll"><span>تحديد الكل</span></label>
+        <span class="sel-count" data-sel-count aria-live="polite">لا فواتير محددة</span>
+        <button type="button" class="btn primary owner-only" data-mark disabled>تحديد كـدخلت</button>
+      </div>
+      <div class="tools-row m-only">
+        <button type="button" class="btn ghost" data-select-mode>تحديد فواتير</button>
+        <a class="btn ghost" href="#report">تقرير لم تدخل</a>
+      </div>
+      <a class="btn ghost not-m" href="#report">تقرير الفواتير التي لم تدخل</a>
+    </div>
+    <p class="eg-note">الحالات الظاهرة أمثلة توضيحية موسومة «مثال»؛ حالة كل فاتورة الفعلية في Odoo غير معروفة بعد.<span class="m-only">اضغط مطوّلاً على فاتورة لبدء التحديد، ثم انقر لتحديد غيرها.</span></p>
+    <p class="status" role="status" aria-live="polite"></p>
+    <div class="table-wrap">
+      <table class="ledger inv cardify">
+        <caption class="sr-only">فواتير المورد (أ) وحالتها في Odoo</caption>
+        <thead><tr>
+          <th scope="col" class="c-pick"><span class="sr-only">تحديد</span></th>
+          <th scope="col">الرقم المرجعي</th>
+          <th scope="col" class="hide-tp">التاريخ</th>
+          <th scope="col" class="hide-tl">السند</th>
+          <th scope="col" class="hide-tl">المورد</th>
+          <th scope="col" class="hide-tl">البيان</th>
+          <th scope="col" class="amt">المبلغ<svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg></th>
+          <th scope="col">حالة Odoo</th>
+        </tr></thead>
+        <tbody>
+          <tr data-inv="P10590" data-amt="7,122.39" data-state="in">
+            <td class="c-pick"><label class="pick"><input type="checkbox" class="pick-in" aria-label="تحديد الفاتورة P10590"></label></td>
+            <th scope="row" class="c-refno"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل P10590"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="num">P10590</span></span></th>
+            <td class="c-date hide-tp"><span class="num">2025-10-23</span></td>
+            <td class="c-v hide-tl"><span class="num">305</span></td>
+            <td class="c-sup hide-tl">المورد (أ)</td>
+            <td class="c-desc hide-tl">فاتورة مشتريات - مستودع الأثاث</td>
+            <td class="amt c-amt"><span class="num">7,122.39</span></td>
+            <td class="c-st"><span class="stamp" data-state="in">دخلت</span><span class="eg">مثال</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="8"><dl class="dl-inline">
+            <div><dt>التاريخ</dt><dd><span class="num">2025-10-23</span></dd></div>
+            <div><dt>السند</dt><dd><span class="num">305</span></dd></div>
+            <div><dt>المورد</dt><dd>المورد (أ)</dd></div>
+            <div><dt>البيان</dt><dd>فاتورة مشتريات - مستودع الأثاث</dd></div>
+          </dl></td></tr>
+          <tr data-inv="P11405" data-amt="7,493.48" data-state="out">
+            <td class="c-pick"><label class="pick"><input type="checkbox" class="pick-in" aria-label="تحديد الفاتورة P11405"></label></td>
+            <th scope="row" class="c-refno"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل P11405"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="num">P11405</span></span></th>
+            <td class="c-date hide-tp"><span class="num">2025-11-27</span></td>
+            <td class="c-v hide-tl"><span class="num">376</span></td>
+            <td class="c-sup hide-tl">المورد (أ)</td>
+            <td class="c-desc hide-tl">فاتورة مشتريات - مستودع الأثاث</td>
+            <td class="amt c-amt"><span class="num">7,493.48</span></td>
+            <td class="c-st"><span class="stamp" data-state="out">لم تدخل</span><span class="eg">مثال</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="8"><dl class="dl-inline">
+            <div><dt>التاريخ</dt><dd><span class="num">2025-11-27</span></dd></div>
+            <div><dt>السند</dt><dd><span class="num">376</span></dd></div>
+            <div><dt>المورد</dt><dd>المورد (أ)</dd></div>
+            <div><dt>البيان</dt><dd>فاتورة مشتريات - مستودع الأثاث</dd></div>
+          </dl></td></tr>
+          <tr data-inv="P12291" data-amt="3,347.87" data-state="in">
+            <td class="c-pick"><label class="pick"><input type="checkbox" class="pick-in" aria-label="تحديد الفاتورة P12291"></label></td>
+            <th scope="row" class="c-refno"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل P12291"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="num">P12291</span></span></th>
+            <td class="c-date hide-tp"><span class="num">2025-12-24</span></td>
+            <td class="c-v hide-tl"><span class="num">412</span></td>
+            <td class="c-sup hide-tl">المورد (أ)</td>
+            <td class="c-desc hide-tl">فاتورة مشتريات - مستودع الأثاث</td>
+            <td class="amt c-amt"><span class="num">3,347.87</span></td>
+            <td class="c-st"><span class="stamp" data-state="in">دخلت</span><span class="eg">مثال</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="8"><dl class="dl-inline">
+            <div><dt>التاريخ</dt><dd><span class="num">2025-12-24</span></dd></div>
+            <div><dt>السند</dt><dd><span class="num">412</span></dd></div>
+            <div><dt>المورد</dt><dd>المورد (أ)</dd></div>
+            <div><dt>البيان</dt><dd>فاتورة مشتريات - مستودع الأثاث</dd></div>
+          </dl></td></tr>
+          <tr data-inv="P12786" data-amt="223.10" data-state="out">
+            <td class="c-pick"><label class="pick"><input type="checkbox" class="pick-in" aria-label="تحديد الفاتورة P12786"></label></td>
+            <th scope="row" class="c-refno"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل P12786"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="num">P12786</span></span></th>
+            <td class="c-date hide-tp"><span class="num">2026-01-04</span></td>
+            <td class="c-v hide-tl"><span class="num">415</span></td>
+            <td class="c-sup hide-tl">المورد (أ)</td>
+            <td class="c-desc hide-tl">فاتورة مشتريات - العز العمرة</td>
+            <td class="amt c-amt"><span class="num">223.10</span></td>
+            <td class="c-st"><span class="stamp" data-state="out">لم تدخل</span><span class="eg">مثال</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="8"><dl class="dl-inline">
+            <div><dt>التاريخ</dt><dd><span class="num">2026-01-04</span></dd></div>
+            <div><dt>السند</dt><dd><span class="num">415</span></dd></div>
+            <div><dt>المورد</dt><dd>المورد (أ)</dd></div>
+            <div><dt>البيان</dt><dd>فاتورة مشتريات - العز العمرة</dd></div>
+          </dl></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="more-line">في الدفتر <span class="num">1,468</span> فاتورة؛ يعرض النموذج أربعاً منها لمورد واحد.</p>
+  </main>
+  <aside class="side" aria-label="تقرير الفواتير التي لم تدخل">
+    <section id="report" class="report" aria-labelledby="rep-h">
+      <h2 id="rep-h">تقرير الفواتير التي لم تدخل</h2>
+      <p>العدد الفعلي <span class="num">[العدد]</span>. من الأمثلة المعروضة:</p>
+      <ol class="rep-list" data-report>
+        <li><span class="num">P11405</span> <span class="num">7,493.48</span></li>
+        <li><span class="num">P12786</span> <span class="num">223.10</span></li>
+      </ol>
+      <button type="button" class="btn ghost" data-export="Excel">تصدير التقرير Excel</button>
+    </section>
+    <section aria-labelledby="hw-h">
+      <h2 id="hw-h">التحديد الجماعي</h2>
+      <p class="owner-only">حدّد الفواتير ثم «تحديد كـدخلت» لتحديث حالتها دفعة واحدة.</p>
+      <p class="entry-only">صلاحية مدخل البيانات للاطلاع فقط؛ تحديث الحالة للمالك والإدارة.</p>
+    </section></aside>
+</div>
+<footer class="foot">
+  <label class="role-wrap"><span>عرض بصلاحية</span><select data-role-select aria-label="عرض بصلاحية"><option value="owner">المالك</option><option value="admin">الإدارة</option><option value="entry">مدخل البيانات</option></select></label>
+  <p>نموذج تصميم للعرض فقط؛ لا يحفظ بيانات.</p>
+</footer>
+<nav class="bottomnav" aria-label="التنقل الرئيسي"><a href="dashboard.html"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"/></svg><span>الأرصدة</span></a><a href="statement.html"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h3"/></svg><span>الكشف</span></a><a href="invoices.html" aria-current="page"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg><span>الفواتير</span></a><a href="add-entry.html"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>إضافة</span></a><a href="review.html"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4h11l-2.5 4L17 12H6"/></svg><span>المراجعة</span></a></nav>
+<a class="fab" href="add-entry.html" aria-label="إضافة حركة"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>
+<div class="selbar" role="region" aria-label="إجراءات التحديد">
+  <span class="sel-count" data-sel-count aria-live="polite">لا فواتير محددة</span>
+  <button type="button" class="btn primary owner-only" data-mark disabled>تحديد كـدخلت</button>
+  <button type="button" class="btn ghost" data-cancel-sel>إلغاء</button>
+</div>
+</body></html>

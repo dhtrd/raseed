@@ -1,0 +1,200 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رصيد — أرصدة الموردين</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<link rel="stylesheet" href="../shared/riyal.css">
+<link rel="stylesheet" href="style.css">
+<script src="../shared/core.js"></script>
+<script src="app.js" defer></script>
+</head>
+<body class="pg-dash" data-page="dash">
+<a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+<header class="masthead">
+  <a class="brand" href="dashboard.html"><svg class="mark" viewBox="0 0 120 120" aria-hidden="true"><rect x="30" y="36" width="76" height="16" rx="8" class="mk-ink"/><rect x="14" y="68" width="76" height="16" rx="8" class="mk-acc"/></svg><span class="wordmark">رصيد</span></a>
+  <nav class="tabs" aria-label="أقسام الدفتر"><a href="dashboard.html" aria-current="page">الأرصدة</a><a href="statement.html">كشف الحساب</a><a href="invoices.html">الفواتير</a><a href="add-entry.html">إضافة حركة</a><a href="review.html">المراجعة</a></nav>
+  <div class="tools">
+    <select class="role-sel" data-role-select aria-label="عرض بصلاحية"><option value="owner">المالك</option><option value="admin">الإدارة</option><option value="entry">مدخل البيانات</option></select>
+    <button type="button" class="icon-btn" data-theme-toggle aria-label="التبديل إلى الوضع الداكن"><svg class="ic ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="ic ic-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+  </div>
+</header>
+<div class="shell">
+  <aside class="index" id="index" aria-label="فهرس الموردين">
+    <div class="index-head">
+      <h2 class="index-title">الموردون</h2>
+      <button type="button" class="collapse-btn" data-collapse aria-controls="index-body" aria-expanded="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span class="lbl">طيّ</span></button>
+    </div>
+    <div class="index-body" id="index-body">
+      <ol class="ix-list"><li><button type="button" class="ix-item" data-pick="0" data-n="المورد (ب)" data-p="256,525.44" data-d="394,922.07" data-c="246,490.45" data-f="348,831.51" aria-pressed="true"><span>المورد (ب)</span><span class="num">348,831.51</span></button></li><li><button type="button" class="ix-item" data-pick="1" data-n="المورد (ج)" data-p="68,803.37" data-d="80,429.26" data-c="31,122.19" data-f="-21,417.06" aria-pressed="false"><span>المورد (ج)</span><span class="num neg">-21,417.06</span></button></li><li><button type="button" class="ix-item" data-pick="2" data-n="المورد (د)" data-p="4,445.12" data-d="3,811.23" data-c="15,095.06" data-f="-96,713.27" aria-pressed="false"><span>المورد (د)</span><span class="num neg">-96,713.27</span></button></li><li><button type="button" class="ix-item" data-pick="3" data-n="المورد (هـ)" data-p="21,793.28" data-d="33,119.15" data-c="78,012.02" data-f="-35,035.84" aria-pressed="false"><span>المورد (هـ)</span><span class="num neg">-35,035.84</span></button></li><li><button type="button" class="ix-item" data-pick="4" data-n="المورد (و)" data-p="0.00" data-d="0.00" data-c="4,003.56" data-f="-4,003.56" aria-pressed="false"><span>المورد (و)</span><span class="num neg">-4,003.56</span></button></li><li><button type="button" class="ix-item" data-pick="5" data-n="المورد (ز)" data-p="1,520.68" data-d="545.22" data-c="0.00" data-f="2,454.65" aria-pressed="false"><span>المورد (ز)</span><span class="num">2,454.65</span></button></li><li><button type="button" class="ix-item" data-pick="6" data-n="المورد (ح)" data-p="-8,942.25" data-d="2,613.42" data-c="7,045.32" data-f="-4,392.71" aria-pressed="false"><span>المورد (ح)</span><span class="num neg">-4,392.71</span></button></li><li><button type="button" class="ix-item" data-pick="7" data-n="المورد (ط)" data-p="2,023.42" data-d="1,149.41" data-c="3,557.09" data-f="-2,251.50" aria-pressed="false"><span>المورد (ط)</span><span class="num neg">-2,251.50</span></button></li></ol>
+      <p class="ix-note">و<span class="num">11</span> مورداً آخر داخلة في الإجمالي، لا تُعرض أرقامهم هنا.</p>
+      <button type="button" class="ix-item ix-total" data-pick="t" data-n="الإجمالي (19 مورداً)" data-p="961,468.34" data-d="142,953.81" data-c="421,504.05" data-f="43,700.21" aria-pressed="false"><span>الإجمالي (19 مورداً)</span><span class="num">43,700.21</span></button></div>
+  </aside>
+  <main id="main" class="main" tabindex="-1">
+
+    <div class="page-head">
+      <div class="ph-title">
+        <h1>أرصدة الموردين</h1>
+        <p class="ph-sub period-cap">الربع الثالث، من <span class="num">2026-07-01</span> إلى <span class="num">2026-09-30</span></p>
+      </div>
+      <form class="period" data-period aria-label="الفترة">
+        <label class="fld"><span class="fl">من</span><input type="text" class="num-in" name="from" value="2026-07-01" placeholder="" inputmode="numeric" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off"></label>
+        <label class="fld"><span class="fl">إلى</span><input type="text" class="num-in" name="to" value="2026-09-30" placeholder="" inputmode="numeric" pattern="\d{4}-\d{2}-\d{2}" autocomplete="off"></label>
+        <button type="submit" class="btn">عرض الفترة</button>
+      </form>
+    </div>
+    <p class="status" role="status" aria-live="polite"></p>
+
+    <section class="hero m-only" aria-labelledby="hero-h">
+      <h2 id="hero-h" class="hero-label">صافي أرصدة الموردين الـ<span class="num">19</span></h2>
+      <p class="hero-num"><span class="money"><svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg><span>43,700.21</span></span></p>
+      <p class="hero-note">الرصيد = مدين − دائن. الرقم السالب بالأحمر مستحق للمورد علينا.</p>
+      
+      <dl class="stats">
+        <div><dt>الموردون</dt><dd>19</dd></div>
+        <div><dt>الحركات</dt><dd>2,495</dd></div>
+        <div><dt>فواتير</dt><dd>1,468</dd></div>
+        <div><dt>قيود</dt><dd>1,008</dd></div>
+        <div><dt>بلا نوع</dt><dd>19</dd></div>
+      </dl>
+    </section>
+    <nav class="m-alerts strip m-only" aria-label="تنبيهات المراجعة">
+      <a href="review.html#dates"><span class="num">33</span>تاريخاً معطوباً</a>
+      <a href="review.html#dups"><span class="num">9</span>أرقام مكررة</a>
+      <a href="review.html#untyped"><span class="num">19</span>بلا نوع</a>
+    </nav>
+
+    <section class="folio tl-only" aria-live="polite" aria-labelledby="folio-name">
+      <h2 id="folio-name" data-fo="n">المورد (ب)</h2>
+      <p class="folio-sub">حساب المورد من <span class="num">2026-07-01</span> إلى <span class="num">2026-09-30</span></p>
+      <div class="taccount">
+        <div class="t-side"><h3>مدين <svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg></h3><p class="num" data-fo="d">394,922.07</p></div>
+        <div class="t-side"><h3>دائن <svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg></h3><p class="num" data-fo="c">246,490.45</p></div>
+      </div>
+      <dl class="recon">
+        <div><dt>الرصيد السابق</dt><dd><span class="num" data-fo="p">256,525.44</span></dd></div>
+        <div class="res"><dt>الرصيد النهائي</dt><dd><span class="num dbl" data-fo="f">348,831.51</span></dd></div>
+      </dl>
+      <p class="folio-state" data-fo="s">رصيد مدين</p>
+    </section>
+
+    <div class="table-wrap dash-wrap">
+      <table class="ledger dash cardify">
+        <caption class="sr-only">أرصدة الموردين من 2026-07-01 إلى 2026-09-30</caption>
+        <thead><tr>
+          <th scope="col">المورد</th>
+          <th scope="col" class="amt hide-tp">الرصيد السابق<svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg></th>
+          <th scope="col" class="amt">مدين<svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg></th>
+          <th scope="col" class="amt">دائن<svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg></th>
+          <th scope="col" class="amt">الرصيد النهائي<svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg></th>
+        </tr></thead>
+        <tbody>
+          <tr id="sup-0">
+            <th scope="row" class="sup"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل المورد (ب)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="nm">المورد (ب)</span></span></th>
+            <td class="amt c-prev hide-tp" data-l="السابق"><span class="num">256,525.44</span></td>
+            <td class="amt" data-l="مدين"><span class="num">394,922.07</span></td>
+            <td class="amt" data-l="دائن"><span class="num">246,490.45</span></td>
+            <td class="amt fin"><span class="num">348,831.51</span><span class="state">رصيد مدين</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="5"><dl class="dl-inline"><div><dt>الرصيد السابق</dt><dd><span class="num">256,525.44</span></dd></div><div><dt>الرصيد النهائي</dt><dd>رصيد مدين</dd></div></dl></td></tr>
+          <tr id="sup-1">
+            <th scope="row" class="sup"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل المورد (ج)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="nm">المورد (ج)</span></span></th>
+            <td class="amt c-prev hide-tp" data-l="السابق"><span class="num">68,803.37</span></td>
+            <td class="amt" data-l="مدين"><span class="num">80,429.26</span></td>
+            <td class="amt" data-l="دائن"><span class="num">31,122.19</span></td>
+            <td class="amt fin"><span class="num neg">-21,417.06</span><span class="state neg">مستحق للمورد</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="5"><dl class="dl-inline"><div><dt>الرصيد السابق</dt><dd><span class="num">68,803.37</span></dd></div><div><dt>الرصيد النهائي</dt><dd>مستحق للمورد</dd></div></dl></td></tr>
+          <tr id="sup-2">
+            <th scope="row" class="sup"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل المورد (د)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="nm">المورد (د)</span></span></th>
+            <td class="amt c-prev hide-tp" data-l="السابق"><span class="num">4,445.12</span></td>
+            <td class="amt" data-l="مدين"><span class="num">3,811.23</span></td>
+            <td class="amt" data-l="دائن"><span class="num">15,095.06</span></td>
+            <td class="amt fin"><span class="num neg">-96,713.27</span><span class="state neg">مستحق للمورد</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="5"><dl class="dl-inline"><div><dt>الرصيد السابق</dt><dd><span class="num">4,445.12</span></dd></div><div><dt>الرصيد النهائي</dt><dd>مستحق للمورد</dd></div></dl></td></tr>
+          <tr id="sup-3">
+            <th scope="row" class="sup"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل المورد (هـ)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="nm">المورد (هـ)</span></span></th>
+            <td class="amt c-prev hide-tp" data-l="السابق"><span class="num">21,793.28</span></td>
+            <td class="amt" data-l="مدين"><span class="num">33,119.15</span></td>
+            <td class="amt" data-l="دائن"><span class="num">78,012.02</span></td>
+            <td class="amt fin"><span class="num neg">-35,035.84</span><span class="state neg">مستحق للمورد</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="5"><dl class="dl-inline"><div><dt>الرصيد السابق</dt><dd><span class="num">21,793.28</span></dd></div><div><dt>الرصيد النهائي</dt><dd>مستحق للمورد</dd></div></dl></td></tr>
+          <tr id="sup-4">
+            <th scope="row" class="sup"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل المورد (و)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="nm">المورد (و)</span></span></th>
+            <td class="amt c-prev hide-tp" data-l="السابق"><span class="num">0.00</span></td>
+            <td class="amt" data-l="مدين"><span class="num">0.00</span></td>
+            <td class="amt" data-l="دائن"><span class="num">4,003.56</span></td>
+            <td class="amt fin"><span class="num neg">-4,003.56</span><span class="state neg">مستحق للمورد</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="5"><dl class="dl-inline"><div><dt>الرصيد السابق</dt><dd><span class="num">0.00</span></dd></div><div><dt>الرصيد النهائي</dt><dd>مستحق للمورد</dd></div></dl></td></tr>
+          <tr id="sup-5">
+            <th scope="row" class="sup"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل المورد (ز)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="nm">المورد (ز)</span></span></th>
+            <td class="amt c-prev hide-tp" data-l="السابق"><span class="num">1,520.68</span></td>
+            <td class="amt" data-l="مدين"><span class="num">545.22</span></td>
+            <td class="amt" data-l="دائن"><span class="num">0.00</span></td>
+            <td class="amt fin"><span class="num">2,454.65</span><span class="state">رصيد مدين</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="5"><dl class="dl-inline"><div><dt>الرصيد السابق</dt><dd><span class="num">1,520.68</span></dd></div><div><dt>الرصيد النهائي</dt><dd>رصيد مدين</dd></div></dl></td></tr>
+          <tr id="sup-6">
+            <th scope="row" class="sup"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل المورد (ح)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="nm">المورد (ح)</span></span></th>
+            <td class="amt c-prev hide-tp" data-l="السابق"><span class="num neg">-8,942.25</span></td>
+            <td class="amt" data-l="مدين"><span class="num">2,613.42</span></td>
+            <td class="amt" data-l="دائن"><span class="num">7,045.32</span></td>
+            <td class="amt fin"><span class="num neg">-4,392.71</span><span class="state neg">مستحق للمورد</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="5"><dl class="dl-inline"><div><dt>الرصيد السابق</dt><dd><span class="num neg">-8,942.25</span></dd></div><div><dt>الرصيد النهائي</dt><dd>مستحق للمورد</dd></div></dl></td></tr>
+          <tr id="sup-7">
+            <th scope="row" class="sup"><span class="cell-in"><button type="button" class="xp" data-expand aria-expanded="false" aria-label="تفاصيل المورد (ط)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><span class="nm">المورد (ط)</span></span></th>
+            <td class="amt c-prev hide-tp" data-l="السابق"><span class="num">2,023.42</span></td>
+            <td class="amt" data-l="مدين"><span class="num">1,149.41</span></td>
+            <td class="amt" data-l="دائن"><span class="num">3,557.09</span></td>
+            <td class="amt fin"><span class="num neg">-2,251.50</span><span class="state neg">مستحق للمورد</span></td>
+          </tr>
+          <tr class="row-detail" hidden><td colspan="5"><dl class="dl-inline"><div><dt>الرصيد السابق</dt><dd><span class="num">2,023.42</span></dd></div><div><dt>الرصيد النهائي</dt><dd>مستحق للمورد</dd></div></dl></td></tr>
+          <tr class="others more"><td colspan="5">و<span class="num">11</span> مورداً آخر داخلة في الإجمالي، أرقامها غير معروضة في هذه اللوحة.</td></tr>
+        </tbody>
+        <tfoot><tr class="total">
+          <th scope="row">الإجمالي (19 مورداً)</th>
+          <td class="amt c-prev hide-tp" data-l="السابق"><span class="num">961,468.34</span></td>
+          <td class="amt" data-l="مدين"><span class="num">142,953.81</span></td>
+          <td class="amt" data-l="دائن"><span class="num">421,504.05</span></td>
+          <td class="amt fin"><span class="num">43,700.21</span></td>
+        </tr></tfoot>
+      </table>
+    </div>
+    <p class="legend">الرصيد النهائي = السابق + مدين − دائن. <b>الرقم السالب</b> مستحق للمورد علينا، والموجب رصيد مدين لنا لديه.</p>
+  </main>
+  <aside class="side" aria-label="تنبيهات المراجعة">
+    <section aria-labelledby="al-h">
+      <h2 id="al-h">تنبيهات المراجعة</h2>
+      <p>سجلات تحتاج قراراً قبل اعتماد أرصدة الفترة.</p>
+      <ul class="alert-list">
+        <li><a href="review.html#dates"><span class="al-n num">33</span><span class="al-t">قيداً بتواريخ معطوبة</span></a></li>
+        <li><a href="review.html#dups"><span class="al-n num">9</span><span class="al-t">أرقام مرجعية مكررة</span></a></li>
+        <li><a href="review.html#untyped"><span class="al-n num">19</span><span class="al-t">سجلاً بلا نوع</span></a></li>
+      </ul>
+    </section>
+    <section aria-labelledby="st-h">
+      <h2 id="st-h">محتوى الدفتر</h2>
+      <dl class="stats">
+        <div><dt>الموردون</dt><dd>19</dd></div>
+        <div><dt>الحركات</dt><dd>2,495</dd></div>
+        <div><dt>فواتير</dt><dd>1,468</dd></div>
+        <div><dt>قيود</dt><dd>1,008</dd></div>
+        <div><dt>بلا نوع</dt><dd>19</dd></div>
+      </dl>
+    </section>
+    <section class="howto" aria-labelledby="how-h">
+      <h2 id="how-h">قراءة الأرصدة</h2>
+      <p>الرصيد = مدين − دائن. السالب مستحق للمورد علينا؛ والموجب رصيد مدين لنا لديه.</p>
+    </section></aside>
+</div>
+<footer class="foot">
+  <label class="role-wrap"><span>عرض بصلاحية</span><select data-role-select aria-label="عرض بصلاحية"><option value="owner">المالك</option><option value="admin">الإدارة</option><option value="entry">مدخل البيانات</option></select></label>
+  <p>نموذج تصميم للعرض فقط؛ لا يحفظ بيانات.</p>
+</footer>
+<nav class="bottomnav" aria-label="التنقل الرئيسي"><a href="dashboard.html" aria-current="page"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"/></svg><span>الأرصدة</span></a><a href="statement.html"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h3"/></svg><span>الكشف</span></a><a href="invoices.html"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg><span>الفواتير</span></a><a href="add-entry.html"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>إضافة</span></a><a href="review.html"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4h11l-2.5 4L17 12H6"/></svg><span>المراجعة</span></a></nav>
+<a class="fab" href="add-entry.html" aria-label="إضافة حركة"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>
+
+</body></html>

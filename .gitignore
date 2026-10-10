@@ -1,0 +1,28 @@
+# بيانات حساسة ومفاتيح — لا تُرفع أبداً (المستودع عام)
+data/
+private/
+*.xlsm
+*.xlsx
+*.xls
+*.xlsb
+*.csv
+*service-account*.json
+*firebase-adminsdk*.json
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+
+# مخرجات قد تحمل بيانات حقيقية
+backups/
+emulator-data/
+migration-reports/
+
+node_modules/
+dist/
+.firebase/
+*-debug.log
+.DS_Store

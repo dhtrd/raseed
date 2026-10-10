@@ -1,0 +1,4 @@
+/* رمز الريال: <svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg> */
+.sar { display: inline-block; width: .78em; height: .86em; vertical-align: -0.08em; fill: currentColor; flex: none; }
+.num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.money { display: inline-flex; align-items: baseline; gap: .22em; direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; white-space: nowrap; }
