@@ -90,6 +90,11 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
 .msg.warn b{color:var(--neg)}
 .disp{font-size:14.5px;color:var(--ink-2);font-family:var(--f-num)}
 .disp:empty{display:none}
+.tbox{align-items:flex-start}
+.tbox textarea{all:unset;flex:1;min-width:0;min-height:44px;padding:9px 0;font-family:var(--f-text);font-size:17px;line-height:1.6;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}
+.sugs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;margin-top:4px}
+.sug{font:inherit;font-size:14px;min-height:36px;padding:2px 12px;border:1px solid var(--rule);border-radius:18px;background:var(--surface);color:var(--ink);cursor:pointer}
+.sug:hover{background:var(--wash)}
 .refno{font-family:var(--f-num);font-weight:700;font-size:19px;direction:ltr;text-align:right;min-height:46px;display:flex;align-items:center;justify-content:flex-end;border-bottom:1.5px dotted var(--ink-2);padding-inline:10px}
 .refno.dup{color:var(--neg);border-bottom:2px solid var(--neg)}
 
@@ -200,11 +205,15 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
 .cal-btn svg{width:20px;height:20px}
 .cal{background:var(--surface);border:1px solid var(--rule);border-top:3px double var(--ink);box-shadow:var(--shadow);border-radius:0 0 6px 6px;padding:10px;margin-top:6px;width:min(100%,340px);z-index:3}
 .cal[hidden]{display:none}
+.cal.pop{position:absolute;top:76px;inset-inline-start:0;margin:0}
+.cal{min-width:min(100%,330px)}
+.cal-h .ttl{white-space:nowrap}
+.fld>.kseg{align-self:flex-start}
 .cal-h{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
 .cal-h .ttl{font:inherit;font-weight:700;font-size:16px;background:none;border:0;color:var(--ink);cursor:pointer;min-height:40px;padding:0 10px;border-radius:6px}
 .cal-h .ttl:hover{background:var(--wash)}
 .cal-h .ttl .n{font-weight:600}
-.arw{font:inherit;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--rule);background:var(--surface);color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.arw{font:inherit;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--rule);background:var(--surface);color:var(--ink);cursor:pointer;display:grid;place-items:center}
 .arw svg{width:16px;height:16px}
 .dgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
 .dgrid .wd{font-size:12.5px;font-weight:700;color:var(--ink-2);text-align:center;padding:2px 0}
@@ -311,6 +320,8 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
   <symbol id="i-cal" viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="13.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 8h15M6.5 2v4M13.5 2v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
   <symbol id="i-next" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-prev" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-prev2" viewBox="0 0 16 16"><path d="M3 3l5 5-5 5M8 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-next2" viewBox="0 0 16 16"><path d="M13 3L8 8l5 5M8 3L3 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-tick" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 
@@ -320,7 +331,7 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
       <svg viewBox="0 0 120 120" aria-hidden="true"><rect x="30" y="36" width="76" height="16" rx="8" fill="var(--mark-ink)"/><rect x="14" y="68" width="76" height="16" rx="8" fill="var(--mark-acc)"/></svg>
       <div>
         <h1>رصيد: نماذج الحقول والمكونات</h1>
-        <div class="meta">ثلاثة نماذج تفاعلية للاختيار قبل المرحلة 1 · البيانات وهمية · اليوم الافتراضي في النماذج: السبت 10/10/2026</div>
+        <div class="meta">الإصدار 2: اختياراتك محددة بـ ✓، ومضاف إليها ملاحظاتك (تقويم داخل حقل التاريخ، أسهم السنة، حقل التفاصيل، طول المرجع) · البيانات وهمية · اليوم في النماذج: السبت 10/10/2026</div>
       </div>
     </div>
     <button class="btn ghost" id="themeBtn" type="button">الوضع الداكن</button>
@@ -341,7 +352,7 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
       </div>
       <div>
         <div class="seg" role="radiogroup" aria-label="خيار الحالات" data-target="p1">
-          <button role="radio" aria-checked="true" data-v="a">أ. هادئ</button>
+          <button role="radio" aria-checked="true" data-v="a">أ. هادئ ✓ اخترته</button>
           <button role="radio" aria-checked="false" data-v="b">ب. ختم</button>
           <button role="radio" aria-checked="false" data-v="c">ج. هامش الدفتر</button>
         </div>
@@ -362,7 +373,8 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
       </div>
       <div class="fld" id="f-date">
         <label class="fl" for="in-date">التاريخ <span class="req">مطلوب</span></label>
-        <div class="box"><input id="in-date" class="num" inputmode="decimal" aria-describedby="m-date d-date" placeholder=""><svg class="ico ico-ok"><use href="#i-ok"/></svg><svg class="ico ico-err"><use href="#i-err"/></svg></div>
+        <div class="box"><input id="in-date" class="num" inputmode="decimal" aria-describedby="m-date d-date" placeholder=""><svg class="ico ico-ok"><use href="#i-ok"/></svg><svg class="ico ico-err"><use href="#i-err"/></svg><button type="button" class="cal-btn" id="calOpen2" aria-label="اختيار التاريخ من التقويم" aria-haspopup="dialog" aria-expanded="false"><svg><use href="#i-cal"/></svg></button></div>
+        <div class="cal pop sheetish" id="cal2" role="dialog" aria-label="اختيار التاريخ" hidden></div>
         <div class="pm" aria-label="تعديل اليوم"><button type="button" data-pm="-1" aria-label="قبل يوم">−</button><button type="button" data-pm="1" aria-label="بعد يوم">+</button></div>
         <span class="disp" id="d-date"></span>
         <span class="msg" id="m-date" role="alert"></span>
@@ -370,7 +382,12 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
       <div class="fld" id="f-ref">
         <label class="fl" for="in-ref">المرجع الرئيسي <span class="req">مطلوب</span></label>
         <div class="box"><input id="in-ref" class="num" inputmode="text" aria-describedby="m-ref" value=""><svg class="ico ico-ok"><use href="#i-ok"/></svg><svg class="ico ico-err"><use href="#i-err"/></svg></div>
+        <span class="disp" id="h-ref"></span>
         <span class="msg" id="m-ref" role="alert"></span>
+      </div>
+      <div class="fld" id="f-rule">
+        <span class="fl" id="rule-l">المرجع الأقصر من المطلوب (للتجربة)</span>
+        <div class="kseg" role="radiogroup" aria-labelledby="rule-l" id="ruleSeg"><button type="button" role="radio" aria-checked="true" data-v="pad">يُكمَل بالأصفار</button><button type="button" role="radio" aria-checked="false" data-v="reject">يُرفض برسالة</button></div>
       </div>
       <div class="fld">
         <span class="fl" id="refno-l">الرقم المرجعي (يتولّد)</span>
@@ -380,6 +397,13 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
         <label class="fl" for="in-v">رقم السند <span class="muted" style="font-weight:400">اختياري</span></label>
         <div class="box"><input id="in-v" class="num" inputmode="numeric" aria-describedby="m-v"><svg class="ico ico-ok"><use href="#i-ok"/></svg><svg class="ico ico-err"><use href="#i-err"/></svg></div>
         <span class="msg" id="m-v" role="alert"></span>
+      </div>
+      <div class="fld wide" id="f-desc">
+        <label class="fl" for="in-desc">التفاصيل <span class="muted" style="font-weight:400">اختياري</span></label>
+        <div class="box tbox"><textarea id="in-desc" rows="1" maxlength="200" aria-describedby="c-desc m-desc"></textarea></div>
+        <div class="sugs" aria-label="اقتراحات لهذا المورد"><span class="muted">الأكثر استخداماً لهذا المورد:</span><button type="button" class="sug">فاتورة مشتريات - مستودع الأثاث</button><button type="button" class="sug">دفعة نقدية</button><button type="button" class="sug">مرتجع بضاعة</button></div>
+        <span class="cc" id="c-desc">0 / 200</span>
+        <span class="msg" id="m-desc" role="alert"></span>
       </div>
       <div class="fld wide">
         <span class="fl">المبلغ <span class="req">مطلوب</span><span class="tagret" id="tagret" hidden></span></span>
@@ -395,14 +419,16 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
     </form>
     <ul class="legend">
       <li><b>التاريخ:</b> جرّب <code>15</code> و<code>1508</code> و<code>15.8</code> و<code>150826</code> و<code>15/8/26</code> و<code>+2</code> (من آخر حركة محفوظة 14/08/2026)، أو اتركه فارغاً واضغط Enter. جرّب <code>3102</code> و<code>158</code> للخطأ، و<code>1506</code> للفترة المقفلة (حتى 30/06/2026).</li>
-      <li><b>المرجع:</b> جرّب <code> out/00013 </code> (يُقص ويُكبَّر)، و<code>0395</code> (مكرر).</li>
+      <li><b>التاريخ بالتقويم:</b> زر التقويم داخل الحقل. أسهم مفردة للشهر ومزدوجة للسنة، والعنوان يفتح الأشهر ثم السنوات. بلوحة المفاتيح: Alt+↓ يفتحه، وPageUp/PageDown للأشهر، ومع Shift للسنوات.</li>
+      <li><b>المرجع:</b> يقترح التالي تلقائياً (فاتورة <code>12292</code>، قيد <code>0396</code>). الفاتورة 5 أرقام والقيد 4: جرّب <code>791</code> مع الخيارين «يُكمَل» و«يُرفض». جرّب <code> out/00013 </code> (يُقص ويُكبَّر)، و<code>10590</code> للفاتورة أو <code>0395</code> للقيد (مكرر).</li>
+      <li><b>التفاصيل:</b> اختر اقتراحاً أو اكتب. Shift+Enter سطر جديد، وEnter للحقل التالي.</li>
       <li><b>المبلغ:</b> جرّب <code>١٢٥٠٠٫٥</code> و<code>1250,5</code> والصق <code>ر.س 1,234.50</code>. جرّب <code>0</code> و<code>-50</code> للخطأ. الكتابة في خانة تفرّغ الأخرى، والفاتورة في المدين تُظهر وسم «مرتجع».</li>
       <li><b>Enter</b> ينقل للحقل التالي.</li>
     </ul>
   </section>
 
   <!-- ============ 2. Excel ============ -->
-  <section class="sheet panel" id="p2" role="tabpanel" aria-labelledby="tb2" hidden data-x="a">
+  <section class="sheet panel" id="p2" role="tabpanel" aria-labelledby="tb2" hidden data-x="c">
     <div class="intro">
       <div>
         <h2>رمز الريال في ملف Excel المصدَّر</h2>
@@ -410,9 +436,9 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
       </div>
       <div>
         <div class="seg" role="radiogroup" aria-label="خيار Excel" data-target="p2">
-          <button role="radio" aria-checked="true" data-v="a">أ. الرمز في كل خلية</button>
+          <button role="radio" aria-checked="false" data-v="a">أ. الرمز في كل خلية</button>
           <button role="radio" aria-checked="false" data-v="b">ب. «ريال» في الرأس</button>
-          <button role="radio" aria-checked="false" data-v="c">ج. صورة الرمز في الرأس</button>
+          <button role="radio" aria-checked="true" data-v="c">ج. صورة الرمز في الرأس ✓ اخترته</button>
         </div>
         <p class="optnote" id="optnote2"></p>
       </div>
@@ -445,7 +471,7 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
       <div class="cblock">
         <h3>منتقي التقويم
           <span class="seg" role="radiogroup" aria-label="خيار التقويم" data-cal>
-            <button role="radio" aria-checked="true" data-v="a">أ. منبثق متدرّج</button>
+            <button role="radio" aria-checked="true" data-v="a">أ. منبثق متدرّج ✓ اخترته</button>
             <button role="radio" aria-checked="false" data-v="b">ب. دفتر شهري</button>
           </span>
         </h3>
@@ -463,8 +489,8 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
       <div class="cblock">
         <h3>قائمة المورد
           <span class="seg" role="radiogroup" aria-label="خيار قائمة المورد" data-cb>
-            <button role="radio" aria-checked="true" data-v="a">أ. بحث بسيط</button>
-            <button role="radio" aria-checked="false" data-v="b">ب. الأخيرة أولاً</button>
+            <button role="radio" aria-checked="false" data-v="a">أ. بحث بسيط</button>
+            <button role="radio" aria-checked="true" data-v="b">ب. الأخيرة أولاً ✓ اخترته</button>
           </span>
         </h3>
         <p class="optnote" id="cbNote"></p>
@@ -482,7 +508,7 @@ code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
       <div class="cblock" style="grid-column:1/-1">
         <h3>نافذة سبب إرجاع «دخلت» إلى «لم تدخل»
           <span class="seg" role="radiogroup" aria-label="خيار النافذة" data-dlg>
-            <button role="radio" aria-checked="true" data-v="a">أ. نافذة وسطى</button>
+            <button role="radio" aria-checked="true" data-v="a">أ. نافذة وسطى ✓ اخترته</button>
             <button role="radio" aria-checked="false" data-v="b">ب. لوحة جانبية</button>
           </span>
         </h3>
@@ -644,12 +670,13 @@ function sample(kind, st, val, i){
 /* ---------- 1. حقول التجربة ---------- */
 var form = $("#tryForm");
 var docType = "inv";
-var DUPS = { "0395": "المورد (د)، الصف 148، 1,700.00", "P0791": "" };
+var DUPS = { "0395": "المورد (د)، الصف 148، 1,700.00", "10590": "المورد (أ)، الصف 92، 4,310.00" };
 
 // Enter للحقل التالي
-var order = ["in-date", "in-ref", "in-v", "in-d", "in-c"];
+var order = ["in-date", "in-ref", "in-v", "in-desc", "in-d", "in-c"];
 form.addEventListener("keydown", function(e){
-  if (e.key !== "Enter" || e.target.tagName !== "INPUT") return;
+  if (e.key !== "Enter" || (e.target.tagName !== "INPUT" && e.target.id !== "in-desc")) return;
+  if (e.target.id === "in-desc" && e.shiftKey) return; // Shift+Enter سطر جديد
   e.preventDefault();
   e.target.dispatchEvent(new Event("blur"));
   var i = order.indexOf(e.target.id);
@@ -691,11 +718,28 @@ inRef.addEventListener("beforeinput", function(e){
   if (!/^[A-Za-z0-9ء-ي٠-٩۰-۹\/\- ]+$/.test(e.data)){ e.preventDefault(); setState(fRef, "error", "المرجع حروف وأرقام و / و - فقط."); }
 });
 inRef.addEventListener("input", function(){ if (fRef.classList.contains("is-error")) setState(fRef, null); updateRefNo(); });
+var refRule = "pad", NEXT = { inv: "12292", misc: "0396" }, LAST = { inv: "12291", misc: "0395" };
+segBind($("#ruleSeg"), function(v){ refRule = v; });
+function suggestRef(){
+  if (inRef.value && inRef.dataset.auto !== "1") return;
+  inRef.value = NEXT[docType]; inRef.dataset.auto = "1"; setState(fRef, null);
+  $("#h-ref").textContent = "مقترح: التالي لآخر " + (docType === "inv" ? "فاتورة" : "قيد") + " لهذا المورد (" + LAST[docType] + ")";
+  updateRefNo();
+}
+inRef.addEventListener("input", function(){ inRef.dataset.auto = "0"; $("#h-ref").textContent = ""; });
 inRef.addEventListener("blur", function(){
   var v = normDigits(inRef.value).trim().replace(/[a-z]+/g, function(x){ return x.toUpperCase(); });
   inRef.value = v; updateRefNo();
   if (!v) return setState(fRef, "error", "أدخل المرجع الرئيسي.");
   if (v.length > 40) return setState(fRef, "error", "المرجع حتى 40 حرفاً.");
+  if (/^\d+$/.test(v)){
+    var need = docType === "inv" ? 5 : 4, kind = docType === "inv" ? "الفاتورة" : "القيد";
+    if (v.length > need) return setState(fRef, "error", "مرجع " + kind + " " + need + " أرقام فقط، وكتبت " + v.length + ".");
+    if (v.length < need){
+      if (refRule === "reject") return setState(fRef, "error", "مرجع " + kind + " " + need + " أرقام بالضبط (مثل " + "0".repeat(need - 1) + "7).");
+      v = "0".repeat(need - v.length) + v; inRef.value = v; updateRefNo();
+    }
+  }
   if (DUPS[v]){ setState(fRef, "error", "المرجع مكرر: مسجّل لـ " + DUPS[v] + ". عدّله أو أكّد أنها حركة مختلفة مع ذكر السبب."); $("#refno").classList.add("dup"); return; }
   $("#refno").classList.remove("dup"); setState(fRef, "valid");
 });
@@ -784,9 +828,16 @@ function syncDC(){
 }
 $$("#f-type [role=radio]").forEach(function(b){ b.addEventListener("click", function(){
   $$("#f-type [role=radio]").forEach(function(x){ x.setAttribute("aria-checked", String(x === b)); });
-  docType = b.dataset.t; syncDC(); updateRefNo();
+  docType = b.dataset.t; syncDC(); suggestRef(); updateRefNo();
 }); });
-syncDC(); updateRefNo();
+syncDC(); suggestRef(); updateRefNo();
+
+// التفاصيل
+var inDesc = $("#in-desc");
+function growDesc(){ inDesc.style.height = "auto"; inDesc.style.height = inDesc.scrollHeight + "px"; $("#c-desc").textContent = inDesc.value.length + " / 200"; }
+inDesc.addEventListener("input", growDesc);
+inDesc.addEventListener("paste", function(e){ e.preventDefault(); var x = (e.clipboardData || window.clipboardData).getData("text").replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, " "); inDesc.setRangeText(x.slice(0, 200 - inDesc.value.length + (inDesc.selectionEnd - inDesc.selectionStart)), inDesc.selectionStart, inDesc.selectionEnd, "end"); growDesc(); });
+$$(".sug").forEach(function(b){ b.addEventListener("click", function(){ inDesc.value = b.textContent; growDesc(); inDesc.focus(); }); });
 
 // مربع اختيار مخصص
 function bindChk(b){ b.addEventListener("click", function(){ if (b.getAttribute("aria-disabled") === "true") return; b.setAttribute("aria-checked", String(b.getAttribute("aria-checked") !== "true")); });
@@ -816,8 +867,8 @@ var DLG_NOTES = {
   a: "<b>نافذة وسطى:</b> تحجب الصفحة وتركّز على القرار. الأسباب بطاقات اختيار.",
   b: "<b>لوحة جانبية:</b> تنزلق من الجانب وتبقى الفواتير المحددة ظاهرة خلفها. على الجوال تصير لوحة من الأسفل."
 };
-$("#optnote1").innerHTML = NOTES1.a; $("#optnote2").innerHTML = NOTES2.a;
-$("#calNote").innerHTML = CAL_NOTES.a; $("#cbNote").innerHTML = CB_NOTES.a; $("#dlgNote").innerHTML = DLG_NOTES.a;
+$("#optnote1").innerHTML = NOTES1.a; $("#optnote2").innerHTML = NOTES2.c;
+$("#calNote").innerHTML = CAL_NOTES.a; $("#cbNote").innerHTML = CB_NOTES.b; $("#dlgNote").innerHTML = DLG_NOTES.a;
 
 function segBind(seg, fn){
   var bs = $$("[role=radio]", seg);
@@ -911,83 +962,94 @@ function renderXL(){
 }
 renderXL();
 
-/* ---------- 3أ. التقويم ---------- */
-var cal = $("#cal"), calOpen = $("#calOpen"), inCal = $("#in-cal"), calStyle = "a";
-var calSel = new Date(2026, 7, 14), view = new Date(2026, 7, 1), mode = "days", focusDay = null;
+/* ---------- 3أ. التقويم (مكوّن قابل لإعادة الاستخدام) ---------- */
+var calStyle = "a", cals = [];
 var WD = ["س", "ح", "ن", "ث", "ر", "خ", "ج"]; // يبدأ السبت
-segBind($("[data-cal]"), function(v){ calStyle = v; $("#calNote").innerHTML = CAL_NOTES[v]; mode = "days"; if (!cal.hidden) renderCal(); });
-function renderCal(){
-  var y = view.getFullYear(), m = view.getMonth(), h = "";
-  var arrows = '<button type="button" class="arw" data-nav="-1" aria-label="الشهر السابق"><svg><use href="#i-prev"/></svg></button>';
-  var arrowsN = '<button type="button" class="arw" data-nav="1" aria-label="الشهر التالي"><svg><use href="#i-next"/></svg></button>';
-  if (calStyle === "a" && mode === "months"){
-    h = '<div class="cal-h">' + '<button type="button" class="arw" data-y="-1" aria-label="السنة السابقة"><svg><use href="#i-prev"/></svg></button>' +
-      '<button type="button" class="ttl" data-mode="years"><span class="n">' + y + '</span></button>' +
-      '<button type="button" class="arw" data-y="1" aria-label="السنة التالية"><svg><use href="#i-next"/></svg></button></div><div class="mgrid">' +
-      MONTHS.map(function(n, i){ return '<button type="button" data-m="' + i + '"' + (i === m ? ' class="cur"' : "") + ">" + n + "</button>"; }).join("") + "</div>";
-  } else if (calStyle === "a" && mode === "years"){
-    var y0 = y - 4; h = '<div class="cal-h"><span class="ttl" style="cursor:default">اختر السنة</span></div><div class="mgrid">';
-    for (var k = 0; k < 9; k++) h += '<button type="button" data-yy="' + (y0 + k) + '"' + (y0 + k === y ? ' class="cur"' : "") + '><span class="n">' + (y0 + k) + "</span></button>";
-    h += "</div>";
-  } else {
-    var grid = '<div class="dgrid" role="grid" aria-label="' + MONTHS[m] + " " + y + '">' + WD.map(function(w, i){ return '<span class="wd' + (i === 6 ? " fri" : "") + '" role="columnheader">' + w + "</span>"; }).join("");
-    var first = new Date(y, m, 1), off = (first.getDay() + 1) % 7; // السبت = 0
-    var start = addDays(first, -off);
-    for (var i = 0; i < 42; i++){
-      var d = addDays(start, i), cls = "day";
-      if (d.getMonth() !== m) cls += " out";
-      if (sameDay(d, TODAY)) cls += " today";
-      if (sameDay(d, calSel)) cls += " sel";
-      var locked = d <= LOCK; if (locked) cls += " lock";
-      grid += '<button type="button" role="gridcell" class="' + cls + '" data-d="' + d.getTime() + '" tabindex="' + (sameDay(d, focusDay || calSel) && d.getMonth() === m ? 0 : -1) + '"' + (locked ? ' aria-disabled="true"' : "") + ' aria-label="' + DAYS[d.getDay()] + " " + fmtDate(d) + (locked ? "، فترة مقفلة" : "") + '">' + d.getDate() + "</button>";
+segBind($("[data-cal]"), function(v){ calStyle = v; $("#calNote").innerHTML = CAL_NOTES[v]; cals.forEach(function(c){ c.refresh(); }); });
+function makeCal(o){
+  var cal = o.panel, btn = o.button, inp = o.input;
+  var sel = o.initial || TODAY, view = new Date(sel.getFullYear(), sel.getMonth(), 1), mode = "days", focusDay = null;
+  function arw(attr, label, icon){ return '<button type="button" class="arw" ' + attr + ' aria-label="' + label + '"><svg><use href="#' + icon + '"/></svg></button>'; }
+  function render(){
+    var y = view.getFullYear(), m = view.getMonth(), h = "";
+    if (calStyle === "a" && mode === "months"){
+      h = '<div class="cal-h">' + arw('data-y="-1"', "السنة السابقة", "i-prev") + '<button type="button" class="ttl" data-mode="years"><span class="n">' + y + "</span></button>" + arw('data-y="1"', "السنة التالية", "i-next") + '</div><div class="mgrid">' +
+        MONTHS.map(function(n, i){ return '<button type="button" data-m="' + i + '"' + (i === m ? ' class="cur"' : "") + ">" + n + "</button>"; }).join("") + "</div>";
+    } else if (calStyle === "a" && mode === "years"){
+      var y0 = y - 4;
+      h = '<div class="cal-h">' + arw('data-yp="-9"', "سنوات أقدم", "i-prev") + '<span class="ttl" style="cursor:default">اختر السنة</span>' + arw('data-yp="9"', "سنوات أحدث", "i-next") + '</div><div class="mgrid">';
+      for (var k = 0; k < 9; k++) h += '<button type="button" data-yy="' + (y0 + k) + '"' + (y0 + k === y ? ' class="cur"' : "") + '><span class="n">' + (y0 + k) + "</span></button>";
+      h += "</div>";
+    } else {
+      var grid = '<div class="dgrid" role="grid" aria-label="' + MONTHS[m] + " " + y + '">' + WD.map(function(w, i){ return '<span class="wd' + (i === 6 ? " fri" : "") + '" role="columnheader">' + w + "</span>"; }).join("");
+      var first = new Date(y, m, 1), start = addDays(first, -((first.getDay() + 1) % 7));
+      for (var i = 0; i < 42; i++){
+        var d = addDays(start, i), cls = "day", locked = d <= LOCK;
+        if (d.getMonth() !== m) cls += " out";
+        if (sameDay(d, TODAY)) cls += " today";
+        if (sameDay(d, sel)) cls += " sel";
+        if (locked) cls += " lock";
+        grid += '<button type="button" role="gridcell" class="' + cls + '" data-d="' + d.getTime() + '" tabindex="' + (sameDay(d, focusDay || sel) && d.getMonth() === m ? 0 : -1) + '"' + (locked ? ' aria-disabled="true"' : "") + ' aria-label="' + DAYS[d.getDay()] + " " + fmtDate(d) + (locked ? "، فترة مقفلة" : "") + '">' + d.getDate() + "</button>";
+      }
+      grid += "</div>";
+      // أسهم الشهر وأسهم السنة ظاهرة دائماً، والعنوان يفتح الأشهر ثم السنوات
+      var hd = '<div class="cal-h">' + '<span style="display:flex;gap:4px">' + arw('data-y="-1"', "السنة السابقة", "i-prev2") + arw('data-nav="-1"', "الشهر السابق", "i-prev") + "</span>" +
+        '<button type="button" class="ttl" ' + (calStyle === "a" ? 'data-mode="months"' : 'style="cursor:default"') + ">" + MONTHS[m] + ' <span class="n">' + y + "</span></button>" +
+        '<span style="display:flex;gap:4px">' + arw('data-nav="1"', "الشهر التالي", "i-next") + arw('data-y="1"', "السنة التالية", "i-next2") + "</span></div>";
+      if (calStyle === "b"){
+        var ml = '<div class="mlist"><div class="yr"><button type="button" data-y="-1" aria-label="السنة السابقة">‹</button><span class="n">' + y + '</span><button type="button" data-y="1" aria-label="السنة التالية">›</button></div>' +
+          MONTHS.map(function(n, i){ return '<button type="button" class="m' + (i === m ? " cur" : "") + '" data-m="' + i + '">' + n + "</button>"; }).join("") + "</div>";
+        h = '<div class="calb">' + ml + "<div>" + hd + grid + "</div></div>";
+      } else h = hd + grid;
     }
-    grid += "</div>";
-    var hd = '<div class="cal-h">' + arrows + '<button type="button" class="ttl" ' + (calStyle === "a" ? 'data-mode="months"' : 'style="cursor:default"') + ">" + MONTHS[m] + ' <span class="n">' + y + "</span></button>" + arrowsN + "</div>";
-    if (calStyle === "b"){
-      var ml = '<div class="mlist"><div class="yr"><button type="button" data-y="-1" aria-label="السنة السابقة">‹</button><span class="n">' + y + '</span><button type="button" data-y="1" aria-label="السنة التالية">›</button></div>' +
-        MONTHS.map(function(n, i){ return '<button type="button" class="m' + (i === m ? " cur" : "") + '" data-m="' + i + '">' + n + "</button>"; }).join("") + "</div>";
-      h = '<div class="calb">' + ml + "<div>" + hd + grid + "</div></div>";
-    } else h = hd + grid;
+    h += '<div class="cal-f"><span>مقفل حتى ' + fmtDate(LOCK) + '</span><span style="display:flex;gap:6px"><button type="button" class="btn ghost" data-today>اليوم</button><button type="button" class="btn ghost" data-close>إغلاق</button></span></div>';
+    cal.innerHTML = h;
+    cal.style.width = calStyle === "b" ? "min(100%,440px)" : "";
   }
-  h += '<div class="cal-f"><span>مقفل حتى ' + fmtDate(LOCK) + '</span><span style="display:flex;gap:6px"><button type="button" class="btn ghost" data-today>اليوم</button><button type="button" class="btn ghost" data-close>إغلاق</button></span></div>';
-  cal.innerHTML = h;
-  cal.style.width = calStyle === "b" ? "min(100%,440px)" : "";
+  function focusGrid(){ var f = $(".day[tabindex='0']", cal); if (f) f.focus(); }
+  function open(){
+    var r = parseDate(inp.value); if (r.date){ sel = r.date; view = new Date(sel.getFullYear(), sel.getMonth(), 1); }
+    focusDay = sel; mode = "days"; cal.hidden = false; btn.setAttribute("aria-expanded", "true"); render(); focusGrid();
+  }
+  function close(back){ cal.hidden = true; btn.setAttribute("aria-expanded", "false"); if (back) btn.focus(); }
+  function pick(d){ if (d <= LOCK) return; sel = d; close(true); o.onPick(d); }
+  function shiftMonths(k){ var d = focusDay || sel; focusDay = new Date(d.getFullYear(), d.getMonth() + k, Math.min(d.getDate(), 28)); view = new Date(focusDay.getFullYear(), focusDay.getMonth(), 1); render(); focusGrid(); }
+  btn.addEventListener("click", function(){ cal.hidden ? open() : close(true); });
+  inp.addEventListener("keydown", function(e){ if (e.key === "ArrowDown" && e.altKey){ e.preventDefault(); open(); } });
+  cal.addEventListener("click", function(e){
+    var b = e.target.closest("button"); if (!b) return;
+    e.stopPropagation();
+    if (b.dataset.nav){ view = new Date(view.getFullYear(), view.getMonth() + +b.dataset.nav, 1); focusDay = null; render(); }
+    else if (b.dataset.y){ view = new Date(view.getFullYear() + +b.dataset.y, view.getMonth(), 1); focusDay = null; render(); }
+    else if (b.dataset.yp){ view = new Date(view.getFullYear() + +b.dataset.yp, view.getMonth(), 1); render(); }
+    else if (b.dataset.mode){ mode = b.dataset.mode; render(); }
+    else if (b.dataset.m){ view = new Date(view.getFullYear(), +b.dataset.m, 1); mode = "days"; focusDay = null; render(); }
+    else if (b.dataset.yy){ view = new Date(+b.dataset.yy, view.getMonth(), 1); mode = "months"; render(); }
+    else if (b.dataset.d) pick(new Date(+b.dataset.d));
+    else if (b.hasAttribute("data-today")) pick(TODAY);
+    else if (b.hasAttribute("data-close")) close(true);
+  });
+  cal.addEventListener("keydown", function(e){
+    if (e.key === "Escape"){ e.preventDefault(); close(true); return; }
+    if (e.key === "PageDown" || e.key === "PageUp"){ e.preventDefault(); shiftMonths((e.key === "PageDown" ? 1 : -1) * (e.shiftKey ? 12 : 1)); return; }
+    var b = e.target.closest(".day"); if (!b) return;
+    var step = { ArrowLeft: 1, ArrowRight: -1, ArrowDown: 7, ArrowUp: -7 }[e.key];
+    if (e.key === "Enter" || e.key === " "){ e.preventDefault(); pick(new Date(+b.dataset.d)); return; }
+    if (!step) return;
+    e.preventDefault(); focusDay = addDays(new Date(+b.dataset.d), step);
+    if (focusDay.getMonth() !== view.getMonth()) view = new Date(focusDay.getFullYear(), focusDay.getMonth(), 1);
+    render(); focusGrid();
+  });
+  document.addEventListener("click", function(e){ if (!cal.hidden && !cal.contains(e.target) && !btn.contains(e.target)) close(false); });
+  var api = { refresh: function(){ mode = "days"; if (!cal.hidden) render(); } };
+  cals.push(api); return api;
 }
-function openCal(){
-  var r = parseDate(inCal.value); if (r.date){ calSel = r.date; view = new Date(r.date.getFullYear(), r.date.getMonth(), 1); }
-  focusDay = calSel; mode = "days"; cal.hidden = false; calOpen.setAttribute("aria-expanded", "true"); renderCal();
-  var f = $(".day[tabindex='0']", cal); if (f) f.focus();
-}
-function closeCal(back){ cal.hidden = true; calOpen.setAttribute("aria-expanded", "false"); if (back) calOpen.focus(); }
-function pick(d){
-  if (d <= LOCK) return;
-  calSel = d; inCal.value = fmtDate(d); $("#d-cal").textContent = DAYS[d.getDay()] + " " + fmtDate(d); closeCal(true);
-}
-calOpen.addEventListener("click", function(){ cal.hidden ? openCal() : closeCal(true); });
-inCal.addEventListener("keydown", function(e){ if (e.key === "ArrowDown" && e.altKey){ e.preventDefault(); openCal(); } });
-inCal.addEventListener("blur", function(){ var r = parseDate(inCal.value); if (r.date){ inCal.value = fmtDate(r.date); $("#d-cal").textContent = DAYS[r.date.getDay()] + " " + fmtDate(r.date); } });
-cal.addEventListener("click", function(e){
-  var b = e.target.closest("button"); if (!b) return;
-  if (b.dataset.nav){ view = new Date(view.getFullYear(), view.getMonth() + +b.dataset.nav, 1); focusDay = null; renderCal(); }
-  else if (b.dataset.y){ view = new Date(view.getFullYear() + +b.dataset.y, view.getMonth(), 1); renderCal(); }
-  else if (b.dataset.mode){ mode = b.dataset.mode; renderCal(); }
-  else if (b.dataset.m){ view = new Date(view.getFullYear(), +b.dataset.m, 1); mode = "days"; focusDay = null; renderCal(); }
-  else if (b.dataset.yy){ view = new Date(+b.dataset.yy, view.getMonth(), 1); mode = "months"; renderCal(); }
-  else if (b.dataset.d) pick(new Date(+b.dataset.d));
-  else if (b.hasAttribute("data-today")) pick(TODAY);
-  else if (b.hasAttribute("data-close")) closeCal(true);
-});
-cal.addEventListener("keydown", function(e){
-  if (e.key === "Escape"){ e.preventDefault(); closeCal(true); return; }
-  var b = e.target.closest(".day"); if (!b) return;
-  var d = new Date(+b.dataset.d), step = { ArrowLeft: 1, ArrowRight: -1, ArrowDown: 7, ArrowUp: -7 }[e.key];
-  if (e.key === "PageDown" || e.key === "PageUp"){ e.preventDefault(); var mm = e.key === "PageDown" ? 1 : -1; focusDay = new Date(d.getFullYear(), d.getMonth() + mm, Math.min(d.getDate(), 28)); view = new Date(focusDay.getFullYear(), focusDay.getMonth(), 1); renderCal(); $(".day[tabindex='0']", cal).focus(); return; }
-  if (!step) return;
-  e.preventDefault(); focusDay = addDays(d, step);
-  if (focusDay.getMonth() !== view.getMonth()) view = new Date(focusDay.getFullYear(), focusDay.getMonth(), 1);
-  renderCal(); var f = $(".day[tabindex='0']", cal); if (f) f.focus();
-});
-document.addEventListener("click", function(e){ if (!cal.hidden && !cal.contains(e.target) && !calOpen.contains(e.target)) closeCal(false); });
+var inCal = $("#in-cal");
+function showCalDate(d){ inCal.value = fmtDate(d); $("#d-cal").textContent = DAYS[d.getDay()] + " " + fmtDate(d); }
+makeCal({ panel: $("#cal"), button: $("#calOpen"), input: inCal, initial: new Date(2026, 7, 14), onPick: showCalDate });
+inCal.addEventListener("blur", function(){ var r = parseDate(inCal.value); if (r.date) showCalDate(r.date); });
+// تقويم حقل التاريخ في نموذج التجربة
+makeCal({ panel: $("#cal2"), button: $("#calOpen2"), input: $("#in-date"), onPick: function(d){ commitDate(fmtDate(d)); $("#in-date").focus(); } });
 
 /* ---------- 3ب. قائمة المورد ---------- */
 var SUPS = [
@@ -996,7 +1058,7 @@ var SUPS = [
   ["منجرة الإيضاح", 18, "30/09/2026"], ["مصنع العرض", 7, "15/09/2026"], ["مؤسسة الافتراض التجارية", 3, "20/08/2026"]
 ];
 var RECENT = [0, 2, 1];
-var cbStyle = "a", inSup = $("#in-sup"), lb = $("#lb"), fSup = $("#f-sup"), act = -1, items = [], chosen = null;
+var cbStyle = "b", inSup = $("#in-sup"), lb = $("#lb"), fSup = $("#f-sup"), act = -1, items = [], chosen = null;
 segBind($("[data-cb]"), function(v){ cbStyle = v; $("#cbNote").innerHTML = CB_NOTES[v]; if (!lb.hidden) renderLb(); });
 function nrm(s){ return normDigits(s).replace(/[ً-ْـ]/g, "").replace(/[أإآ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").toLowerCase(); }
 function hl(name, q){
@@ -1100,15 +1162,15 @@ scrim.addEventListener("click", function(e){ if (e.target === scrim) closeDlg();
 
 /* ---------- الإجابات ---------- */
 var QS = [
-  { id: "1", q: "حالات الحقول (صحيح / خطأ / معطّل)", o: ["أ. هادئ", "ب. ختم", "ج. هامش الدفتر"] },
-  { id: "1ب", q: "سلوك حقول التجربة (التاريخ، المرجع، السند، المبلغ، مدين/دائن)", o: ["مقبول كما هو", "عندي ملاحظات (في المربع)"] },
-  { id: "2", q: "رمز الريال في Excel", o: ["أ. الرمز في كل خلية", "ب. «ريال» في الرأس", "ج. صورة الرمز في الرأس"] },
-  { id: "3", q: "منتقي التقويم", o: ["أ. منبثق متدرّج", "ب. دفتر شهري"] },
-  { id: "4", q: "قائمة المورد", o: ["أ. بحث بسيط", "ب. الأخيرة أولاً"] },
-  { id: "5", q: "نافذة سبب الإرجاع", o: ["أ. نافذة وسطى", "ب. لوحة جانبية"] },
-  { id: "6", q: "الخطوة التالية", o: ["نماذج الشاشات الناقصة (فهرس القيود، الدخول، المستخدمون، قفل الفترات، التدقيق، الإشعارات، التحميل والفراغ)", "المرحلة 1 (الأساس + CI + القواعد + مكتبة الحقول)، والشاشات الناقصة لاحقاً"] }
+  { id: "1", q: "حقل التاريخ: كتابة + زر تقويم داخل الحقل، وفي التقويم أسهم للشهر وأسهم مزدوجة للسنة، والعنوان يفتح الأشهر ثم السنوات", o: ["معتمد", "عندي ملاحظات (في المربع)"] },
+  { id: "2", q: "مرجع الفاتورة أو القيد الأقصر من المطلوب (مثل 791)", o: ["يُكمَل بالأصفار تلقائياً (00791)", "يُرفض برسالة"] },
+  { id: "3", q: "المرجع الأطول من المطلوب (فاتورة 6 أرقام أو قيد 5)", o: ["يُرفض دائماً", "يُقبل (قد تتجاوز الأرقام يوماً ما)"] },
+  { id: "4", q: "مراجع المرتجعات ببادئة (OUT/00013 و«العز/OUT/00011»): هل يُفرض طول على جزئها الرقمي؟", o: ["لا، تُقبل كما تُكتب", "نعم، 5 أرقام مثل الفاتورة"] },
+  { id: "5", q: "المراجع المنقولة من الإكسل التي لا تطابق الطول (إن وُجدت)", o: ["تُنقل كما هي بلا تنبيه", "تُنقل وتظهر في مركز المراجعة"] },
+  { id: "6", q: "حقل التفاصيل (اقتراحات المورد، Shift+Enter، 200 حرف)", o: ["معتمد", "عندي ملاحظات (في المربع)"] },
+  { id: "7", q: "الخطوة التالية", o: ["المرحلة 1 الآن، ونماذج الشاشات الناقصة قبل المرحلة 4 (توصيتي)", "نماذج الشاشات الناقصة أولاً"] }
 ];
-var KEY = "rased-proposals-r1", st = {};
+var KEY = "rased-proposals-r2", st = {};
 try { st = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e){ st = {}; }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e){} }
 $("#tot").textContent = QS.length;
@@ -1126,7 +1188,7 @@ $$("#qs .note").forEach(function(t){ t.addEventListener("input", function(){ var
 function count(){ var n = 0; QS.forEach(function(q, i){ var s = st[i] || {}; var d = !!(s.a || (s.n && s.n.trim())); if (d) n++; $("#q" + i).classList.toggle("done", d); }); $("#cnt").textContent = n; }
 count();
 function text(){
-  var L = ["إجاباتي على نماذج الحقول والمكونات لمشروع «رصيد»:", ""];
+  var L = ["إجاباتي على الإصدار 2 من نماذج الحقول لمشروع «رصيد»:", ""];
   QS.forEach(function(q, i){ var s = st[i] || {}; L.push(q.id + ". " + q.q + ": " + (s.a || "لم يُجب") + (s.n && s.n.trim() ? " — ملاحظة: " + s.n.trim().replace(/\s*\n\s*/g, " / ") : "")); });
   return L.join("\n");
 }
