@@ -1,0 +1,40 @@
+name: Deploy Firestore rules
+
+# يرفع القواعد والفهارس إلى raseed-dhtrd بعد الدمج في main، فقط إن نجحت اختبارات القواعد على المحاكي.
+# المفتاح في أسرار المستودع (FIREBASE_SERVICE_ACCOUNT) ولا يمر عبر أي ملف في git.
+on:
+  push:
+    branches: [main]
+    paths: [firestore.rules, firestore.indexes.json, firebase.json, tests/rules/**]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-rules
+  cancel-in-progress: false
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
+        with: { distribution: temurin, java-version: 21 }
+      - run: npm ci
+      - run: npm run test:rules
+      - name: Deploy
+        env:
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SA_JSON" ]; then echo "::error::السر FIREBASE_SERVICE_ACCOUNT غير موجود في إعدادات المستودع."; exit 1; fi
+          umask 077
+          printf '%s' "$SA_JSON" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          npx firebase deploy --only firestore:rules,firestore:indexes --project raseed-dhtrd --non-interactive
+          rm -f "$RUNNER_TEMP/sa.json"
