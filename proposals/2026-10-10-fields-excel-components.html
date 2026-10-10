@@ -1,0 +1,1157 @@
+<!doctype html><html lang="ar"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<title>رصيد · نماذج الحقول والمكونات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&display=swap">
+<style>
+/* التخطيط: ورقة الدفتر بألسنة علوية؛ كل لسان نموذج بمقطّع خيارات (أ/ب/ج)، وقسم إجابات بشريط نسخ ثابت */
+:root{
+  --paper:#EEF2F5; --surface:#FFFFFF; --ink:#1B2A44; --ink-2:#46546D; --rule:#C9D3DE;
+  --neg:#A3242B; --accent:#2B4C7E; --on-accent:#FFFFFF; --margin:#E2B6B9; --wash:#E3EAF4;
+  --wash-2:#F5F8FB; --neg-wash:#F8E8E9; --tab:#E2E8EE; --mark-ink:#1E4634; --mark-acc:#B8752A;
+  --xl-grid:#D4D9DF; --xl-head:#F3F4F6; --xl-ink:#1F2328; --xl-green:#1E6E43;
+  --shadow:0 8px 22px rgba(27,42,68,.22);
+  --f-text:"Noto Naskh Arabic","Geeza Pro","Times New Roman",serif;
+  --f-num:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-xl:Calibri,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#141B26; --surface:#1C2533; --ink:#E3E8EF; --ink-2:#AAB5C6; --rule:#33415A;
+  --neg:#F08A8F; --accent:#8FB0E6; --on-accent:#141B26; --margin:#5A3A46; --wash:#243452;
+  --wash-2:#202B3B; --neg-wash:#3A2530; --tab:#18202C; --mark-ink:#D7EAE1; --mark-acc:#C9822B;
+  --xl-grid:#3A4250; --xl-head:#252B35; --xl-ink:#E6E8EB; --xl-green:#5FBF8A;
+  --shadow:0 8px 22px rgba(0,0,0,.45); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#141B26; --surface:#1C2533; --ink:#E3E8EF; --ink-2:#AAB5C6; --rule:#33415A;
+  --neg:#F08A8F; --accent:#8FB0E6; --on-accent:#141B26; --margin:#5A3A46; --wash:#243452;
+  --wash-2:#202B3B; --neg-wash:#3A2530; --tab:#18202C; --mark-ink:#D7EAE1; --mark-acc:#C9822B;
+  --xl-grid:#3A4250; --xl-head:#252B35; --xl-ink:#E6E8EB; --xl-green:#5FBF8A;
+  --shadow:0 8px 22px rgba(0,0,0,.45); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-text);font-size:17px;line-height:1.75;margin:0;padding-inline:16px;padding-block:18px 150px;
+  scrollbar-color:var(--rule) transparent}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--rule);border-radius:10px}::-webkit-scrollbar-track{background:transparent}
+.wrap{max-width:1180px;margin-inline:auto}
+h1,h2,h3{line-height:1.4;margin:0;text-wrap:balance}
+h1{font-size:clamp(24px,2.3vw,30px)}
+h2{font-size:20px}
+h3{font-size:16.5px}
+p{margin:0 0 10px}
+.muted{color:var(--ink-2)}
+.n,code{font-family:var(--f-num);direction:ltr;unicode-bidi:isolate;font-variant-numeric:lining-nums tabular-nums}
+code{font-size:.92em;background:var(--wash-2);padding:0 4px;border-radius:3px}
+.sar{display:inline-block;width:.78em;height:.86em;vertical-align:-.08em;fill:currentColor;flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{width:44px;height:44px;flex:none}
+.meta{font-size:14.5px;color:var(--ink-2)}
+.btn{font:inherit;font-size:15.5px;font-weight:700;min-height:44px;padding:6px 18px;border-radius:6px;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.ghost{border-color:var(--rule);color:var(--ink)}
+.btn.danger{background:var(--neg);border-color:var(--neg);color:var(--surface)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* ألسنة الدفتر */
+.tabs{display:flex;gap:4px;overflow-x:auto;padding-inline-start:6px}
+.tab{font:inherit;font-weight:700;font-size:15.5px;min-height:46px;padding:8px 18px;border:1px solid var(--rule);border-bottom:0;border-radius:10px 10px 0 0;background:var(--tab);color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:inset 0 3px 0 var(--accent);position:relative;top:1px}
+.sheet{background:var(--surface);border:1px solid var(--rule);border-inline-start:4px double var(--margin);padding:24px 30px 34px}
+@media (max-width:600px){.sheet{padding:16px 14px 24px;border-inline-start:1px solid var(--rule)}}
+.panel[hidden]{display:none}
+.intro{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:3px double var(--ink);margin-bottom:18px}
+.intro>div{min-width:0;max-width:640px}
+
+/* مقطّع الخيارات */
+.seg{display:inline-flex;border:1.5px solid var(--accent);border-radius:6px;overflow:hidden;flex-wrap:wrap}
+.seg button{font:inherit;font-size:15px;font-weight:700;min-height:44px;padding:6px 16px;border:0;background:var(--surface);color:var(--accent);cursor:pointer}
+.seg button+button{border-inline-start:1.5px solid var(--accent)}
+.seg button[aria-checked="true"]{background:var(--accent);color:var(--on-accent)}
+.optnote{font-size:14.5px;color:var(--ink-2);margin-top:6px}
+.optnote b{color:var(--ink)}
+
+/* ===== الحقول ===== */
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0;position:relative}
+.fl{font-size:14.5px;font-weight:700;color:var(--ink-2);display:flex;gap:6px;align-items:baseline}
+.req{color:var(--neg);font-size:13px;font-weight:700}
+.box{position:relative;display:flex;align-items:center;gap:8px;min-height:46px;background:var(--wash-2);border-bottom:1.5px solid var(--rule);border-radius:4px 4px 0 0;padding-inline:10px}
+.box input{all:unset;flex:1;min-width:0;height:44px;font-family:var(--f-text);font-size:17px;color:var(--ink);caret-color:var(--accent)}
+.box input.num{font-family:var(--f-num);direction:ltr;text-align:right;font-variant-numeric:lining-nums tabular-nums;font-size:18px}
+.box input::placeholder{color:var(--ink-2);opacity:.75}
+.box .sar{width:1em;height:1.1em;color:var(--ink-2)}
+.box:focus-within,.st-focus .box{border-bottom-color:var(--accent);outline:3px solid var(--accent);outline-offset:2px}
+.ico{display:none;flex:none;width:18px;height:18px}
+.msg{font-size:14.5px;line-height:1.55;min-height:0;color:var(--neg)}
+.msg:empty{display:none}
+.msg.warn{color:var(--ink-2)}
+.msg.warn b{color:var(--neg)}
+.disp{font-size:14.5px;color:var(--ink-2);font-family:var(--f-num)}
+.disp:empty{display:none}
+.refno{font-family:var(--f-num);font-weight:700;font-size:19px;direction:ltr;text-align:right;min-height:46px;display:flex;align-items:center;justify-content:flex-end;border-bottom:1.5px dotted var(--ink-2);padding-inline:10px}
+.refno.dup{color:var(--neg);border-bottom:2px solid var(--neg)}
+
+/* الحالات حسب الخيار */
+.is-readonly .box{background:transparent;border-bottom:1.5px dotted var(--ink-2)}
+.is-readonly input{cursor:default}
+/* أ: هادئ */
+[data-style="a"] .is-error .box{border-bottom:2px solid var(--neg)}
+[data-style="a"] .is-error .fl{color:var(--neg)}
+[data-style="a"] .is-disabled{opacity:.5}
+[data-style="a"] .is-disabled input{cursor:not-allowed}
+/* ب: ختم */
+[data-style="b"] .is-valid .ico-ok{display:block;color:var(--accent)}
+[data-style="b"] .is-error .box{background:var(--neg-wash);border-bottom:2px solid var(--neg);box-shadow:inset -4px 0 0 var(--neg)}
+[dir="rtl"] [data-style="b"] .is-error .box{box-shadow:inset -4px 0 0 var(--neg)}
+[data-style="b"] .is-error .ico-err{display:block;color:var(--neg)}
+[data-style="b"] .is-error .msg::before{content:"المطلوب: ";font-weight:700}
+[data-style="b"] .is-disabled .box{background:var(--tab);border-bottom:1.5px dashed var(--rule)}
+[data-style="b"] .is-disabled input{color:var(--ink-2);cursor:not-allowed}
+[data-style="b"] .is-disabled .ico-lock{display:block;color:var(--ink-2)}
+/* ج: هامش الدفتر */
+[data-style="c"] .is-valid .box{border-bottom:3px double var(--accent)}
+[data-style="c"] .is-error .box{outline:1.5px solid var(--neg);outline-offset:0;border-bottom-color:var(--neg)}
+[data-style="c"] .is-error .box:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+[data-style="c"] .is-error .msg{background:var(--neg-wash);border-inline-start:4px solid var(--neg);padding:6px 10px;border-radius:0 0 4px 4px;color:var(--ink)}
+[data-style="c"] .is-error .msg b{color:var(--neg)}
+[data-style="c"] .is-disabled .box{background:repeating-linear-gradient(135deg,var(--wash-2) 0 7px,var(--tab) 7px 14px);border-bottom:1.5px solid var(--rule)}
+[data-style="c"] .is-disabled input{color:var(--ink-2);cursor:not-allowed}
+
+/* مربع اختيار مخصص */
+.chk{display:inline-flex;align-items:center;gap:10px;min-height:44px;cursor:pointer;font:inherit;background:none;border:0;color:var(--ink);padding:0 4px;text-align:start}
+.chk .sq{width:22px;height:22px;border:2px solid var(--ink-2);border-radius:4px;display:grid;place-items:center;flex:none;background:var(--surface)}
+.chk .sq svg{width:14px;height:14px;opacity:0;color:var(--on-accent)}
+.chk[aria-checked="true"] .sq{background:var(--accent);border-color:var(--accent)}
+.chk[aria-checked="true"] .sq svg{opacity:1}
+.chk.danger[aria-checked="true"] .sq{background:var(--neg);border-color:var(--neg)}
+.chk[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
+.is-error .chk .sq{border-color:var(--neg)}
+
+/* شبكة الحالات */
+.states{display:grid;grid-template-columns:110px repeat(3,minmax(0,1fr));gap:14px 18px;align-items:start}
+.states .sh{font-size:13.5px;font-weight:700;color:var(--ink-2);border-bottom:3px double var(--ink);padding-bottom:4px}
+.states .sn{font-weight:700;font-size:15px;padding-top:30px}
+.states .sn small{display:block;font-weight:400;color:var(--ink-2);font-size:12.5px;line-height:1.4}
+@media (max-width:820px){.states{grid-template-columns:1fr}.states .sh{display:none}.states .sn{padding-top:12px;border-top:1px solid var(--rule)}}
+
+/* شريط مدين/دائن */
+.dc{display:grid;grid-template-columns:1fr 1fr;border-top:3px double var(--ink)}
+.dc .dch{font-size:14px;font-weight:700;color:var(--ink-2);padding:4px 10px;border-bottom:1px solid var(--rule)}
+.dc .dch+.dch,.dc .fld+.fld{border-inline-start:1px solid var(--margin)}
+.dc .fld{padding:8px 10px 4px}
+.dc .dch.on{color:var(--accent);background:var(--wash)}
+.tagret{display:inline-block;font-size:12.5px;font-weight:700;border:1.5px solid var(--neg);color:var(--neg);border-radius:3px;padding:0 6px;margin-inline-start:6px}
+.tagret[hidden]{display:none}
+
+/* نموذج التجربة */
+.try{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:18px 22px;margin-top:10px}
+.try .wide{grid-column:1/-1}
+.pm{display:none;gap:6px}
+.pm button{font:inherit;font-family:var(--f-num);font-size:20px;font-weight:700;width:44px;height:44px;border:1.5px solid var(--rule);border-radius:50%;background:var(--surface);color:var(--ink);cursor:pointer}
+@media (max-width:600px),(pointer:coarse){.pm{display:flex}}
+.legend{font-size:14px;color:var(--ink-2);border-inline-start:4px double var(--margin);padding-inline-start:12px;margin-top:16px}
+.legend li{margin-bottom:2px}
+.kseg{display:inline-flex;border:1.5px solid var(--accent);border-radius:6px;overflow:hidden}
+.kseg button{font:inherit;font-weight:700;min-height:46px;padding:4px 16px;border:0;background:var(--surface);color:var(--accent);cursor:pointer}
+.kseg button+button{border-inline-start:1.5px solid var(--accent)}
+.kseg button[aria-checked="true"]{background:var(--accent);color:var(--on-accent)}
+
+/* ===== Excel ===== */
+.xl{border:1px solid var(--xl-grid);border-radius:6px;overflow:hidden;background:var(--surface);font-family:var(--f-xl);color:var(--xl-ink)}
+.xl-bar{display:flex;align-items:center;gap:10px;background:var(--xl-green);color:#fff;padding:6px 12px;font-size:14px;direction:ltr}
+.xl-bar b{font-weight:700}
+.xl-fx{display:flex;align-items:stretch;border-bottom:1px solid var(--xl-grid);font-size:14px;direction:ltr}
+.xl-fx .nm{width:70px;border-right:1px solid var(--xl-grid);padding:4px 8px;text-align:center;background:var(--xl-head)}
+.xl-fx .fx{padding:4px 8px;color:var(--ink-2);font-style:italic;border-right:1px solid var(--xl-grid)}
+.xl-fx .v{padding:4px 10px;flex:1;direction:rtl;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.xl-scroll{overflow-x:auto}
+.xl table{border-collapse:collapse;direction:rtl;font-size:14.5px;min-width:720px;width:100%}
+.xl th,.xl td{border:1px solid var(--xl-grid);padding:3px 8px;height:26px;white-space:nowrap}
+.xl thead th{background:var(--xl-head);font-weight:400;color:var(--ink-2);font-size:13px;text-align:center}
+.xl tbody th{background:var(--xl-head);font-weight:400;color:var(--ink-2);font-size:13px;width:34px;text-align:center}
+.xl td{cursor:cell}
+.xl td.num{text-align:left;direction:ltr;font-variant-numeric:tabular-nums}
+.xl td.hd{font-weight:700;background:var(--wash-2);text-align:center}
+.xl td.tot{font-weight:700;border-top:2px solid var(--xl-ink)}
+.xl td.sel{outline:2px solid var(--xl-green);outline-offset:-2px}
+.xl .tofu{display:inline-block;width:.62em;height:.9em;border:1px solid currentColor;vertical-align:-.1em;margin-right:.2em}
+.xl .pic{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1px dashed var(--xl-green);border-radius:2px;margin-inline-start:6px;vertical-align:-3px}
+.xl .pic .sar{width:12px;height:13px}
+.xl-tabs{display:flex;gap:2px;background:var(--xl-head);border-top:1px solid var(--xl-grid);padding:0 8px;direction:rtl;font-size:13.5px}
+.xl-tabs span{padding:4px 14px;border-bottom:3px solid var(--xl-green);background:var(--surface);color:var(--xl-green);font-weight:700}
+.fontsw{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px;margin-top:14px}
+.cmp div{border-top:1px solid var(--rule);padding-top:8px;font-size:15px;min-width:0}
+.cmp b{display:block;font-size:13px;color:var(--ink-2)}
+
+/* ===== المكونات ===== */
+.comp{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px 30px}
+@media (max-width:900px){.comp{grid-template-columns:1fr}}
+.cblock{border-top:3px double var(--ink);padding-top:10px;min-width:0}
+.cblock h3{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.stage{min-height:420px;position:relative}
+
+/* التقويم */
+.cal-btn{all:unset;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;cursor:pointer;color:var(--ink-2)}
+.cal-btn:hover{background:var(--wash)}
+.cal-btn:focus-visible{outline:3px solid var(--accent)}
+.cal-btn svg{width:20px;height:20px}
+.cal{background:var(--surface);border:1px solid var(--rule);border-top:3px double var(--ink);box-shadow:var(--shadow);border-radius:0 0 6px 6px;padding:10px;margin-top:6px;width:min(100%,340px);z-index:3}
+.cal[hidden]{display:none}
+.cal-h{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+.cal-h .ttl{font:inherit;font-weight:700;font-size:16px;background:none;border:0;color:var(--ink);cursor:pointer;min-height:40px;padding:0 10px;border-radius:6px}
+.cal-h .ttl:hover{background:var(--wash)}
+.cal-h .ttl .n{font-weight:600}
+.arw{font:inherit;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--rule);background:var(--surface);color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.arw svg{width:16px;height:16px}
+.dgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.dgrid .wd{font-size:12.5px;font-weight:700;color:var(--ink-2);text-align:center;padding:2px 0}
+.dgrid .wd.fri{color:var(--neg)}
+.day{font:inherit;font-family:var(--f-num);font-size:15.5px;height:40px;border:0;border-radius:6px;background:none;color:var(--ink);cursor:pointer;font-variant-numeric:tabular-nums}
+.day:hover{background:var(--wash)}
+.day.out{color:var(--ink-2);opacity:.55}
+.day.today{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.day.sel{background:var(--accent);color:var(--on-accent);font-weight:700}
+.day.lock{background:repeating-linear-gradient(135deg,transparent 0 5px,var(--wash) 5px 9px);color:var(--ink-2);cursor:not-allowed;text-decoration:line-through;text-decoration-color:var(--rule)}
+.day:focus-visible{outline:3px solid var(--accent);outline-offset:0}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mgrid button{font:inherit;min-height:44px;border:1px solid var(--rule);border-radius:6px;background:var(--surface);color:var(--ink);cursor:pointer}
+.mgrid button.cur{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:700}
+.cal-f{display:flex;justify-content:space-between;gap:8px;margin-top:8px;border-top:1px solid var(--rule);padding-top:8px;font-size:13.5px;color:var(--ink-2);align-items:center;flex-wrap:wrap}
+.cal-f .btn{min-height:38px;font-size:14px;padding:4px 12px}
+/* التقويم ب: دفتر شهري */
+.calb{display:grid;grid-template-columns:92px 1fr;gap:10px;width:min(100%,430px)}
+.mlist{display:flex;flex-direction:column;gap:2px;border-inline-end:1px solid var(--margin);padding-inline-end:8px}
+.mlist .yr{display:flex;align-items:center;justify-content:space-between;font-family:var(--f-num);font-weight:700;margin-bottom:4px}
+.mlist .yr button{font:inherit;width:26px;height:26px;border:0;background:none;color:var(--accent);cursor:pointer;border-radius:50%}
+.mlist .m{font:inherit;font-size:14px;text-align:start;min-height:30px;border:0;background:none;color:var(--ink);border-radius:4px;padding:0 8px;cursor:pointer}
+.mlist .m.cur{background:var(--wash);color:var(--accent);font-weight:700;box-shadow:inset -3px 0 0 var(--accent)}
+@media (max-width:600px){
+  .cal.sheetish{position:fixed;inset-inline:0;bottom:0;width:auto;margin:0;border-radius:14px 14px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));z-index:20}
+  .calb{grid-template-columns:1fr}.mlist{flex-direction:row;overflow-x:auto;border:0;padding:0}.mlist .yr{margin:0 6px 0 0}
+}
+
+/* القائمة المنسدلة */
+.lb{position:absolute;inset-inline:0;top:100%;margin-top:4px;background:var(--surface);border:1px solid var(--rule);box-shadow:var(--shadow);border-radius:0 0 6px 6px;max-height:300px;overflow:auto;z-index:4;padding:4px 0}
+.lb[hidden]{display:none}
+.lb .grp{font-size:12.5px;font-weight:700;color:var(--ink-2);padding:6px 12px 2px}
+.lb .op{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;padding:4px 12px;cursor:pointer}
+.lb .op[aria-selected="true"]{background:var(--wash);box-shadow:inset -4px 0 0 var(--accent)}
+.lb .op mark{background:none;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.lb .op small{font-size:12.5px;color:var(--ink-2);font-family:var(--f-num);white-space:nowrap}
+.lb .empty{padding:10px 12px;color:var(--ink-2);font-size:14.5px}
+.cnt{font-size:12.5px;color:var(--ink-2)}
+
+/* نافذة السبب */
+.scrim{position:absolute;inset:0;background:rgba(20,27,38,.42);display:grid;place-items:center;padding:14px;border-radius:4px;z-index:5}
+.scrim[hidden]{display:none}
+.dlg{background:var(--surface);border-top:4px solid var(--neg);box-shadow:var(--shadow);border-radius:6px;width:min(100%,440px);padding:18px 18px 16px;max-height:100%;overflow:auto}
+.dlg h4{font-size:18px;margin:0 0 4px}
+.dlg .sub{font-size:14.5px;color:var(--ink-2);margin-bottom:12px}
+.rc{display:flex;flex-direction:column;gap:8px}
+.rcard{font:inherit;text-align:start;display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--rule);border-radius:6px;background:var(--surface);color:var(--ink);padding:10px 12px;cursor:pointer;min-height:48px}
+.rcard .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--ink-2);flex:none;margin-top:3px;display:grid;place-items:center}
+.rcard[aria-checked="true"]{border-color:var(--accent);background:var(--wash)}
+.rcard[aria-checked="true"] .dot{border-color:var(--accent)}
+.rcard[aria-checked="true"] .dot::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.rcard small{display:block;color:var(--ink-2);font-size:13.5px;line-height:1.5}
+.rgerr .rcard{border-color:var(--neg)}
+.ta{width:100%;font:inherit;font-size:15.5px;color:var(--ink);background:var(--wash-2);border:0;border-bottom:1.5px solid var(--rule);border-radius:4px 4px 0 0;padding:8px 10px;min-height:70px;resize:vertical}
+.ta:focus{outline:3px solid var(--accent);outline-offset:2px;border-bottom-color:var(--accent)}
+.ta.err{border-bottom:2px solid var(--neg)}
+.dlg-f{display:flex;gap:8px;justify-content:flex-start;margin-top:14px;flex-wrap:wrap}
+.cc{font-size:12.5px;color:var(--ink-2);text-align:end;font-family:var(--f-num)}
+/* ب: لوحة جانبية */
+.scrim.side{place-items:stretch;justify-content:end;padding:0}
+.scrim.side .dlg{border-radius:0;border-top:0;border-inline-start:4px double var(--neg);width:min(100%,380px);height:100%;display:flex;flex-direction:column;padding:0}
+.scrim.side .dlg .body{padding:18px;overflow:auto;flex:1}
+.scrim.side .dlg .dlg-f{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--rule);padding:12px 18px;margin:0}
+.seglist{display:flex;flex-direction:column;border:1.5px solid var(--rule);border-radius:6px;overflow:hidden}
+.seglist .rcard{border:0;border-radius:0}
+.seglist .rcard+.rcard{border-top:1px solid var(--rule)}
+@media (max-width:600px){.scrim.side{place-items:end stretch;justify-content:stretch}.scrim.side .dlg{width:100%;height:auto;max-height:92%;border-inline-start:0;border-top:4px double var(--neg);border-radius:14px 14px 0 0}}
+.toast{margin-top:10px;font-size:14.5px;color:var(--accent);font-weight:700}
+.toast:empty{display:none}
+.mini{border:1px solid var(--rule);border-radius:4px;overflow:hidden;font-size:14.5px}
+.mini div{display:flex;justify-content:space-between;gap:10px;padding:8px 12px;border-bottom:1px solid var(--rule)}
+.mini div:last-child{border-bottom:0}
+.stamp{font-size:13px;font-weight:700;border-radius:4px;padding:0 8px;white-space:nowrap}
+.stamp.in{border:3px double var(--accent);color:var(--accent)}
+.stamp.out{border:1.5px dashed var(--neg);color:var(--neg)}
+
+/* الإجابات */
+.answers{margin-top:26px}
+.answers .sheet{border-top:5px double var(--ink)}
+.q{padding:14px 0;border-bottom:1px dashed var(--rule)}
+.q.done .qt::after{content:"✓ مُجاب";font-size:12.5px;color:var(--accent);font-weight:700;margin-inline-start:8px}
+.qt{font-weight:700;margin-bottom:8px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.qt .id{font-family:var(--f-num);color:var(--ink-2);font-size:14px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{font:inherit;font-size:15.5px;min-height:44px;padding:6px 14px;border:1.5px solid var(--rule);border-radius:6px;background:var(--surface);color:var(--ink);cursor:pointer;text-align:start}
+.opt[aria-checked="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.note{width:100%;margin-top:8px;font:inherit;font-size:15px;color:var(--ink);background:var(--wash-2);border:0;border-bottom:1.5px solid var(--rule);border-radius:4px 4px 0 0;padding:8px 10px;min-height:44px;resize:vertical}
+.note:focus{outline:3px solid var(--accent);outline-offset:2px}
+.bar{position:fixed;inset-inline:0;bottom:0;background:var(--surface);border-top:2px solid var(--accent);box-shadow:var(--shadow);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));z-index:10}
+.bar-in{max-width:1180px;margin-inline:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.status{font-size:14.5px;color:var(--accent);font-weight:700}
+.status.err{color:var(--neg)}
+#out{display:none;width:100%;min-height:150px;margin-top:12px;font:inherit;font-size:14.5px;background:var(--wash-2);color:var(--ink);border:1px solid var(--rule);border-radius:4px;padding:10px}
+#out.show{display:block}
+@media (max-width:600px){.bar .btn{flex:1}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="sar" viewBox="40 0 1145 1270"><path d="M750,1119 C730,1163,716,1211,711,1262 C711,1262,1136,1172,1136,1172 C1156,1127,1169,1079,1174,1028 C1174,1028,750,1119,750,1119Z M1136,901 C1156,857,1169,809,1174,758 C1174,758,843,828,843,828 C843,828,843,693,843,693 C843,693,1136,631,1136,631 C1156,587,1169,538,1174,488 C1174,488,843,558,843,558 C843,558,843,72,843,72 C793,100,748,138,711,183 C711,183,711,586,711,586 C711,586,579,614,579,614 C579,614,579,6,579,6 C528,34,483,72,447,117 C447,117,447,642,447,642 C447,642,151,705,151,705 C131,750,117,798,112,849 C112,849,447,777,447,777 C447,777,447,948,447,948 C447,948,88,1024,88,1024 C68,1068,55,1117,50,1167 C50,1167,425,1088,425,1088 C456,1081,482,1063,499,1038 C499,1038,568,936,568,936 C575,926,579,913,579,899 C579,899,579,749,579,749 C579,749,711,721,711,721 C711,721,711,992,711,992 C711,992,1136,901,1136,901Z"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-err" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 5.5v5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="10" cy="14.3" r="1.3" fill="currentColor"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 20 20"><rect x="4" y="9" width="12" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6.8 9V6.6a3.2 3.2 0 016.4 0V9" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="13.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 8h15M6.5 2v4M13.5 2v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-next" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="wrap" dir="rtl" lang="ar">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 120 120" aria-hidden="true"><rect x="30" y="36" width="76" height="16" rx="8" fill="var(--mark-ink)"/><rect x="14" y="68" width="76" height="16" rx="8" fill="var(--mark-acc)"/></svg>
+      <div>
+        <h1>رصيد: نماذج الحقول والمكونات</h1>
+        <div class="meta">ثلاثة نماذج تفاعلية للاختيار قبل المرحلة 1 · البيانات وهمية · اليوم الافتراضي في النماذج: السبت 10/10/2026</div>
+      </div>
+    </div>
+    <button class="btn ghost" id="themeBtn" type="button">الوضع الداكن</button>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="النماذج">
+    <button class="tab" role="tab" id="tb1" aria-controls="p1" aria-selected="true">1. حالات الحقول</button>
+    <button class="tab" role="tab" id="tb2" aria-controls="p2" aria-selected="false" tabindex="-1">2. الريال في Excel</button>
+    <button class="tab" role="tab" id="tb3" aria-controls="p3" aria-selected="false" tabindex="-1">3. التقويم والمورد والسبب</button>
+  </div>
+
+  <!-- ============ 1. حالات الحقول ============ -->
+  <section class="sheet panel" id="p1" role="tabpanel" aria-labelledby="tb1" data-style="a">
+    <div class="intro">
+      <div>
+        <h2>الحالات الست للحقول</h2>
+        <p class="muted">الفارغ والتركيز والقراءة فقط ثابتة من CHOSEN. الخيارات الثلاثة تختلف في <b>صحيح</b> و<b>خطأ</b> و<b>معطّل</b>. الحقول في الأسفل تعمل فعلاً بقواعد FIELDS، فجرّبها.</p>
+      </div>
+      <div>
+        <div class="seg" role="radiogroup" aria-label="خيار الحالات" data-target="p1">
+          <button role="radio" aria-checked="true" data-v="a">أ. هادئ</button>
+          <button role="radio" aria-checked="false" data-v="b">ب. ختم</button>
+          <button role="radio" aria-checked="false" data-v="c">ج. هامش الدفتر</button>
+        </div>
+        <p class="optnote" id="optnote1"></p>
+      </div>
+    </div>
+
+    <div class="states" id="states"></div>
+
+    <h3 style="margin-top:30px">جرّب الحقول (تعمل بالقواعد المعتمدة)</h3>
+    <form class="try" id="tryForm" novalidate autocomplete="off">
+      <div class="fld" id="f-type">
+        <span class="fl" id="type-l">نوع المستند</span>
+        <div class="kseg" role="radiogroup" aria-labelledby="type-l">
+          <button type="button" role="radio" aria-checked="true" data-t="inv">فاتورة</button>
+          <button type="button" role="radio" aria-checked="false" data-t="misc">قيد</button>
+        </div>
+      </div>
+      <div class="fld" id="f-date">
+        <label class="fl" for="in-date">التاريخ <span class="req">مطلوب</span></label>
+        <div class="box"><input id="in-date" class="num" inputmode="decimal" aria-describedby="m-date d-date" placeholder=""><svg class="ico ico-ok"><use href="#i-ok"/></svg><svg class="ico ico-err"><use href="#i-err"/></svg></div>
+        <div class="pm" aria-label="تعديل اليوم"><button type="button" data-pm="-1" aria-label="قبل يوم">−</button><button type="button" data-pm="1" aria-label="بعد يوم">+</button></div>
+        <span class="disp" id="d-date"></span>
+        <span class="msg" id="m-date" role="alert"></span>
+      </div>
+      <div class="fld" id="f-ref">
+        <label class="fl" for="in-ref">المرجع الرئيسي <span class="req">مطلوب</span></label>
+        <div class="box"><input id="in-ref" class="num" inputmode="text" aria-describedby="m-ref" value=""><svg class="ico ico-ok"><use href="#i-ok"/></svg><svg class="ico ico-err"><use href="#i-err"/></svg></div>
+        <span class="msg" id="m-ref" role="alert"></span>
+      </div>
+      <div class="fld">
+        <span class="fl" id="refno-l">الرقم المرجعي (يتولّد)</span>
+        <output class="refno" id="refno" aria-labelledby="refno-l">P</output>
+      </div>
+      <div class="fld" id="f-v">
+        <label class="fl" for="in-v">رقم السند <span class="muted" style="font-weight:400">اختياري</span></label>
+        <div class="box"><input id="in-v" class="num" inputmode="numeric" aria-describedby="m-v"><svg class="ico ico-ok"><use href="#i-ok"/></svg><svg class="ico ico-err"><use href="#i-err"/></svg></div>
+        <span class="msg" id="m-v" role="alert"></span>
+      </div>
+      <div class="fld wide">
+        <span class="fl">المبلغ <span class="req">مطلوب</span><span class="tagret" id="tagret" hidden></span></span>
+        <div class="dc" id="dc">
+          <span class="dch" id="h-d">مدين</span><span class="dch" id="h-c">دائن</span>
+          <div class="fld" id="f-d"><div class="box"><svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg><input id="in-d" class="num amt" inputmode="decimal" aria-labelledby="h-d" aria-describedby="m-d"><svg class="ico ico-ok"><use href="#i-ok"/></svg><svg class="ico ico-err"><use href="#i-err"/></svg></div><span class="msg" id="m-d" role="alert"></span></div>
+          <div class="fld" id="f-c"><div class="box"><svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg><input id="in-c" class="num amt" inputmode="decimal" aria-labelledby="h-c" aria-describedby="m-c"><svg class="ico ico-ok"><use href="#i-ok"/></svg><svg class="ico ico-err"><use href="#i-err"/></svg></div><span class="msg" id="m-c" role="alert"></span></div>
+        </div>
+      </div>
+      <div class="fld wide">
+        <button type="button" class="chk danger" role="checkbox" aria-checked="false" id="cDup"><span class="sq"><svg><use href="#i-tick"/></svg></span><span>أؤكد أنها حركة مختلفة (مثال لمربع التأكيد)</span></button>
+      </div>
+    </form>
+    <ul class="legend">
+      <li><b>التاريخ:</b> جرّب <code>15</code> و<code>1508</code> و<code>15.8</code> و<code>150826</code> و<code>15/8/26</code> و<code>+2</code> (من آخر حركة محفوظة 14/08/2026)، أو اتركه فارغاً واضغط Enter. جرّب <code>3102</code> و<code>158</code> للخطأ، و<code>1506</code> للفترة المقفلة (حتى 30/06/2026).</li>
+      <li><b>المرجع:</b> جرّب <code> out/00013 </code> (يُقص ويُكبَّر)، و<code>0395</code> (مكرر).</li>
+      <li><b>المبلغ:</b> جرّب <code>١٢٥٠٠٫٥</code> و<code>1250,5</code> والصق <code>ر.س 1,234.50</code>. جرّب <code>0</code> و<code>-50</code> للخطأ. الكتابة في خانة تفرّغ الأخرى، والفاتورة في المدين تُظهر وسم «مرتجع».</li>
+      <li><b>Enter</b> ينقل للحقل التالي.</li>
+    </ul>
+  </section>
+
+  <!-- ============ 2. Excel ============ -->
+  <section class="sheet panel" id="p2" role="tabpanel" aria-labelledby="tb2" hidden data-x="a">
+    <div class="intro">
+      <div>
+        <h2>رمز الريال في ملف Excel المصدَّر</h2>
+        <p class="muted">محاكاة لورقة كشف حساب كما ستُفتح في Excel. في الخيارات الثلاثة تبقى المبالغ <b>أرقاماً حقيقية</b> تُجمع وتُفرز. اضغط على أي خلية لترى محتواها في شريط الصيغة.</p>
+      </div>
+      <div>
+        <div class="seg" role="radiogroup" aria-label="خيار Excel" data-target="p2">
+          <button role="radio" aria-checked="true" data-v="a">أ. الرمز في كل خلية</button>
+          <button role="radio" aria-checked="false" data-v="b">ب. «ريال» في الرأس</button>
+          <button role="radio" aria-checked="false" data-v="c">ج. صورة الرمز في الرأس</button>
+        </div>
+        <p class="optnote" id="optnote2"></p>
+      </div>
+    </div>
+    <div class="fontsw" id="fontsw">
+      <span class="muted" style="font-size:15px">جهاز من يفتح الملف:</span>
+      <div class="kseg" role="radiogroup" aria-label="دعم الخط">
+        <button type="button" role="radio" aria-checked="true" data-f="yes">خطه يدعم الرمز الجديد</button>
+        <button type="button" role="radio" aria-checked="false" data-f="no">خطه لا يدعمه</button>
+      </div>
+    </div>
+    <div class="xl">
+      <div class="xl-bar"><b>Excel</b><span>كشف-المورد-أ-2026-Q3.xlsx</span></div>
+      <div class="xl-fx"><span class="nm" id="xlName">F3</span><span class="fx">fx</span><span class="v" id="xlVal"></span></div>
+      <div class="xl-scroll"><table id="xlT"></table></div>
+      <div class="xl-tabs"><span>كشف الحساب</span></div>
+    </div>
+    <div class="cmp" id="xlCmp"></div>
+  </section>
+
+  <!-- ============ 3. المكونات ============ -->
+  <section class="sheet panel" id="p3" role="tabpanel" aria-labelledby="tb3" hidden>
+    <div class="intro">
+      <div>
+        <h2>منتقي التقويم، وقائمة المورد، ونافذة سبب الإرجاع</h2>
+        <p class="muted">لكل مكوّن خياران تبدّل بينهما من فوقه. كلها تعمل بلوحة المفاتيح: الأسهم للتنقل، وEnter للاختيار، وEsc للإغلاق. على الجوال يصير التقويم لوحة من أسفل الشاشة.</p>
+      </div>
+    </div>
+    <div class="comp">
+      <div class="cblock">
+        <h3>منتقي التقويم
+          <span class="seg" role="radiogroup" aria-label="خيار التقويم" data-cal>
+            <button role="radio" aria-checked="true" data-v="a">أ. منبثق متدرّج</button>
+            <button role="radio" aria-checked="false" data-v="b">ب. دفتر شهري</button>
+          </span>
+        </h3>
+        <p class="optnote" id="calNote"></p>
+        <div class="stage" data-style="a">
+          <div class="fld" id="f-cal" style="max-width:340px">
+            <label class="fl" for="in-cal">تاريخ الحركة</label>
+            <div class="box"><input id="in-cal" class="num" inputmode="decimal" value="14/08/2026" aria-describedby="d-cal"><button type="button" class="cal-btn" id="calOpen" aria-label="فتح التقويم" aria-haspopup="dialog" aria-expanded="false"><svg><use href="#i-cal"/></svg></button></div>
+            <span class="disp" id="d-cal">الجمعة 14/08/2026</span>
+          </div>
+          <div class="cal sheetish" id="cal" role="dialog" aria-label="اختيار التاريخ" hidden></div>
+        </div>
+      </div>
+
+      <div class="cblock">
+        <h3>قائمة المورد
+          <span class="seg" role="radiogroup" aria-label="خيار قائمة المورد" data-cb>
+            <button role="radio" aria-checked="true" data-v="a">أ. بحث بسيط</button>
+            <button role="radio" aria-checked="false" data-v="b">ب. الأخيرة أولاً</button>
+          </span>
+        </h3>
+        <p class="optnote" id="cbNote"></p>
+        <div class="stage" data-style="a" style="min-height:380px">
+          <div class="fld" id="f-sup" style="max-width:420px">
+            <label class="fl" for="in-sup" id="sup-l">المورد <span class="req">مطلوب</span> <span class="cnt">9 موردين مسندين لك</span></label>
+            <div class="box"><input id="in-sup" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lb" aria-describedby="m-sup" placeholder="اكتب جزءاً من الاسم"><svg class="ico ico-ok"><use href="#i-ok"/></svg><svg class="ico ico-err"><use href="#i-err"/></svg></div>
+            <div class="lb" id="lb" role="listbox" aria-labelledby="sup-l" hidden></div>
+            <span class="msg" id="m-sup" role="alert"></span>
+          </div>
+          <p class="muted" style="font-size:14px;margin-top:14px">جرّب «الامثلة» بلا همزة، أو «عينه» بهاء: البحث يتجاهل الهمزات والتاء المربوطة والتشكيل. اكتب نصاً غير موجود ثم اخرج من الحقل لترى الرفض.</p>
+        </div>
+      </div>
+
+      <div class="cblock" style="grid-column:1/-1">
+        <h3>نافذة سبب إرجاع «دخلت» إلى «لم تدخل»
+          <span class="seg" role="radiogroup" aria-label="خيار النافذة" data-dlg>
+            <button role="radio" aria-checked="true" data-v="a">أ. نافذة وسطى</button>
+            <button role="radio" aria-checked="false" data-v="b">ب. لوحة جانبية</button>
+          </span>
+        </h3>
+        <p class="optnote" id="dlgNote"></p>
+        <div class="stage" style="min-height:460px;border:1px solid var(--rule);border-radius:4px;padding:14px">
+          <div class="mini" aria-label="فواتير محددة (مثال)">
+            <div><span class="n">P10590</span><span>المورد (أ)</span><span class="stamp in">دخلت</span></div>
+            <div><span class="n">P11405</span><span>المورد (أ)</span><span class="stamp in">دخلت</span></div>
+            <div><span class="n">P12291</span><span>المورد (ب)</span><span class="stamp in">دخلت</span></div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <button class="btn" type="button" id="dlgOpen">إرجاع 3 فواتير إلى «لم تدخل»</button>
+            <span class="toast" id="dlgToast" role="status"></span>
+          </div>
+          <div class="scrim" id="scrim" hidden>
+            <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dlg-h" id="dlg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ الإجابات ============ -->
+  <section class="answers" id="answers" aria-labelledby="ans-h">
+    <div class="sheet">
+      <h2 id="ans-h">إجاباتك</h2>
+      <p class="muted">اختر لكل سؤال وأضف ملاحظة إن أردت. تُحفظ المسودة في هذا المتصفح فقط. ثم «نسخ الإجابات» وألصقها لي.</p>
+      <div id="qs"></div>
+      <textarea id="out" readonly aria-label="نص الإجابات"></textarea>
+    </div>
+  </section>
+</div>
+
+<div class="bar" dir="rtl" lang="ar">
+  <div class="bar-in">
+    <span>أُجيب <b class="n" id="cnt">0</b> من <b class="n" id="tot">0</b></span>
+    <button class="btn primary" id="copyBtn" type="button">نسخ الإجابات</button>
+    <button class="btn ghost" id="clearBtn" type="button">مسح</button>
+    <span class="status" id="status" role="status" aria-live="polite"></span>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $ = function(s, r){ return (r || document).querySelector(s); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+/* ---------- منطق مشترك (نسخة أولية لما سيصير fields/core) ---------- */
+var TODAY = new Date(2026, 9, 10);            // اليوم الافتراضي في النموذج (الرياض)
+var LAST_SAVED = new Date(2026, 7, 14);       // آخر حركة محفوظة للمورد
+var LOCK = new Date(2026, 5, 30);             // مقفل حتى
+var DAYS = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+var MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+var MAX_AMOUNT = 9999999999; // بالهللات = 99,999,999.99
+
+function normDigits(s){
+  return String(s).replace(/[٠-٩]/g, function(c){ return String(c.charCodeAt(0) - 0x660); })
+                  .replace(/[۰-۹]/g, function(c){ return String(c.charCodeAt(0) - 0x6F0); });
+}
+function pad(n){ return (n < 10 ? "0" : "") + n; }
+function fmtDate(d){ return pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear(); }
+function sameDay(a, b){ return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+function addDays(d, n){ var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function mk(y, m, d){ var x = new Date(y, m - 1, d); return (x.getFullYear() === y && x.getMonth() === m - 1 && x.getDate() === d) ? x : null; }
+
+var FORMS = "اكتب: 15 أو 1508 أو 15/8 أو 150826 أو +1";
+function parseDate(raw, opts){
+  opts = opts || {};
+  var s = normDigits(raw).trim().replace(/\s+/g, "");
+  if (s === "") return { date: TODAY };
+  var m;
+  if ((m = s.match(/^([+-])(\d{1,3})$/))) return { date: addDays(opts.base || LAST_SAVED, (m[1] === "-" ? -1 : 1) * +m[2]) };
+  if (opts.paste && (m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/))) return check(+m[3], +m[2], +m[1]);
+  if (/[\/.\-]/.test(s)){
+    var p = s.split(/[\/.\-]/);
+    if (p.some(function(x){ return !/^\d+$/.test(x); }) || p.length < 2 || p.length > 3) return { error: "صيغة غير مفهومة. " + FORMS };
+    var y = p.length === 3 ? +p[2] : TODAY.getFullYear();
+    if (p.length === 3 && p[2].length === 2) y = 2000 + y;
+    else if (p.length === 3 && p[2].length !== 4) return { error: "السنة برقمين أو أربعة. " + FORMS };
+    return check(+p[0], +p[1], y);
+  }
+  if (!/^\d+$/.test(s)) return { error: "التاريخ أرقام فقط. " + FORMS };
+  switch (s.length){
+    case 1: case 2: return check(+s, TODAY.getMonth() + 1, TODAY.getFullYear());
+    case 4: return check(+s.slice(0,2), +s.slice(2), TODAY.getFullYear());
+    case 6: return check(+s.slice(0,2), +s.slice(2,4), 2000 + +s.slice(4));
+    case 8: return check(+s.slice(0,2), +s.slice(2,4), +s.slice(4));
+    default: return { error: "عدد الأرقام (" + s.length + ") لا يُفهم بلا لبس. " + FORMS };
+  }
+  function check(d, mo, y){
+    if (mo < 1 || mo > 12) return { error: "لا يوجد شهر رقم " + mo + ". اليوم أولاً ثم الشهر." };
+    var dt = mk(y, mo, d);
+    if (!dt) return { error: "لا يوجد يوم " + d + " في " + MONTHS[mo - 1] + " " + y + "." };
+    return { date: dt };
+  }
+}
+function dateNotes(d){
+  if (d <= LOCK) return { error: "الفترة مقفلة حتى " + fmtDate(LOCK) + ". اختر تاريخاً بعده أو اطلب فك القفل من المالك." };
+  var w = null, yearAgo = new Date(TODAY); yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+  if (d > TODAY) w = "تاريخ في المستقبل. تأكد منه قبل الحفظ.";
+  else if (d < yearAgo) w = "أقدم من 12 شهراً. تأكد منه قبل الحفظ.";
+  return { warn: w };
+}
+
+function groupInt(s){ s = s.replace(/^0+(?=\d)/, ""); return s.replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+function toHalalas(clean){ if (!clean || clean === ".") return null; var p = clean.split("."); return (+(p[0] || "0")) * 100 + +((p[1] || "") + "00").slice(0, 2); }
+function fmtHalalas(h){ var i = Math.floor(h / 100), f = h % 100; return groupInt(String(i)) + "." + pad(f); }
+function cleanPasteAmount(t){
+  var s = normDigits(t).replace(/ر\.?\s?س\.?|SAR|ريال|⃁/gi, "").replace(/[\s  ]/g, "");
+  if (/[-−(]/.test(s)) return { error: "المبلغ موجب فقط. الاتجاه تحدده خانة مدين أو دائن." };
+  if (s.indexOf(".") > -1 || s.indexOf("٫") > -1) s = s.replace(/[,،٬]/g, "").replace("٫", ".");
+  else s = s.replace(/[،,]/g, ".").replace(/٬/g, "");
+  if (!/^\d*\.?\d*$/.test(s) || s === "" || s === ".") return { error: "النص الملصوق ليس مبلغاً." };
+  var f = (s.split(".")[1] || "");
+  if (f.length > 2) return { error: "المبلغ الملصوق فيه أكثر من منزلتين عشريتين. صحّحه ثم الصقه." };
+  return { value: s };
+}
+
+/* ---------- حالة الحقل ---------- */
+function setState(fld, st, msg){
+  fld.classList.remove("is-valid", "is-error");
+  if (st) fld.classList.add("is-" + st);
+  var inp = $("input", fld), m = $(".msg", fld);
+  if (inp) inp.setAttribute("aria-invalid", st === "error" ? "true" : "false");
+  if (m){ m.className = "msg"; m.innerHTML = msg || ""; }
+}
+function setWarn(fld, html){ var m = $(".msg", fld); m.className = "msg warn"; m.innerHTML = html; }
+
+/* ---------- 1. شبكة الحالات (عرض ثابت) ---------- */
+var STATES = [
+  ["فارغ", "قبل الكتابة", "", "", ""],
+  ["تركيز", "المؤشر في الحقل", "st-focus", "", ""],
+  ["صحيح", "بعد الخروج", "is-valid", "15/08/2026", "1,250.00"],
+  ["خطأ", "بعد الخروج أو الحفظ", "is-error", "31/02", "0"],
+  ["معطّل", "لا يمكن الكتابة", "is-disabled", "15/08/2026", "1,250.00"],
+  ["للقراءة فقط", "يُعرض ولا يُعدَّل", "is-readonly", "15/08/2026", "1,250.00"]
+];
+var ERR = { date: "لا يوجد يوم 31 في فبراير 2026.", amt: "المبلغ يجب أن يكون أكبر من صفر.", ref: "المرجع مكرر: مسجّل للمورد (د)، الصف 148." };
+function sample(kind, st, val, i){
+  var id = "s-" + kind + "-" + i, dis = st === "is-disabled", ro = st === "is-readonly";
+  var label = kind === "date" ? "التاريخ" : kind === "amt" ? "المبلغ (دائن)" : "المرجع الرئيسي";
+  var v = kind === "ref" ? (st === "is-error" ? "0395" : val ? "0791" : "") : val;
+  var lead = kind === "amt" ? '<svg class="sar" role="img" aria-label="ريال سعودي"><use href="#sar"/></svg>' : "";
+  var disp = kind === "date" && st === "is-valid" ? '<span class="disp">السبت 15/08/2026</span>' : "";
+  var msg = st === "is-error" ? '<span class="msg">' + ERR[kind] + "</span>" : "";
+  return '<div class="fld ' + st + '"><label class="fl" for="' + id + '">' + label + '</label><div class="box">' + lead +
+    '<input id="' + id + '" class="num" value="' + v + '"' + (dis ? " disabled aria-disabled=\"true\"" : "") + (ro ? " readonly" : "") + (st === "is-error" ? ' aria-invalid="true"' : "") + ' tabindex="-1">' +
+    '<svg class="ico ico-ok"><use href="#i-ok"/></svg><svg class="ico ico-err"><use href="#i-err"/></svg><svg class="ico ico-lock"><use href="#i-lock"/></svg></div>' + disp + msg + "</div>";
+}
+(function(){
+  var h = '<div class="sh">الحالة</div><div class="sh">التاريخ</div><div class="sh">المبلغ</div><div class="sh">المرجع</div>';
+  STATES.forEach(function(s, i){
+    h += '<div class="sn">' + s[0] + "<small>" + s[1] + "</small></div>" + sample("date", s[2], s[3], i) + sample("amt", s[2], s[4], i) + sample("ref", s[2], s[3], i);
+  });
+  $("#states").innerHTML = h;
+})();
+
+/* ---------- 1. حقول التجربة ---------- */
+var form = $("#tryForm");
+var docType = "inv";
+var DUPS = { "0395": "المورد (د)، الصف 148، 1,700.00", "P0791": "" };
+
+// Enter للحقل التالي
+var order = ["in-date", "in-ref", "in-v", "in-d", "in-c"];
+form.addEventListener("keydown", function(e){
+  if (e.key !== "Enter" || e.target.tagName !== "INPUT") return;
+  e.preventDefault();
+  e.target.dispatchEvent(new Event("blur"));
+  var i = order.indexOf(e.target.id);
+  var next = order.slice(i + 1).map(function(id){ return $("#" + id); }).filter(function(x){ return x && !x.disabled; })[0];
+  if (next) next.focus(); else $("#cDup").focus();
+});
+
+// التاريخ
+var inDate = $("#in-date"), fDate = $("#f-date");
+var currentDate = null;
+function commitDate(raw, paste){
+  var r = parseDate(raw, { paste: paste });
+  $("#d-date").textContent = "";
+  if (r.error){ currentDate = null; setState(fDate, "error", r.error); return; }
+  var n = dateNotes(r.date);
+  if (n.error){ currentDate = null; inDate.value = fmtDate(r.date); setState(fDate, "error", n.error); return; }
+  currentDate = r.date;
+  inDate.value = fmtDate(r.date);
+  $("#d-date").textContent = DAYS[r.date.getDay()] + " " + fmtDate(r.date);
+  setState(fDate, "valid");
+  if (n.warn) setWarn(fDate, "<b>تنبيه:</b> " + n.warn);
+  updateRefNo();
+}
+inDate.addEventListener("beforeinput", function(e){
+  if (e.inputType !== "insertText" || !e.data) return;
+  if (!/^[0-9٠-٩۰-۹\/.\-+]+$/.test(e.data)){ e.preventDefault(); setState(fDate, "error", "التاريخ أرقام وفواصل فقط. " + FORMS); }
+});
+inDate.addEventListener("input", function(){ if (fDate.classList.contains("is-error")) setState(fDate, null); });
+inDate.addEventListener("blur", function(){ commitDate(inDate.value); });
+inDate.addEventListener("paste", function(e){ e.preventDefault(); var t = (e.clipboardData || window.clipboardData).getData("text"); commitDate(t, true); });
+$$(".pm button", fDate).forEach(function(b){ b.addEventListener("click", function(){
+  var base = currentDate || TODAY; commitDate(fmtDate(addDays(base, +b.dataset.pm)));
+}); });
+
+// المرجع
+var inRef = $("#in-ref"), fRef = $("#f-ref");
+inRef.addEventListener("beforeinput", function(e){
+  if (e.inputType !== "insertText" || !e.data) return;
+  if (!/^[A-Za-z0-9ء-ي٠-٩۰-۹\/\- ]+$/.test(e.data)){ e.preventDefault(); setState(fRef, "error", "المرجع حروف وأرقام و / و - فقط."); }
+});
+inRef.addEventListener("input", function(){ if (fRef.classList.contains("is-error")) setState(fRef, null); updateRefNo(); });
+inRef.addEventListener("blur", function(){
+  var v = normDigits(inRef.value).trim().replace(/[a-z]+/g, function(x){ return x.toUpperCase(); });
+  inRef.value = v; updateRefNo();
+  if (!v) return setState(fRef, "error", "أدخل المرجع الرئيسي.");
+  if (v.length > 40) return setState(fRef, "error", "المرجع حتى 40 حرفاً.");
+  if (DUPS[v]){ setState(fRef, "error", "المرجع مكرر: مسجّل لـ " + DUPS[v] + ". عدّله أو أكّد أنها حركة مختلفة مع ذكر السبب."); $("#refno").classList.add("dup"); return; }
+  $("#refno").classList.remove("dup"); setState(fRef, "valid");
+});
+function updateRefNo(){
+  var v = normDigits(inRef.value).trim().replace(/[a-z]+/g, function(x){ return x.toUpperCase(); });
+  var d = currentDate || TODAY;
+  $("#refno").textContent = docType === "inv" ? "P" + v : "MISC/" + d.getFullYear() + "/" + pad(d.getMonth() + 1) + "/" + v;
+}
+
+// السند
+var inV = $("#in-v"), fV = $("#f-v");
+inV.addEventListener("beforeinput", function(e){
+  if (e.inputType !== "insertText" || !e.data) return;
+  if (!/^[0-9٠-٩۰-۹]+$/.test(e.data)){ e.preventDefault(); setState(fV, "error", "رقم السند أرقام فقط، بلا حروف ولا كسور."); }
+});
+inV.addEventListener("input", function(){ var c = inV.selectionStart; inV.value = normDigits(inV.value); inV.setSelectionRange(c, c); if (fV.classList.contains("is-error")) setState(fV, null); });
+inV.addEventListener("blur", function(){
+  var v = inV.value.trim();
+  if (!v) return setState(fV, null);
+  if (v.length > 12) return setState(fV, "error", "رقم السند حتى 12 رقماً.");
+  setState(fV, "valid");
+});
+
+// المبلغ: مدين/دائن
+function amountField(inp, fld, other, otherFld){
+  function reformat(){
+    var raw = inp.value, caret = inp.selectionStart || 0;
+    var sig = raw.slice(0, caret).replace(/[^0-9.]/g, "").length;
+    var s = raw.replace(/[^0-9.]/g, "");
+    var p = s.split("."), ip = p[0], fp = p.length > 1 ? "." + p.slice(1).join("").slice(0, 2) : "";
+    ip = ip.replace(/^0+(?=\d)/, "");
+    var out = groupInt(ip) + fp;
+    if (ip === "" && fp) out = "0" + fp;
+    inp.value = out;
+    var pos = 0, cnt = 0;
+    while (pos < out.length && cnt < sig){ if (/[0-9.]/.test(out[pos])) cnt++; pos++; }
+    inp.setSelectionRange(pos, pos);
+  }
+  inp.addEventListener("beforeinput", function(e){
+    if (e.inputType !== "insertText" || !e.data) return;
+    var ch = normDigits(e.data);
+    if (/^[0-9]+$/.test(ch)){
+      var v = inp.value, dot = v.indexOf("."), c = inp.selectionStart;
+      if (dot > -1 && c > dot && v.slice(dot + 1).length >= 2 && inp.selectionEnd === c){ e.preventDefault(); setState(fld, "error", "منزلتان عشريتان كحد أقصى."); return; }
+      if (ch !== e.data){ e.preventDefault(); inp.setRangeText(ch, inp.selectionStart, inp.selectionEnd, "end"); inp.dispatchEvent(new Event("input")); }
+      return;
+    }
+    if (/^[.,،٫]$/.test(ch)){
+      e.preventDefault();
+      if (inp.value.indexOf(".") > -1){ setState(fld, "error", "فاصلة عشرية واحدة فقط."); return; }
+      inp.setRangeText(".", inp.selectionStart, inp.selectionEnd, "end"); inp.dispatchEvent(new Event("input")); return;
+    }
+    e.preventDefault();
+    setState(fld, "error", ch === "-" || ch === "+" ? "المبلغ موجب فقط. الاتجاه تحدده خانة مدين أو دائن." : "المبلغ أرقام فقط.");
+  });
+  inp.addEventListener("input", function(){
+    reformat();
+    if (fld.classList.contains("is-error")) setState(fld, null);
+    if (inp.value){ other.value = ""; setState(otherFld, null); }
+    syncDC();
+  });
+  inp.addEventListener("paste", function(e){
+    e.preventDefault();
+    var r = cleanPasteAmount((e.clipboardData || window.clipboardData).getData("text"));
+    if (r.error) return setState(fld, "error", r.error);
+    inp.value = r.value; inp.setSelectionRange(r.value.length, r.value.length); inp.dispatchEvent(new Event("input"));
+  });
+  inp.addEventListener("blur", function(){
+    if (!inp.value){ if (!other.value) setState(fld, null); return; }
+    var h = toHalalas(inp.value.replace(/,/g, ""));
+    if (!h) return setState(fld, "error", "المبلغ يجب أن يكون أكبر من صفر.");
+    if (h > MAX_AMOUNT) return setState(fld, "error", "الحد الأقصى 99,999,999.99.");
+    inp.value = fmtHalalas(h); setState(fld, "valid");
+  });
+}
+var inD = $("#in-d"), inC = $("#in-c"), fD = $("#f-d"), fC = $("#f-c");
+amountField(inD, fD, inC, fC); amountField(inC, fC, inD, fD);
+function syncDC(){
+  var defCredit = docType === "inv";
+  var side = inD.value ? "d" : inC.value ? "c" : (defCredit ? "c" : "d");
+  $("#h-d").classList.toggle("on", side === "d"); $("#h-c").classList.toggle("on", side === "c");
+  var t = $("#tagret");
+  if (docType === "inv" && inD.value){ t.hidden = false; t.textContent = "مرتجع"; }
+  else if (docType === "misc" && inC.value){ t.hidden = false; t.textContent = "استرداد"; }
+  else t.hidden = true;
+}
+$$("#f-type [role=radio]").forEach(function(b){ b.addEventListener("click", function(){
+  $$("#f-type [role=radio]").forEach(function(x){ x.setAttribute("aria-checked", String(x === b)); });
+  docType = b.dataset.t; syncDC(); updateRefNo();
+}); });
+syncDC(); updateRefNo();
+
+// مربع اختيار مخصص
+function bindChk(b){ b.addEventListener("click", function(){ if (b.getAttribute("aria-disabled") === "true") return; b.setAttribute("aria-checked", String(b.getAttribute("aria-checked") !== "true")); });
+  b.addEventListener("keydown", function(e){ if (e.key === " "){ e.preventDefault(); b.click(); } }); }
+bindChk($("#cDup"));
+
+/* ---------- مقطّعات الخيارات ---------- */
+var NOTES1 = {
+  a: "<b>هادئ:</b> الصحيح بلا زخرفة. الخطأ خط أحمر 2px وتسمية حمراء ورسالة. المعطّل بشفافية 50%. الأقل ضجيجاً، لكن المعطّل باهت النص.",
+  b: "<b>ختم:</b> الصحيح بعلامة ✓ كحلية. الخطأ بخلفية حمراء فاتحة وحافة 4px وأيقونة، والرسالة تبدأ بـ «المطلوب:». المعطّل برمادي اللسان وقفل، والنص مقروء. الأوضح للعين.",
+  c: "<b>هامش الدفتر:</b> الصحيح بخط مزدوج كحلي كإجمالي الدفتر. الخطأ بإطار أحمر رفيع ورسالة في صندوق بهامش أحمر. المعطّل بتظليل مخطط. الأقرب لروح «الدفتر»."
+};
+var NOTES2 = {
+  a: "<b>الرمز في كل خلية:</b> تنسيق رقم مخصص يضع ⃁ بجانب كل مبلغ، والقيمة تبقى رقماً. يعتمد على خط جهاز القارئ: بدّل «خطه لا يدعمه» لترى المربع الفارغ.",
+  b: "<b>«ريال» في الرأس:</b> الأعمدة «مدين (ريال)» والخلايا أرقام عادية. يظهر صحيحاً على كل جهاز وبرنامج (Excel وNumbers وGoogle Sheets)، لكن بلا الرمز الرسمي.",
+  c: "<b>صورة الرمز في الرأس:</b> رمز الريال يُرسم صورة صغيرة بجانب عنوان العمود، والخلايا أرقام عادية. يظهر الرمز الرسمي على كل جهاز، لكن الصورة لا تُنسخ مع الخلايا ولا تظهر في CSV."
+};
+var CAL_NOTES = {
+  a: "<b>منبثق متدرّج:</b> شبكة أيام، والضغط على «أغسطس 2026» يفتح الأشهر ثم السنوات. صغير ومألوف.",
+  b: "<b>دفتر شهري:</b> قائمة الأشهر ظاهرة دائماً بجانب الأيام مع مبدّل السنة. قفز أسرع بين الأشهر بنقرة واحدة، ويأخذ مساحة أعرض."
+};
+var CB_NOTES = {
+  a: "<b>بحث بسيط:</b> قائمة مرتبة أبجدياً تُفلتر أثناء الكتابة مع إبراز الجزء المطابق.",
+  b: "<b>الأخيرة أولاً:</b> مجموعة «المستخدمون مؤخراً» في الأعلى، وبجانب كل مورد تاريخ آخر حركة. أسرع لمن يُدخل لنفس الموردين يومياً."
+};
+var DLG_NOTES = {
+  a: "<b>نافذة وسطى:</b> تحجب الصفحة وتركّز على القرار. الأسباب بطاقات اختيار.",
+  b: "<b>لوحة جانبية:</b> تنزلق من الجانب وتبقى الفواتير المحددة ظاهرة خلفها. على الجوال تصير لوحة من الأسفل."
+};
+$("#optnote1").innerHTML = NOTES1.a; $("#optnote2").innerHTML = NOTES2.a;
+$("#calNote").innerHTML = CAL_NOTES.a; $("#cbNote").innerHTML = CB_NOTES.a; $("#dlgNote").innerHTML = DLG_NOTES.a;
+
+function segBind(seg, fn){
+  var bs = $$("[role=radio]", seg);
+  bs.forEach(function(b, i){
+    b.tabIndex = b.getAttribute("aria-checked") === "true" ? 0 : -1;
+    b.addEventListener("click", function(){ bs.forEach(function(x){ x.setAttribute("aria-checked", String(x === b)); x.tabIndex = x === b ? 0 : -1; }); fn(b.dataset.v || b.dataset.f || b.dataset.t, b); });
+    b.addEventListener("keydown", function(e){
+      var k = e.key === "ArrowLeft" ? 1 : e.key === "ArrowRight" ? -1 : 0;
+      if (!k) return; e.preventDefault(); var n = bs[(i + k + bs.length) % bs.length]; n.focus(); n.click();
+    });
+  });
+}
+segBind($("[data-target=p1]"), function(v){ $("#p1").dataset.style = v; $("#optnote1").innerHTML = NOTES1[v]; });
+segBind($("[data-target=p2]"), function(v){ $("#p2").dataset.x = v; $("#optnote2").innerHTML = NOTES2[v]; renderXL(); });
+segBind($("#fontsw .kseg"), function(v){ xlFont = v; renderXL(); });
+
+/* ---------- ألسنة ---------- */
+var tabs = $$(".tab");
+tabs.forEach(function(t, i){
+  t.addEventListener("click", function(){ selectTab(i); });
+  t.addEventListener("keydown", function(e){
+    var k = e.key === "ArrowLeft" ? 1 : e.key === "ArrowRight" ? -1 : 0;
+    if (k){ e.preventDefault(); var n = (i + k + tabs.length) % tabs.length; selectTab(n); tabs[n].focus(); }
+  });
+});
+function selectTab(i){
+  tabs.forEach(function(t, j){ t.setAttribute("aria-selected", String(i === j)); t.tabIndex = i === j ? 0 : -1; $("#" + t.getAttribute("aria-controls")).hidden = i !== j; });
+}
+
+/* ---------- 2. Excel ---------- */
+var xlFont = "yes";
+var ROWS = [
+  ["01/07/2026", "0412", "P0412", "فاتورة مشتريات", null, 4750],
+  ["06/07/2026", "0388", "MISC/2026/07/0388", "دفعة", 3000, null],
+  ["19/07/2026", "0431", "P0431", "فاتورة مشتريات", null, 1825.5],
+  ["02/08/2026", "0395", "MISC/2026/08/0395", "دفعة", 2500, null],
+  ["21/08/2026", "OUT/00013", "POUT/00013", "مرتجع", 600, null]
+];
+function cellMoney(v){
+  if (v == null) return "";
+  var t = Number(v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if ($("#p2").dataset.x !== "a") return t;
+  var sym = xlFont === "yes" ? '<svg class="sar" aria-hidden="true"><use href="#sar"/></svg>' : '<span class="tofu" aria-hidden="true"></span>';
+  return sym + " " + t;
+}
+function head(lbl){
+  var x = $("#p2").dataset.x;
+  if (x === "b") return lbl + " (ريال)";
+  if (x === "c") return lbl + '<span class="pic" title="صورة مدرجة"><svg class="sar" aria-hidden="true"><use href="#sar"/></svg></span>';
+  return lbl;
+}
+function renderXL(){
+  var cols = ["A","B","C","D","E","F","G"];
+  var h = "<thead><tr><th></th>" + cols.map(function(c){ return "<th>" + c + "</th>"; }).join("") + "</tr></thead><tbody>";
+  h += '<tr><th>1</th><td class="hd" data-v="التاريخ">التاريخ</td><td class="hd" data-v="المرجع">المرجع</td><td class="hd" data-v="الرقم المرجعي">الرقم المرجعي</td><td class="hd" data-v="البيان">البيان</td><td class="hd" data-v="' + ($("#p2").dataset.x === "b" ? "مدين (ريال)" : "مدين") + '">' + head("مدين") + '</td><td class="hd" data-v="' + ($("#p2").dataset.x === "b" ? "دائن (ريال)" : "دائن") + '">' + head("دائن") + '</td><td class="hd" data-v="' + ($("#p2").dataset.x === "b" ? "الرصيد (ريال)" : "الرصيد") + '">' + head("الرصيد") + "</td></tr>";
+  var bal = -1200;
+  ROWS.forEach(function(r, i){
+    var n = i + 2; bal = bal + (r[4] || 0) - (r[5] || 0);
+    h += "<tr><th>" + n + "</th>" +
+      '<td data-v="' + r[0] + '">' + r[0] + "</td>" +
+      '<td data-v="\'' + r[1] + '">' + r[1] + "</td>" +
+      '<td data-v="' + r[2] + '">' + r[2] + "</td>" +
+      '<td data-v="' + r[3] + '">' + r[3] + "</td>" +
+      '<td class="num" data-v="' + (r[4] == null ? "" : r[4]) + '">' + cellMoney(r[4]) + "</td>" +
+      '<td class="num" data-v="' + (r[5] == null ? "" : r[5]) + '">' + cellMoney(r[5]) + "</td>" +
+      '<td class="num" data-v="' + (n === 2 ? "=-1200+E2-F2" : "=G" + (n - 1) + "+E" + n + "-F" + n) + '">' + cellMoney(bal) + "</td></tr>";
+  });
+  var sd = ROWS.reduce(function(a, r){ return a + (r[4] || 0); }, 0), sc = ROWS.reduce(function(a, r){ return a + (r[5] || 0); }, 0);
+  h += '<tr><th>7</th><td class="tot" colspan="4" data-v="الإجمالي">الإجمالي</td><td class="num tot" data-v="=SUM(E2:E6)">' + cellMoney(sd) + '</td><td class="num tot" data-v="=SUM(F2:F6)">' + cellMoney(sc) + '</td><td class="num tot" data-v="=G6">' + cellMoney(bal) + "</td></tr></tbody>";
+  $("#xlT").innerHTML = h;
+  $$("#xlT td").forEach(function(td){
+    td.addEventListener("click", function(){
+      $$("#xlT td.sel").forEach(function(x){ x.classList.remove("sel"); });
+      td.classList.add("sel");
+      var row = td.parentNode.rowIndex, col = td.cellIndex;
+      $("#xlName").textContent = cols[col - 1] + row;
+      var v = td.dataset.v, fmt = "";
+      if (td.classList.contains("num") && v && v[0] !== "=") fmt = $("#p2").dataset.x === "a" ? "   ← رقم، والتنسيق: \"⃁\" #,##0.00" : "   ← رقم، والتنسيق: #,##0.00";
+      $("#xlVal").textContent = (v || "") + fmt;
+    });
+  });
+  var sel = $$("#xlT td.num")[1]; if (sel) sel.click();
+  var x = $("#p2").dataset.x;
+  var cmp = {
+    a: [["الرمز الرسمي", xlFont === "yes" ? "يظهر في كل خلية" : "مربع فارغ مكانه"], ["الجمع والفرز", "يعمل (القيمة رقم)"], ["النسخ إلى برنامج آخر", "يُنسخ الرقم، والرمز حسب الخط"], ["يعتمد على", "خط جهاز القارئ يدعم U+20C1"]],
+    b: [["الرمز الرسمي", "لا يظهر، كلمة «ريال» بدله"], ["الجمع والفرز", "يعمل"], ["النسخ إلى برنامج آخر", "يعمل كما هو"], ["يعتمد على", "لا شيء، يعمل في كل مكان"]],
+    c: [["الرمز الرسمي", "يظهر صورة في الرأس فقط"], ["الجمع والفرز", "يعمل"], ["النسخ إلى برنامج آخر", "الصورة لا تُنسخ"], ["يعتمد على", "دعم الصور (Excel وNumbers نعم، CSV لا)"]]
+  }[x];
+  $("#xlCmp").innerHTML = cmp.map(function(c){ return "<div><b>" + c[0] + "</b>" + c[1] + "</div>"; }).join("");
+  $("#fontsw").style.display = x === "a" ? "" : "none";
+}
+renderXL();
+
+/* ---------- 3أ. التقويم ---------- */
+var cal = $("#cal"), calOpen = $("#calOpen"), inCal = $("#in-cal"), calStyle = "a";
+var calSel = new Date(2026, 7, 14), view = new Date(2026, 7, 1), mode = "days", focusDay = null;
+var WD = ["س", "ح", "ن", "ث", "ر", "خ", "ج"]; // يبدأ السبت
+segBind($("[data-cal]"), function(v){ calStyle = v; $("#calNote").innerHTML = CAL_NOTES[v]; mode = "days"; if (!cal.hidden) renderCal(); });
+function renderCal(){
+  var y = view.getFullYear(), m = view.getMonth(), h = "";
+  var arrows = '<button type="button" class="arw" data-nav="-1" aria-label="الشهر السابق"><svg><use href="#i-prev"/></svg></button>';
+  var arrowsN = '<button type="button" class="arw" data-nav="1" aria-label="الشهر التالي"><svg><use href="#i-next"/></svg></button>';
+  if (calStyle === "a" && mode === "months"){
+    h = '<div class="cal-h">' + '<button type="button" class="arw" data-y="-1" aria-label="السنة السابقة"><svg><use href="#i-prev"/></svg></button>' +
+      '<button type="button" class="ttl" data-mode="years"><span class="n">' + y + '</span></button>' +
+      '<button type="button" class="arw" data-y="1" aria-label="السنة التالية"><svg><use href="#i-next"/></svg></button></div><div class="mgrid">' +
+      MONTHS.map(function(n, i){ return '<button type="button" data-m="' + i + '"' + (i === m ? ' class="cur"' : "") + ">" + n + "</button>"; }).join("") + "</div>";
+  } else if (calStyle === "a" && mode === "years"){
+    var y0 = y - 4; h = '<div class="cal-h"><span class="ttl" style="cursor:default">اختر السنة</span></div><div class="mgrid">';
+    for (var k = 0; k < 9; k++) h += '<button type="button" data-yy="' + (y0 + k) + '"' + (y0 + k === y ? ' class="cur"' : "") + '><span class="n">' + (y0 + k) + "</span></button>";
+    h += "</div>";
+  } else {
+    var grid = '<div class="dgrid" role="grid" aria-label="' + MONTHS[m] + " " + y + '">' + WD.map(function(w, i){ return '<span class="wd' + (i === 6 ? " fri" : "") + '" role="columnheader">' + w + "</span>"; }).join("");
+    var first = new Date(y, m, 1), off = (first.getDay() + 1) % 7; // السبت = 0
+    var start = addDays(first, -off);
+    for (var i = 0; i < 42; i++){
+      var d = addDays(start, i), cls = "day";
+      if (d.getMonth() !== m) cls += " out";
+      if (sameDay(d, TODAY)) cls += " today";
+      if (sameDay(d, calSel)) cls += " sel";
+      var locked = d <= LOCK; if (locked) cls += " lock";
+      grid += '<button type="button" role="gridcell" class="' + cls + '" data-d="' + d.getTime() + '" tabindex="' + (sameDay(d, focusDay || calSel) && d.getMonth() === m ? 0 : -1) + '"' + (locked ? ' aria-disabled="true"' : "") + ' aria-label="' + DAYS[d.getDay()] + " " + fmtDate(d) + (locked ? "، فترة مقفلة" : "") + '">' + d.getDate() + "</button>";
+    }
+    grid += "</div>";
+    var hd = '<div class="cal-h">' + arrows + '<button type="button" class="ttl" ' + (calStyle === "a" ? 'data-mode="months"' : 'style="cursor:default"') + ">" + MONTHS[m] + ' <span class="n">' + y + "</span></button>" + arrowsN + "</div>";
+    if (calStyle === "b"){
+      var ml = '<div class="mlist"><div class="yr"><button type="button" data-y="-1" aria-label="السنة السابقة">‹</button><span class="n">' + y + '</span><button type="button" data-y="1" aria-label="السنة التالية">›</button></div>' +
+        MONTHS.map(function(n, i){ return '<button type="button" class="m' + (i === m ? " cur" : "") + '" data-m="' + i + '">' + n + "</button>"; }).join("") + "</div>";
+      h = '<div class="calb">' + ml + "<div>" + hd + grid + "</div></div>";
+    } else h = hd + grid;
+  }
+  h += '<div class="cal-f"><span>مقفل حتى ' + fmtDate(LOCK) + '</span><span style="display:flex;gap:6px"><button type="button" class="btn ghost" data-today>اليوم</button><button type="button" class="btn ghost" data-close>إغلاق</button></span></div>';
+  cal.innerHTML = h;
+  cal.style.width = calStyle === "b" ? "min(100%,440px)" : "";
+}
+function openCal(){
+  var r = parseDate(inCal.value); if (r.date){ calSel = r.date; view = new Date(r.date.getFullYear(), r.date.getMonth(), 1); }
+  focusDay = calSel; mode = "days"; cal.hidden = false; calOpen.setAttribute("aria-expanded", "true"); renderCal();
+  var f = $(".day[tabindex='0']", cal); if (f) f.focus();
+}
+function closeCal(back){ cal.hidden = true; calOpen.setAttribute("aria-expanded", "false"); if (back) calOpen.focus(); }
+function pick(d){
+  if (d <= LOCK) return;
+  calSel = d; inCal.value = fmtDate(d); $("#d-cal").textContent = DAYS[d.getDay()] + " " + fmtDate(d); closeCal(true);
+}
+calOpen.addEventListener("click", function(){ cal.hidden ? openCal() : closeCal(true); });
+inCal.addEventListener("keydown", function(e){ if (e.key === "ArrowDown" && e.altKey){ e.preventDefault(); openCal(); } });
+inCal.addEventListener("blur", function(){ var r = parseDate(inCal.value); if (r.date){ inCal.value = fmtDate(r.date); $("#d-cal").textContent = DAYS[r.date.getDay()] + " " + fmtDate(r.date); } });
+cal.addEventListener("click", function(e){
+  var b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.nav){ view = new Date(view.getFullYear(), view.getMonth() + +b.dataset.nav, 1); focusDay = null; renderCal(); }
+  else if (b.dataset.y){ view = new Date(view.getFullYear() + +b.dataset.y, view.getMonth(), 1); renderCal(); }
+  else if (b.dataset.mode){ mode = b.dataset.mode; renderCal(); }
+  else if (b.dataset.m){ view = new Date(view.getFullYear(), +b.dataset.m, 1); mode = "days"; focusDay = null; renderCal(); }
+  else if (b.dataset.yy){ view = new Date(+b.dataset.yy, view.getMonth(), 1); mode = "months"; renderCal(); }
+  else if (b.dataset.d) pick(new Date(+b.dataset.d));
+  else if (b.hasAttribute("data-today")) pick(TODAY);
+  else if (b.hasAttribute("data-close")) closeCal(true);
+});
+cal.addEventListener("keydown", function(e){
+  if (e.key === "Escape"){ e.preventDefault(); closeCal(true); return; }
+  var b = e.target.closest(".day"); if (!b) return;
+  var d = new Date(+b.dataset.d), step = { ArrowLeft: 1, ArrowRight: -1, ArrowDown: 7, ArrowUp: -7 }[e.key];
+  if (e.key === "PageDown" || e.key === "PageUp"){ e.preventDefault(); var mm = e.key === "PageDown" ? 1 : -1; focusDay = new Date(d.getFullYear(), d.getMonth() + mm, Math.min(d.getDate(), 28)); view = new Date(focusDay.getFullYear(), focusDay.getMonth(), 1); renderCal(); $(".day[tabindex='0']", cal).focus(); return; }
+  if (!step) return;
+  e.preventDefault(); focusDay = addDays(d, step);
+  if (focusDay.getMonth() !== view.getMonth()) view = new Date(focusDay.getFullYear(), focusDay.getMonth(), 1);
+  renderCal(); var f = $(".day[tabindex='0']", cal); if (f) f.focus();
+});
+document.addEventListener("click", function(e){ if (!cal.hidden && !cal.contains(e.target) && !calOpen.contains(e.target)) closeCal(false); });
+
+/* ---------- 3ب. قائمة المورد ---------- */
+var SUPS = [
+  ["مؤسسة الأمثلة للأثاث", 41, "09/10/2026"], ["منجرة التجربة", 12, "07/10/2026"], ["مفروشات العيّنة", 33, "08/10/2026"],
+  ["مركز النموذج", 5, "12/09/2026"], ["بيت الاختبار", 9, "28/09/2026"], ["معرض المثال الحديث", 2, "01/08/2026"],
+  ["منجرة الإيضاح", 18, "30/09/2026"], ["مصنع العرض", 7, "15/09/2026"], ["مؤسسة الافتراض التجارية", 3, "20/08/2026"]
+];
+var RECENT = [0, 2, 1];
+var cbStyle = "a", inSup = $("#in-sup"), lb = $("#lb"), fSup = $("#f-sup"), act = -1, items = [], chosen = null;
+segBind($("[data-cb]"), function(v){ cbStyle = v; $("#cbNote").innerHTML = CB_NOTES[v]; if (!lb.hidden) renderLb(); });
+function nrm(s){ return normDigits(s).replace(/[ً-ْـ]/g, "").replace(/[أإآ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").toLowerCase(); }
+function hl(name, q){
+  if (!q) return esc(name);
+  var nn = nrm(name), nq = nrm(q), i = nn.indexOf(nq);
+  if (i < 0) return esc(name);
+  return esc(name.slice(0, i)) + "<mark>" + esc(name.slice(i, i + q.length)) + "</mark>" + esc(name.slice(i + q.length));
+}
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+function renderLb(){
+  var q = inSup.value.trim(), nq = nrm(q);
+  var match = SUPS.map(function(s, i){ return i; }).filter(function(i){ return !nq || nrm(SUPS[i][0]).indexOf(nq) > -1; });
+  var groups = [];
+  if (cbStyle === "b" && !nq) groups = [["المستخدمون مؤخراً", RECENT], ["كل الموردين", match.filter(function(i){ return RECENT.indexOf(i) < 0; }).sort(function(a, b){ return SUPS[a][0].localeCompare(SUPS[b][0], "ar"); })]];
+  else groups = [[null, match.sort(function(a, b){ return SUPS[a][0].localeCompare(SUPS[b][0], "ar"); })]];
+  items = []; var h = "";
+  groups.forEach(function(g){
+    if (!g[1].length) return;
+    if (g[0]) h += '<div class="grp" role="presentation">' + g[0] + "</div>";
+    g[1].forEach(function(i){
+      var k = items.length; items.push(i);
+      h += '<div class="op" role="option" id="op' + k + '" data-k="' + k + '" aria-selected="' + (k === act) + '"><span>' + hl(SUPS[i][0], q) + "</span>" + (cbStyle === "b" ? "<small>آخر حركة " + SUPS[i][2] + "</small>" : "") + "</div>";
+    });
+  });
+  if (!items.length) h = '<div class="empty">لا يوجد مورد مسند لك بهذا الاسم.</div>';
+  lb.innerHTML = h;
+  inSup.setAttribute("aria-activedescendant", act > -1 ? "op" + act : "");
+}
+function openLb(){ lb.hidden = false; inSup.setAttribute("aria-expanded", "true"); renderLb(); }
+function closeLb(){ lb.hidden = true; inSup.setAttribute("aria-expanded", "false"); act = -1; }
+function choose(k){ chosen = SUPS[items[k]][0]; inSup.value = chosen; closeLb(); setState(fSup, "valid"); }
+inSup.addEventListener("focus", openLb);
+inSup.addEventListener("input", function(){ chosen = null; act = items.length ? 0 : -1; setState(fSup, null); openLb(); act = items.length ? 0 : -1; renderLb(); });
+inSup.addEventListener("keydown", function(e){
+  if (e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); if (lb.hidden) openLb(); if (!items.length) return; act = (act + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length; renderLb(); var el = $("#op" + act); if (el) el.scrollIntoView({ block: "nearest" }); }
+  else if (e.key === "Enter"){ if (!lb.hidden && act > -1){ e.preventDefault(); choose(act); } }
+  else if (e.key === "Escape"){ closeLb(); }
+});
+lb.addEventListener("mousedown", function(e){ e.preventDefault(); var o = e.target.closest(".op"); if (o) choose(+o.dataset.k); });
+inSup.addEventListener("blur", function(){
+  closeLb();
+  var v = inSup.value.trim();
+  if (!v) return setState(fSup, "error", "اختر المورد من القائمة.");
+  var exact = SUPS.filter(function(s){ return nrm(s[0]) === nrm(v); })[0];
+  if (exact){ inSup.value = exact[0]; chosen = exact[0]; return setState(fSup, "valid"); }
+  if (!chosen) setState(fSup, "error", "«" + esc(v) + "» ليس مورداً مسنداً لك. اختر من القائمة.");
+});
+
+/* ---------- 3ج. نافذة السبب ---------- */
+var dlgStyle = "a", scrim = $("#scrim"), dlg = $("#dlg"), reason = null, lastFocus = null;
+segBind($("[data-dlg]"), function(v){ dlgStyle = v; $("#dlgNote").innerHTML = DLG_NOTES[v]; if (!scrim.hidden) renderDlg(); });
+var REASONS = [["wrong", "حُددت بالخطأ", "ضُغطت «دخلت» على فاتورة لم تُدخل في Odoo."], ["cancel", "أُلغيت في Odoo", "أُدخلت ثم أُلغيت هناك."], ["other", "أخرى", "اكتب السبب في الحقل أدناه (إلزامي)."]];
+function renderDlg(){
+  var cards = REASONS.map(function(r){ return '<button type="button" class="rcard" role="radio" aria-checked="' + (reason === r[0]) + '" data-r="' + r[0] + '" tabindex="' + (reason === r[0] || (!reason && r[0] === "wrong") ? 0 : -1) + '"><span class="dot"></span><span>' + r[1] + "<small>" + r[2] + "</small></span></button>"; }).join("");
+  var inner = '<h4 id="dlg-h">إرجاع 3 فواتير إلى «لم تدخل»</h4><p class="sub">السبب يُحفظ مع كل فاتورة وفي سجل التدقيق. سبب واحد يُطبَّق على الثلاث.</p>' +
+    '<div class="fl" id="rs-l" style="margin-bottom:6px">السبب <span class="req">مطلوب</span></div>' +
+    '<div class="' + (dlgStyle === "b" ? "seglist" : "rc") + '" role="radiogroup" aria-labelledby="rs-l" id="rg">' + cards + "</div>" +
+    '<span class="msg" id="m-rg" style="display:block;margin-top:4px"></span>' +
+    '<label class="fl" for="rs-t" style="margin-top:12px;display:flex">تفاصيل <span class="muted" id="rs-req" style="font-weight:400">اختياري</span></label>' +
+    '<textarea class="ta" id="rs-t" maxlength="300" aria-describedby="rs-c m-t"></textarea><div class="cc" id="rs-c">0 / 300</div><span class="msg" id="m-t"></span>';
+  var foot = '<div class="dlg-f"><button type="button" class="btn danger" data-ok>إرجاع إلى «لم تدخل»</button><button type="button" class="btn ghost" data-cancel>إلغاء</button></div>';
+  dlg.innerHTML = dlgStyle === "b" ? '<div class="body">' + inner + "</div>" + foot : inner + foot;
+  scrim.classList.toggle("side", dlgStyle === "b");
+  var rs = $$("#rg [role=radio]");
+  rs.forEach(function(b, i){
+    b.addEventListener("click", function(){ reason = b.dataset.r; renderReason(); });
+    b.addEventListener("keydown", function(e){ var k = { ArrowDown: 1, ArrowUp: -1, ArrowLeft: 1, ArrowRight: -1 }[e.key]; if (!k) return; e.preventDefault(); var n = rs[(i + k + rs.length) % rs.length]; n.focus(); n.click(); });
+  });
+  $("#rs-t").addEventListener("input", function(e){ $("#rs-c").textContent = e.target.value.length + " / 300"; if (e.target.value.trim()){ e.target.classList.remove("err"); $("#m-t").textContent = ""; } });
+  renderReason();
+}
+function renderReason(){
+  $$("#rg [role=radio]").forEach(function(b){ var on = b.dataset.r === reason; b.setAttribute("aria-checked", String(on)); b.tabIndex = on || (!reason && b.dataset.r === "wrong") ? 0 : -1; });
+  if (reason){ $("#rg").classList.remove("rgerr"); $("#m-rg").textContent = ""; }
+  $("#rs-req").textContent = reason === "other" ? "مطلوب مع «أخرى»" : "اختياري";
+  $("#rs-req").className = reason === "other" ? "req" : "muted";
+}
+function openDlg(){ lastFocus = document.activeElement; reason = null; scrim.hidden = false; renderDlg(); $("#rg [tabindex='0']").focus(); }
+function closeDlg(){ scrim.hidden = true; if (lastFocus) lastFocus.focus(); }
+$("#dlgOpen").addEventListener("click", openDlg);
+dlg.addEventListener("click", function(e){
+  if (e.target.closest("[data-cancel]")) return closeDlg();
+  if (!e.target.closest("[data-ok]")) return;
+  var ok = true;
+  if (!reason){ ok = false; $("#rg").classList.add("rgerr"); $("#m-rg").textContent = "اختر سبب الإرجاع."; }
+  if (reason === "other" && !$("#rs-t").value.trim()){ ok = false; $("#rs-t").classList.add("err"); $("#m-t").textContent = "اكتب السبب، فهو مطلوب مع «أخرى»."; }
+  if (!ok){ var f = $("#rg.rgerr [role=radio]") || $("#rs-t.err"); if (f) f.focus(); return; }
+  closeDlg();
+  $$(".mini .stamp").forEach(function(s){ s.className = "stamp out"; s.textContent = "لم تدخل"; });
+  $("#dlgToast").textContent = "أُرجعت 3 فواتير إلى «لم تدخل» وسُجّل السبب في التدقيق.";
+});
+scrim.addEventListener("keydown", function(e){
+  if (e.key === "Escape"){ e.preventDefault(); closeDlg(); return; }
+  if (e.key !== "Tab") return;
+  var f = $$("button, textarea", dlg).filter(function(x){ return x.tabIndex !== -1; });
+  var first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+});
+scrim.addEventListener("click", function(e){ if (e.target === scrim) closeDlg(); });
+
+/* ---------- الإجابات ---------- */
+var QS = [
+  { id: "1", q: "حالات الحقول (صحيح / خطأ / معطّل)", o: ["أ. هادئ", "ب. ختم", "ج. هامش الدفتر"] },
+  { id: "1ب", q: "سلوك حقول التجربة (التاريخ، المرجع، السند، المبلغ، مدين/دائن)", o: ["مقبول كما هو", "عندي ملاحظات (في المربع)"] },
+  { id: "2", q: "رمز الريال في Excel", o: ["أ. الرمز في كل خلية", "ب. «ريال» في الرأس", "ج. صورة الرمز في الرأس"] },
+  { id: "3", q: "منتقي التقويم", o: ["أ. منبثق متدرّج", "ب. دفتر شهري"] },
+  { id: "4", q: "قائمة المورد", o: ["أ. بحث بسيط", "ب. الأخيرة أولاً"] },
+  { id: "5", q: "نافذة سبب الإرجاع", o: ["أ. نافذة وسطى", "ب. لوحة جانبية"] },
+  { id: "6", q: "الخطوة التالية", o: ["نماذج الشاشات الناقصة (فهرس القيود، الدخول، المستخدمون، قفل الفترات، التدقيق، الإشعارات، التحميل والفراغ)", "المرحلة 1 (الأساس + CI + القواعد + مكتبة الحقول)، والشاشات الناقصة لاحقاً"] }
+];
+var KEY = "rased-proposals-r1", st = {};
+try { st = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e){ st = {}; }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e){} }
+$("#tot").textContent = QS.length;
+$("#qs").innerHTML = QS.map(function(q, i){
+  var s = st[i] || {};
+  return '<div class="q" id="q' + i + '"><div class="qt"><span class="id">' + q.id + '</span><span id="qt' + i + '">' + q.q + '</span></div><div class="opts" role="radiogroup" aria-labelledby="qt' + i + '">' +
+    q.o.map(function(o){ return '<button type="button" class="opt" role="radio" aria-checked="' + (s.a === o) + '" data-i="' + i + '">' + esc(o) + "</button>"; }).join("") +
+    '</div><textarea class="note" data-i="' + i + '" rows="1" placeholder="ملاحظة اختيارية" aria-label="ملاحظة على ' + esc(q.q) + '">' + esc(s.n || "") + "</textarea></div>";
+}).join("");
+$$("#qs .opt").forEach(function(b){ b.addEventListener("click", function(){
+  var i = +b.dataset.i; st[i] = st[i] || {}; st[i].a = b.textContent; save();
+  $$("#q" + i + " .opt").forEach(function(x){ x.setAttribute("aria-checked", String(x === b)); }); count();
+}); });
+$$("#qs .note").forEach(function(t){ t.addEventListener("input", function(){ var i = +t.dataset.i; st[i] = st[i] || {}; st[i].n = t.value; save(); count(); }); });
+function count(){ var n = 0; QS.forEach(function(q, i){ var s = st[i] || {}; var d = !!(s.a || (s.n && s.n.trim())); if (d) n++; $("#q" + i).classList.toggle("done", d); }); $("#cnt").textContent = n; }
+count();
+function text(){
+  var L = ["إجاباتي على نماذج الحقول والمكونات لمشروع «رصيد»:", ""];
+  QS.forEach(function(q, i){ var s = st[i] || {}; L.push(q.id + ". " + q.q + ": " + (s.a || "لم يُجب") + (s.n && s.n.trim() ? " — ملاحظة: " + s.n.trim().replace(/\s*\n\s*/g, " / ") : "")); });
+  return L.join("\n");
+}
+var status = $("#status"), out = $("#out");
+function say(m, err){ status.textContent = m; status.classList.toggle("err", !!err); }
+$("#copyBtn").addEventListener("click", function(){
+  var t = text(); out.value = t;
+  function fb(){ out.classList.add("show"); out.focus(); out.select(); var ok = false; try { ok = document.execCommand("copy"); } catch (e){}
+    if (ok) say("نُسخت الإجابات. ألصقها في المحادثة."); else { say("تعذّر النسخ التلقائي. النص محدد بالأسفل، انسخه يدوياً.", true); out.scrollIntoView({ block: "center" }); } }
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function(){ out.classList.add("show"); say("نُسخت الإجابات. ألصقها في المحادثة."); }, fb); else fb();
+});
+var pend = false;
+$("#clearBtn").addEventListener("click", function(e){
+  if (!pend){ pend = true; e.target.textContent = "تأكيد المسح"; say("اضغط «تأكيد المسح» لحذف الإجابات.", true); setTimeout(function(){ if (pend){ pend = false; e.target.textContent = "مسح"; say(""); } }, 4000); return; }
+  pend = false; e.target.textContent = "مسح"; st = {}; save();
+  $$("#qs .opt").forEach(function(x){ x.setAttribute("aria-checked", "false"); }); $$("#qs .note").forEach(function(x){ x.value = ""; });
+  out.classList.remove("show"); count(); say("مُسحت الإجابات.");
+});
+
+/* ---------- الوضع ---------- */
+var root = document.documentElement, tb = $("#themeBtn");
+function isDark(){ var t = root.getAttribute("data-theme"); return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; }
+function syncTb(){ tb.textContent = isDark() ? "الوضع الفاتح" : "الوضع الداكن"; }
+tb.addEventListener("click", function(){ root.setAttribute("data-theme", isDark() ? "light" : "dark"); syncTb(); });
+syncTb();
+})();
+</script>
+</body></html>
