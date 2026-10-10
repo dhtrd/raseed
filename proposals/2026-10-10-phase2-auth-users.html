@@ -211,13 +211,11 @@ table.ledger{width:100%;border-collapse:collapse;font-size:16px}
 .ledger .who .n{font-size:14px;color:var(--ink-2)}
 .ua{display:grid;grid-template-columns:minmax(0,1fr) 340px;min-height:480px}
 .ua .pane{background:var(--wash-2);border-inline-start:1px solid var(--rule);padding:18px;display:flex;flex-direction:column;gap:14px}
-@container (max-width:900px){.ua{grid-template-columns:1fr}.ua .pane{border-inline-start:0;border-top:3px double var(--ink)}}
+
 @container (max-width:600px){
   .ledger thead{display:none}
-  .ledger tr{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:12px 14px;border-bottom:1px solid var(--rule)}
+  table.ledger,.ledger tbody{display:block}
   .ledger td{border:0;padding:0}
-  .ledger td[data-l]::before{content:attr(data-l) " ";font-size:12.5px;color:var(--ink-2)}
-  .ledger td.c-last{grid-column:1/-1}
 }
 .pane h4{display:flex;justify-content:space-between;gap:8px;align-items:center}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:15px}
@@ -319,6 +317,47 @@ table.cmp{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;bac
 .flow .st{border:1px solid var(--rule);border-top:3px double var(--ink);background:var(--surface);padding:12px 14px;font-size:15px}
 .flow .st h3{margin-bottom:4px}
 
+/* النسخة 2 */
+.clock{display:flex;flex-direction:column;gap:2px;line-height:1.2}
+.clock .t{font-family:var(--f-num);font-size:44px;font-weight:600;font-variant-numeric:lining-nums tabular-nums;direction:ltr;unicode-bidi:isolate;color:var(--mark-on)}
+.clock .t small{font-family:var(--f-text);font-size:20px;font-weight:700;margin-inline-start:6px}
+.clock .d{font-size:15px;opacity:.85}
+@container (max-width:700px){.lb .side .clock{margin-inline-start:auto;align-items:flex-end}.lb .side .clock .t{font-size:24px}.lb .side .clock .t small{font-size:14px}.lb .side .clock .d{font-size:12.5px}}
+.back{display:none;font:inherit;font-size:15px;font-weight:700;min-height:44px;padding:4px 12px 4px 4px;border:0;background:none;color:var(--accent);cursor:pointer;align-items:center;gap:6px}
+.ahead{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.ahead h3{font-size:18px;flex:1;min-width:0}
+.ledger td.c-go{display:none}
+.ua>div{min-width:0}
+.clock .t{display:flex;align-items:baseline;gap:6px}
+.clock .t small{margin:0}
+@container (max-width:900px){
+  .ua{grid-template-columns:1fr}
+  .ua .pane{border-inline-start:0;display:none}
+  .ua.open>div:first-child{display:none}
+  .ua.open .pane{display:flex;background:var(--surface)}
+  .ua .pane .back{display:inline-flex;align-self:flex-start}
+}
+@container (max-width:600px){
+  .ledger tbody tr{display:grid;grid-template-columns:minmax(0,1fr) auto 18px;grid-template-areas:"who role go" "sup st go";gap:4px 10px;padding:12px 14px;border-bottom:1px solid var(--rule);align-items:center}
+  .ledger td.c-who{grid-area:who;min-width:0}
+  .ledger td.c-role{grid-area:role;justify-self:end}
+  .ledger td.c-sup{grid-area:sup;font-size:14.5px;color:var(--ink-2)}
+  .ledger td.c-st{grid-area:st;justify-self:end}
+  .ledger td.c-last{display:none}
+  .ledger td.c-go{display:block;grid-area:go;color:var(--ink-2);font-size:20px;text-align:center}
+  .ledger tbody tr[aria-selected="true"]{box-shadow:none;background:transparent}
+}
+@container (max-width:720px){
+  .aa .who{display:flex;flex-direction:column;overflow:visible}
+  .aa .who .grp{display:block}
+  .aa .who .it{white-space:normal;border-bottom:1px solid var(--rule);border-inline-start:0}
+  .aa .who .it[aria-selected="true"]{border-bottom-color:var(--rule);background:transparent;font-weight:400}
+  .aa .who .it::after{content:"‹";font-size:20px;color:var(--ink-2)}
+  .aa:not(.open) .body{display:none}
+  .aa.open .who{display:none}
+  .aa .back{display:inline-flex}
+}
+
 /* الإجابات */
 .answers{margin-top:26px}
 .answers .sheet{border-top:5px double var(--ink)}
@@ -346,7 +385,7 @@ table.cmp{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;bac
     <div class="brand">
       <svg class="mark" viewBox="0 0 120 120" aria-hidden="true"><rect x="30" y="36" width="76" height="16" rx="8" fill="var(--mark-ink)"/><rect x="14" y="68" width="76" height="16" rx="8" fill="var(--mark-acc)"/></svg>
       <div>
-        <h1>رصيد · نماذج المرحلة 2</h1>
+        <h1>رصيد · نماذج المرحلة 2 <span class="ex">النسخة 2</span></h1>
         <div class="meta">الدخول · إدارة المستخدمين · إسناد الموردين · <span class="n">2026-10-10</span> · الأسماء والموردون وهمية</div>
       </div>
     </div>
@@ -357,7 +396,7 @@ table.cmp{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;bac
     <button class="tab" role="tab" id="t-login" aria-controls="p-login" aria-selected="true"><span class="tn">1</span>شاشة الدخول</button>
     <button class="tab" role="tab" id="t-users" aria-controls="p-users" aria-selected="false" tabindex="-1"><span class="tn">2</span>إدارة المستخدمين</button>
     <button class="tab" role="tab" id="t-assign" aria-controls="p-assign" aria-selected="false" tabindex="-1"><span class="tn">3</span>إسناد الموردين</button>
-    <button class="tab" role="tab" id="t-acc" aria-controls="p-acc" aria-selected="false" tabindex="-1"><span class="tn">4</span>إنشاء الحسابات (قرار تقني)</button>
+    <button class="tab" role="tab" id="t-acc" aria-controls="p-acc" aria-selected="false" tabindex="-1"><span class="tn">4</span>إنشاء الحسابات (حُسم: ج)</button>
   </div>
 
   <div class="sheet">
@@ -369,7 +408,7 @@ table.cmp{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;bac
           <p class="muted">حقل واحد للبريد أو اسم المستخدم، وكلمة مرور بزر إظهار. جرّب كتابة <code>fahad</code> أو <code>a@b</code> ثم اخرج من الحقل. الحالات أسفل الخيارات تعرض ما يراه المستخدم في كل موقف.</p>
         </div>
         <div class="ctrls">
-          <div class="ctrl"><span>الخيار</span><div class="seg" role="radiogroup" aria-label="خيار شاشة الدخول" data-k="login"></div></div>
+          <div class="ctrl" hidden><span>الخيار</span><div class="seg" role="radiogroup" aria-label="خيار شاشة الدخول" data-k="login"></div></div>
           <div class="ctrl"><span>المعاينة</span><div class="seg small" role="radiogroup" aria-label="عرض المعاينة" data-w="login"></div></div>
         </div>
       </div>
@@ -386,7 +425,7 @@ table.cmp{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;bac
           <p class="muted">بدّل «تعرض بصفة» لترى الفرق: الإدارة ترى حساب المالك مقفلاً ولا تعدّل مسميات الأدوار. لا حذف للمستخدم، بل إيقاف (القواعد تمنع الحذف). «إضافة مستخدم» تفتح النافذة بمؤشر قوة كلمة المرور.</p>
         </div>
         <div class="ctrls">
-          <div class="ctrl"><span>الخيار</span><div class="seg" role="radiogroup" aria-label="خيار إدارة المستخدمين" data-k="users"></div></div>
+          <div class="ctrl" hidden><span>الخيار</span><div class="seg" role="radiogroup" aria-label="خيار إدارة المستخدمين" data-k="users"></div></div>
           <div class="ctrl"><span>تعرض بصفة</span><div class="seg small" role="radiogroup" aria-label="تعرض بصفة" data-k="viewer"></div></div>
           <div class="ctrl"><span>المعاينة</span><div class="seg small" role="radiogroup" aria-label="عرض المعاينة" data-w="users"></div></div>
         </div>
@@ -403,7 +442,7 @@ table.cmp{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;bac
           <p class="muted">المالك والإدارة يرون كل الموردين، فالإسناد لمدخلي البيانات فقط. التغييرات تُجمع ثم تُحفظ مرة واحدة مع سجل تدقيق يذكر ما أُضيف وما أُزيل. المورد <b>(ق)</b> هنا مؤرشف للعرض.</p>
         </div>
         <div class="ctrls">
-          <div class="ctrl"><span>الخيار</span><div class="seg" role="radiogroup" aria-label="خيار الإسناد" data-k="assign"></div></div>
+          <div class="ctrl" hidden><span>الخيار</span><div class="seg" role="radiogroup" aria-label="خيار الإسناد" data-k="assign"></div></div>
           <div class="ctrl"><span>المعاينة</span><div class="seg small" role="radiogroup" aria-label="عرض المعاينة" data-w="assign"></div></div>
         </div>
       </div>
@@ -415,7 +454,7 @@ table.cmp{border-collapse:collapse;width:100%;min-width:760px;font-size:15px;bac
     <section class="panel" id="p-acc" role="tabpanel" aria-labelledby="t-acc" hidden>
       <div class="intro">
         <div>
-          <h2>كيف يُنشأ حساب الدخول لمستخدم جديد؟</h2>
+          <h2>كيف يُنشأ حساب الدخول لمستخدم جديد؟ <span class="ex">اخترت: ج. هجين</span></h2>
           <p class="muted">خطة Spark بلا Cloud Functions. الواجهة تستطيع إنشاء حساب دخول، لكنها <b>لا تستطيع تغيير كلمة مرور مستخدم آخر</b>. هذا يمسّ قراراً سابقاً: «إعادة كلمة المرور لأصحاب الأسماء عبر المالك أو الإدارة». القرار لك؛ هذه المقارنة لتختار.</p>
         </div>
       </div>
@@ -522,23 +561,23 @@ var users = [
   { id: "u3", name: "ليلى", login: "layla@example.com", role: "entry", active: true, assigned: ["و","ز","ح"], upd: "2026-10-07" },
   { id: "u4", name: "سعد", login: "saad", role: "entry", active: false, assigned: ["ط"], upd: "2026-09-30" }
 ];
-var S = { login: "a", users: "a", assign: "a", viewer: "owner", sel: "u2", w: { login: "desk", users: "desk", assign: "desk" }, lstate: "normal", dtab: "data" };
+var S = { login: "b", users: "a", assign: "a", uOpen: false, aOpen: false, viewer: "owner", sel: "u2", w: { login: "desk", users: "desk", assign: "desk" }, lstate: "normal", dtab: "data" };
 var draft = {}; // الإسناد قبل الحفظ: userId -> Set
 function draftOf(uid){ if (!draft[uid]){ var u = users.filter(function(x){ return x.id === uid; })[0]; draft[uid] = new Set(u.assigned); } return draft[uid]; }
 function userById(id){ return users.filter(function(u){ return u.id === id; })[0]; }
 var NOTES = {
   login: {
     a: "<b>أ. ورقة وسطى:</b> صفحة دفتر واحدة في منتصف الشاشة: الشعار، ثم خط مزدوج، ثم الحقلان والزر. الأبسط والأسرع تحميلاً، وتبدو مثل باقي النظام.",
-    b: "<b>ب. مقسومة:</b> لوح أخضر بألوان الشعار «نخلة وتمر» يميناً، والنموذج يساراً. على الجوال يصير اللوح شريطاً علوياً صغيراً. أوضح هوية، وأول شاشة يراها المستخدم تحمل الشعار كبيراً.",
+    b: "<b>معتمد: ب. مقسومة.</b> <b>جديد في النسخة 2:</b> ساعة حالية بنظام 12 ساعة بتوقيت الرياض مع التاريخ، في اللوح الأخضر على الحاسوب وفي الشريط العلوي على الجوال. جرّب «جوال 390».<br>لوح أخضر بألوان الشعار «نخلة وتمر» يميناً، والنموذج يساراً. على الجوال يصير اللوح شريطاً علوياً صغيراً. أوضح هوية، وأول شاشة يراها المستخدم تحمل الشعار كبيراً.",
     c: "<b>ج. سطر الدفتر:</b> الدخول كأنه قيد في دفتر مسطّر: كل حقل سطر بتسمية يميناً، وتاريخ اليوم في الرأس، والزر تحت خط الإجمالي المزدوج. الأكثر تميزاً، وأطول قليلاً على الجوال."
   },
   users: {
-    a: "<b>أ. جدول الدفتر + لوحة:</b> جدول بكل المستخدمين (الاسم، الدخول، الدور، الموردون، الحالة)، والنقر على صف يفتح لوحة التعديل جانباً. مسميات الأدوار في شريط أسفل الجدول. يناسب العدد الكبير.",
+    a: "<b>معتمد: أ. جدول الدفتر + لوحة.</b> <b>جديد في النسخة 2 للجوال واللوحي العمودي:</b> كل مستخدم سطر بطاقة (الاسم والدور، ثم الموردون والحالة)، والنقر يفتح صفحته بملء العرض مع زر «→ المستخدمون» للرجوع. على الحاسوب تبقى اللوحة جانبية. وأُضيفت «مدة الخمول» للمالك بجانب مسميات الأدوار.<br> جدول بكل المستخدمين (الاسم، الدخول، الدور، الموردون، الحالة)، والنقر على صف يفتح لوحة التعديل جانباً. مسميات الأدوار في شريط أسفل الجدول. يناسب العدد الكبير.",
     b: "<b>ب. أعمدة الأدوار:</b> ثلاثة أعمدة بعنوان كل دور، والعنوان نفسه يُعدَّل لتغيير المسمى (للمالك). بطاقة لكل مستخدم. يُظهر توزيع الأدوار بنظرة، ويطول مع كثرة مدخلي البيانات.",
     c: "<b>ج. فهرس وتفاصيل:</b> فهرس جانبي مقسوم حسب الدور، وصفحة تفاصيل بألسنة: البيانات، الموردون، السجل. يضع الإسناد وسجل التدقيق داخل صفحة المستخدم نفسها."
   },
   assign: {
-    a: "<b>أ. من جهة المستخدم:</b> تختار مدخل البيانات، فتظهر قائمة الموردين بمربعات اختيار وبحث و«تحديد الكل». الأوضح عند إسناد مستخدم جديد.",
+    a: "<b>معتمد: أ. من جهة المستخدم.</b> <b>جديد في النسخة 2:</b> على الجوال تظهر قائمة مدخلي البيانات أولاً، واختيار أحدهم يفتح موردينه مع زر «→ مدخلو البيانات». على كل الأحجام رابط «صفحة المستخدم» يعيدك إلى إدارة المستخدمين، وإن كانت هناك تغييرات غير محفوظة يسألك أولاً. المورد المؤرشف لا يظهر (قرارك).<br> تختار مدخل البيانات، فتظهر قائمة الموردين بمربعات اختيار وبحث و«تحديد الكل». الأوضح عند إسناد مستخدم جديد.",
     b: "<b>ب. مصفوفة:</b> الموردون صفوف ومدخلو البيانات أعمدة، وكل خلية مربع اختيار. يُرى كل الإسناد في شاشة واحدة، ويُعرف فوراً أي مورد بلا مسؤول. على الجوال تتمرر أفقياً.",
     c: "<b>ج. ناقلة:</b> عمودان «متاح» و«مُسنَد» وزر نقل لكل مورد. واضح على اللمس، والتغيير قبل الحفظ ملوّن (أزرق أُضيف، أحمر أُزيل)."
   }
@@ -601,13 +640,13 @@ function renderLogin(){
     html = '<div class="la"><div class="card"><header><div class="logo">' + markSvg(false) + '<span>رصيد</span></div><span class="muted" style="font-size:15px">دفتر حسابات الموردين</span></header>' + body + '</div></div>';
   } else if (S.login === "b"){
     html = '<div class="lb"><div class="side"><div style="display:flex;flex-direction:column;gap:14px"><svg class="big" viewBox="0 0 120 120" aria-hidden="true"><rect x="30" y="36" width="76" height="16" rx="8" fill="var(--mark-on)"/><rect x="14" y="68" width="76" height="16" rx="8" fill="var(--mark-acc-on)"/></svg><h3>رصيد</h3><p>دفتر حسابات الموردين: الكشوف، والفواتير، وحالة Odoo في مكان واحد.</p></div>' +
-      '<div class="lines" aria-hidden="true"><div><span>رصيد سابق</span><span>+ مدين</span></div><div><span>− دائن</span><span>= رصيد</span></div></div></div>' +
+      '<div class="clock" role="timer" aria-live="off" aria-label="الوقت الحالي بتوقيت الرياض"><span class="t" data-clock></span><span class="d" data-date></span></div></div>' +
       '<div class="main"><div style="max-width:400px;width:100%"><h3>تسجيل الدخول</h3><p class="muted" style="font-size:15px">بحسابك الذي أنشأته لك الإدارة.</p>' + body + '</div></div></div>';
   } else {
     html = '<div class="lc"><div class="page"><header><div class="logo">' + markSvg(false) + '<span>رصيد</span></div><span class="n muted" style="font-size:14.5px">' + esc(today) + '</span></header>' + rowify(body) + '</div></div>';
   }
   var stage = $("#stage-login"); stage.innerHTML = html;
-  wireLogin(stage);
+  wireLogin(stage); tickClock();
 }
 /* في الخيار ج: الحقول سطور دفتر */
 function rowify(body){ return body.replace(/class="fld"/g, 'class="fld row"').replace(/<div class="actions">/, '<div class="actions total">'); }
@@ -651,6 +690,17 @@ function wireLogin(stage){
     $("#idl-k", stage).addEventListener("click", function(){ $('#st-login .chip[data-s="normal"]').click(); });
   }
 }
+function clockParts(){
+  var now = new Date(), o = { timeZone: "Asia/Riyadh" };
+  try {
+    var t = new Intl.DateTimeFormat("en-US", Object.assign({ hour: "numeric", minute: "2-digit", hour12: true }, o)).formatToParts(now);
+    var get = function(k){ var x = t.filter(function(p){ return p.type === k; })[0]; return x ? x.value : ""; };
+    var d = new Intl.DateTimeFormat("ar-SA-u-nu-latn-ca-gregory", Object.assign({ weekday: "long", day: "numeric", month: "long", year: "numeric" }, o)).format(now);
+    return { time: get("hour") + ":" + get("minute"), ap: get("dayPeriod").toUpperCase() === "AM" ? "ص" : "م", date: d };
+  } catch (e){ return { time: "", ap: "", date: "" }; }
+}
+function tickClock(){ var c = clockParts(); $$("[data-clock]").forEach(function(el){ el.innerHTML = esc(c.time) + "<small>" + c.ap + "</small>"; }); $$("[data-date]").forEach(function(el){ el.textContent = c.date; }); }
+setInterval(tickClock, 15000);
 function checkId(input){
   var r = identifierToEmail(input.value);
   setErr(input.id, r.ok ? "" : r.error);
@@ -684,14 +734,15 @@ function editPanel(u){
 function renderUsers(){
   $("#note-users").innerHTML = NOTES.users[S.users];
   var bar = '<div class="ubar"><h3>المستخدمون <span class="n muted" style="font-size:15px">(' + users.length + ")</span></h3><button class=\"btn primary\" type=\"button\" data-act=\"add\">إضافة مستخدم</button></div>";
-  var rn = '<div class="rnames"><span class="fl" style="flex-basis:100%">مسميات الأدوار ' + (S.viewer === "owner" ? "(المالك يعدّلها؛ الصلاحيات لا تتغير)" : "(للعرض: يعدّلها المالك فقط)") + "</span>" +
-    ["owner","admin","entry"].map(function(r){ return '<div class="fld"><label class="fl" for="rn-' + r + '">' + { owner: "دور المالك", admin: "دور الإدارة", entry: "دور مدخل البيانات" }[r] + '</label><div class="box"><input id="rn-' + r + '" data-rn="' + r + '" maxlength="40" value="' + esc(roleNames[r]) + '"' + (S.viewer === "owner" ? "" : " readonly") + "></div></div>"; }).join("") + "</div>";
+  var rn = '<div class="rnames"><span class="fl" style="flex-basis:100%">الإعدادات: مسميات الأدوار ومدة الخمول ' + (S.viewer === "owner" ? "(المالك يعدّلها؛ الصلاحيات لا تتغير)" : "(للعرض: يعدّلها المالك فقط)") + "</span>" +
+    ["owner","admin","entry"].map(function(r){ return '<div class="fld"><label class="fl" for="rn-' + r + '">' + { owner: "دور المالك", admin: "دور الإدارة", entry: "دور مدخل البيانات" }[r] + '</label><div class="box"><input id="rn-' + r + '" data-rn="' + r + '" maxlength="40" value="' + esc(roleNames[r]) + '"' + (S.viewer === "owner" ? "" : " readonly") + "></div></div>"; }).join("") +
+    '<div class="fld" id="idle-f"><label class="fl" for="idle">مدة الخمول قبل الخروج (دقيقة)</label><div class="box"><input id="idle" class="ltr" data-idle inputmode="numeric" maxlength="3" value="' + (S.idle || 30) + '"' + (S.viewer === "owner" ? "" : " readonly") + '></div><div class="msg" id="idle-m"></div></div>' + "</div>";
   var html;
   if (S.users === "a"){
     var rows = users.map(function(u){
-      return '<tr tabindex="0" data-u="' + u.id + '" aria-selected="' + (u.id === S.sel) + '" class="' + (u.active ? "" : "inactive") + '"><td class="who"><b>' + esc(u.name) + '</b><span class="n">' + esc(u.login) + "</span></td><td data-l=\"\">" + roleChip(u.role) + '</td><td data-l="الموردون:">' + supCount(u) + '</td><td data-l="">' + stateStamp(u) + (u.role === "owner" && S.viewer !== "owner" ? ' <span class="lock">' + LOCK + "محمي</span>" : "") + '</td><td class="c-last n" data-l="آخر تعديل:">' + u.upd + "</td></tr>";
+      return '<tr tabindex="0" data-u="' + u.id + '" aria-selected="' + (u.id === S.sel) + '" class="' + (u.active ? "" : "inactive") + '"><td class="who c-who"><b>' + esc(u.name) + '</b><span class="n">' + esc(u.login) + '</span></td><td class="c-role">' + roleChip(u.role) + '</td><td class="c-sup">' + supCount(u) + '</td><td class="c-st">' + stateStamp(u) + (u.role === "owner" && S.viewer !== "owner" ? ' <span class="lock">' + LOCK + "محمي</span>" : "") + '</td><td class="c-last n">' + u.upd + '</td><td class="c-go" aria-hidden="true">‹</td></tr>';
     }).join("");
-    html = bar + '<div class="ua"><div><div class="tbl-wrap"><table class="ledger"><thead><tr><th>المستخدم</th><th>الدور</th><th>الموردون</th><th>الحالة</th><th>آخر تعديل</th></tr></thead><tbody>' + rows + "</tbody></table></div>" + rn + '</div><aside class="pane" aria-label="تعديل المستخدم">' + editPanel(userById(S.sel)) + "</aside></div>";
+    html = bar + '<div class="ua' + (S.uOpen ? " open" : "") + '"><div><div class="tbl-wrap"><table class="ledger"><thead><tr><th>المستخدم</th><th>الدور</th><th>الموردون</th><th>الحالة</th><th>آخر تعديل</th></tr></thead><tbody>' + rows + "</tbody></table></div>" + rn + '</div><aside class="pane" aria-label="تعديل المستخدم"><button type="button" class="back" data-act="uback">→ المستخدمون</button>' + editPanel(userById(S.sel)) + "</aside></div>";
   } else if (S.users === "b"){
     html = bar + '<div class="ub">' + ["owner","admin","entry"].map(function(r){
       var list = users.filter(function(u){ return u.role === r; });
@@ -723,7 +774,7 @@ function renderUsers(){
 }
 function wireUsers(stage){
   $$("[data-u]", stage).forEach(function(el){
-    var go = function(){ S.sel = el.dataset.u; renderUsers(); var n = $('[data-u="' + S.sel + '"]', $("#stage-users")); if (n) n.focus(); };
+    var go = function(){ S.sel = el.dataset.u; S.uOpen = true; renderUsers(); var bk = $('[data-act="uback"]', $("#stage-users")); if (bk && getComputedStyle(bk).display !== "none"){ bk.focus(); return; } var n = $('[data-u="' + S.sel + '"]', $("#stage-users")); if (n) n.focus(); };
     el.addEventListener("click", go);
     el.addEventListener("keydown", function(e){ if ((e.key === "Enter" || e.key === " ") && el.tagName !== "BUTTON"){ e.preventDefault(); go(); } });
   });
@@ -732,7 +783,11 @@ function wireUsers(stage){
   $$('[data-role]', stage).forEach(function(b){ b.addEventListener("click", function(){ var u = userById(S.sel); u.role = b.dataset.role; renderUsers(); toast($("#stage-users"), "تغيّر الدور وسُجّل في التدقيق (نموذج)."); }); });
   var sw = $('[data-act="active"]', stage);
   if (sw) sw.addEventListener("click", function(){ if (sw.getAttribute("aria-disabled") === "true") return; var u = userById(S.sel); confirmDlg(stage, u.active ? "إيقاف حساب " + u.name + "؟" : "تفعيل حساب " + u.name + "؟", u.active ? "لن يستطيع الدخول، وتبقى حركاته وسجله كما هي. يمكن تفعيله لاحقاً." : "يعود للدخول بدوره وإسناده السابقين.", u.active ? "إيقاف" : "تفعيل", u.active, function(){ u.active = !u.active; renderUsers(); toast($("#stage-users"), "حُفظ وسُجّل في التدقيق (نموذج)."); }); });
-  var ga = $('[data-act="goassign"]', stage); if (ga) ga.addEventListener("click", function(){ S.aUser = S.sel; $("#t-assign").click(); });
+  var ga = $('[data-act="goassign"]', stage); if (ga) ga.addEventListener("click", function(){ S.aUser = S.sel; S.aOpen = true; $("#t-assign").click(); });
+  var ub = $('[data-act="uback"]', stage); if (ub) ub.addEventListener("click", function(){ var id = S.sel; S.uOpen = false; renderUsers(); var n = $('[data-u="' + id + '"]', $("#stage-users")); if (n) n.focus(); });
+  var idl = $("[data-idle]", stage); if (idl) idl.addEventListener("change", function(){ var v = idl.value.trim().replace(/[٠-٩]/g, function(d){ return "٠١٢٣٤٥٦٧٨٩".indexOf(d); }); var n = /^\d{1,3}$/.test(v) ? +v : NaN; var f = $("#idle-f", stage);
+    if (!(n >= 5 && n <= 120)){ f.classList.add("is-error"); $("#idle-m", stage).textContent = "اكتب عدداً من 5 إلى 120 دقيقة."; idl.setAttribute("aria-invalid", "true"); return; }
+    f.classList.remove("is-error"); $("#idle-m", stage).textContent = ""; idl.removeAttribute("aria-invalid"); S.idle = n; toast(stage, "حُفظت مدة الخمول " + n + " دقيقة، وتُطبَّق على الجلسات المفتوحة فوراً (نموذج)."); });
   var rs = $('[data-act="reset"]', stage); if (rs) rs.addEventListener("click", function(){ var u = userById(S.sel); toast(stage, u.login.indexOf("@") > 0 ? "يُرسل Firebase رابط تعيين إلى بريده (نموذج)." : "حسب قرارك في اللسان 4: من الشاشة أو عبر سكربت المالك."); });
   var add = $('[data-act="add"]', stage); if (add) add.addEventListener("click", function(){ addDlg(stage); });
 }
@@ -800,7 +855,8 @@ function renderAssign(){
     var d = draftOf(S.aUser), q = S.q.trim();
     var vis = SUP.filter(function(s){ return !s.archived && (!q || s.name.indexOf(q) >= 0); });
     var all = vis.length && vis.every(function(s){ return d.has(s.id); }), some = vis.some(function(s){ return d.has(s.id); });
-    html = '<div class="aa uc" style="display:grid"><nav class="who idx" aria-label="مدخلو البيانات"><div class="grp">' + esc(roleNames.entry) + "</div>" + whoList() + '</nav><div class="body">' +
+    html = '<div class="aa uc' + (S.aOpen ? " open" : "") + '" style="display:grid"><nav class="who idx" aria-label="مدخلو البيانات"><div class="grp">' + esc(roleNames.entry) + "</div>" + whoList() + '</nav><div class="body">' +
+      '<div class="ahead"><button type="button" class="back" data-act="aback">→ مدخلو البيانات</button><h3>موردو ' + esc(userById(S.aUser).name) + '</h3><button type="button" class="lnk" data-act="touser">صفحة المستخدم ←</button></div>' +
       '<div class="tools"><div class="fld"><label class="fl" for="aq">بحث في الموردين</label><div class="box"><input id="aq" value="' + esc(S.q) + '" placeholder="اكتب جزءاً من الاسم" autocomplete="off"></div></div>' +
       chk(all ? "true" : some ? "mixed" : "false", "تحديد الظاهر (" + vis.length + ")", ' data-act="all"') + "</div>" +
       '<div class="slist">' + vis.map(function(s){ return chk(String(d.has(s.id)), esc(s.name) + '<span class="last n">' + s.last + "</span>", ' data-s="' + s.id + '"'); }).join("") + (vis.length ? "" : '<div class="empty">لا مورد يطابق البحث.</div>') + "</div>" +
@@ -818,7 +874,8 @@ function renderAssign(){
     var d2 = draftOf(S.aUser), u = userById(S.aUser), q2 = S.q.trim();
     var avail = SUP.filter(function(s){ return !s.archived && !d2.has(s.id) && (!q2 || s.name.indexOf(q2) >= 0); });
     var asg = SUP.filter(function(s){ return d2.has(s.id); });
-    html = '<div class="aa uc" style="display:grid"><nav class="who idx" aria-label="مدخلو البيانات"><div class="grp">' + esc(roleNames.entry) + "</div>" + whoList() + '</nav><div class="body">' +
+    html = '<div class="aa uc' + (S.aOpen ? " open" : "") + '" style="display:grid"><nav class="who idx" aria-label="مدخلو البيانات"><div class="grp">' + esc(roleNames.entry) + "</div>" + whoList() + '</nav><div class="body">' +
+      '<div class="ahead"><button type="button" class="back" data-act="aback">→ مدخلو البيانات</button><h3>موردو ' + esc(userById(S.aUser).name) + '</h3><button type="button" class="lnk" data-act="touser">صفحة المستخدم ←</button></div>' +
       '<div class="tools"><div class="fld"><label class="fl" for="aq">بحث في المتاح</label><div class="box"><input id="aq" value="' + esc(S.q) + '" placeholder="اكتب جزءاً من الاسم" autocomplete="off"></div></div></div>' +
       '<div class="tl"><section class="lst" aria-label="متاح"><header><b>متاح</b><button class="mv" type="button" data-act="addall"' + (avail.length ? "" : " disabled") + '>إسناد الكل ←</button></header><div class="items">' +
       (avail.length ? avail.map(function(s){ var was = u.assigned.indexOf(s.id) >= 0; return '<div class="row' + (was ? " gone" : "") + '"><span>' + esc(s.name) + (was ? ' <span class="ex">سيُلغى</span>' : "") + '</span><button class="mv" type="button" data-in="' + s.id + '" aria-label="إسناد ' + esc(s.name) + '">إسناد ←</button></div>'; }).join("") : '<div class="empty">لا موردين متاحين.</div>') +
@@ -830,7 +887,12 @@ function renderAssign(){
 }
 function wireAssign(stage){
   function re(focusSel){ renderAssign(); if (focusSel){ var n = $(focusSel, $("#stage-assign")); if (n) n.focus(); } }
-  $$("[data-au]", stage).forEach(function(b){ b.addEventListener("click", function(){ S.aUser = b.dataset.au; re('[data-au="' + S.aUser + '"]'); }); });
+  $$("[data-au]", stage).forEach(function(b){ b.addEventListener("click", function(){ S.aUser = b.dataset.au; S.aOpen = true; re('[data-au="' + S.aUser + '"]'); var bk = $('[data-act="aback"]', $("#stage-assign")); if (bk && getComputedStyle(bk).display !== "none") bk.focus(); }); });
+  var ab = $('[data-act="aback"]', stage); if (ab) ab.addEventListener("click", function(){ S.aOpen = false; re('[data-au="' + S.aUser + '"]'); });
+  var tu = $('[data-act="touser"]', stage); if (tu) tu.addEventListener("click", function(){
+    function go(){ S.sel = S.aUser; S.uOpen = true; $("#t-users").click(); }
+    var t = allDiffs(); if (!t.add && !t.rem) return go();
+    confirmDlg(stage, "لديك تغييرات غير محفوظة", "+" + t.add + " إسناد و−" + t.rem + " إلغاء لم تُحفظ. تبقى معلّقة هنا حتى تعود وتحفظها أو تتراجع عنها.", "انتقل دون حفظ", false, go); });
   var aq = $("#aq", stage); if (aq) aq.addEventListener("input", function(){ S.q = aq.value; var p = aq.selectionStart; re("#aq"); var n = $("#aq"); try { n.setSelectionRange(p, p); } catch (e){} });
   $$("[data-s]", stage).forEach(function(b){ b.addEventListener("click", function(){ var d = draftOf(S.aUser); d.has(b.dataset.s) ? d.delete(b.dataset.s) : d.add(b.dataset.s); re('[data-s="' + b.dataset.s + '"]'); }); });
   var all = $('[data-act="all"]', stage); if (all) all.addEventListener("click", function(){ var d = draftOf(S.aUser), q = S.q.trim(); var vis = SUP.filter(function(s){ return !s.archived && (!q || s.name.indexOf(q) >= 0); }); var on = all.getAttribute("aria-checked") !== "true"; vis.forEach(function(s){ on ? d.add(s.id) : d.delete(s.id); }); re('[data-act="all"]'); });
@@ -856,19 +918,14 @@ renderLogin();
 
 /* ---------- الإجابات ---------- */
 var QS = [
-  { id: "1", q: "شاشة الدخول", o: ["أ. ورقة وسطى", "ب. مقسومة", "ج. سطر الدفتر"] },
-  { id: "2", q: "مدة الخمول قبل إنهاء الجلسة تلقائياً", h: "مع تحذير بعدّ تنازلي قبل الخروج بدقيقة (حالة «تحذير الخمول»).", o: ["15 دقيقة", "30 دقيقة (كما في النموذج)", "60 دقيقة", "أخرى (في الملاحظة)"] },
-  { id: "3", q: "إغلاق المتصفح", o: ["يُخرج المستخدم دائماً (أأمن)", "تبقى الجلسة حتى مدة الخمول ولو أُغلق المتصفح"] },
-  { id: "4", q: "أول دخول بكلمة مرور مؤقتة", o: ["إلزام تغييرها قبل أي شاشة (توصيتي)", "لا إلزام"] },
-  { id: "5", q: "مؤشر قوة كلمة المرور", h: "سياسة Firebase المفروضة: 12 حرفاً والأنواع الأربعة. الكود الحالي يعتبر 3 أنواع «قوية»، فقد يقبلها المؤشر ويرفضها Firebase.", o: ["يطابق سياسة Firebase بالأنواع الأربعة (توصيتي)", "يبقى كما هو"] },
-  { id: "6", q: "إدارة المستخدمين", o: ["أ. جدول الدفتر + لوحة", "ب. أعمدة الأدوار", "ج. فهرس وتفاصيل"] },
-  { id: "7", q: "هل تنشئ الإدارة حسابات «إدارة» أخرى وتعدّلها؟", h: "القواعد الحالية تسمح بذلك (كل الأدوار عدا المالك).", o: ["نعم، كما في القواعد الآن", "لا، الإدارة تدير مدخلي البيانات فقط والمالك يدير الإدارة"] },
-  { id: "8", q: "إسناد الموردين", o: ["أ. من جهة المستخدم", "ب. مصفوفة", "ج. ناقلة"] },
-  { id: "9", q: "المورد المؤرشف في شاشة الإسناد", o: ["لا يظهر ولا يُسند، ويبقى إسناده السابق كما هو", "يظهر معطّلاً للعلم فقط (كما في المصفوفة)", "يُلغى إسناده تلقائياً عند الأرشفة"] },
-  { id: "10", q: "إنشاء الحسابات وإعادة كلمات المرور (اللسان 4)", o: ["أ. من الواجهة", "ب. سكربت محلي فقط", "ج. هجين (توصيتي)", "د. ترقية إلى Blaze"] },
-  { id: "11", q: "بعد هذه الإجابات", o: ["ابدأ تنفيذ المرحلة 2", "عندي ملاحظات أولاً (في المربع)"] }
+  { id: "1", q: "الساعة في شاشة الدخول", h: "12 ساعة بتوقيت الرياض، ساعات ودقائق بلا ثوانٍ، مع «ص/م» والتاريخ تحتها.", o: ["معتمدة", "أريد الثواني أيضاً", "عندي ملاحظات (في المربع)"] },
+  { id: "2", q: "المستخدمون على الجوال واللوحي العمودي (بطاقة لكل مستخدم، والنقر يفتح صفحته بزر رجوع)", o: ["معتمد", "عندي ملاحظات (في المربع)"] },
+  { id: "3", q: "الرجوع في الإسناد (قائمة ثم موردون بزر رجوع على الجوال، ورابط «صفحة المستخدم» مع تنبيه التغييرات غير المحفوظة)", o: ["معتمد", "عندي ملاحظات (في المربع)"] },
+  { id: "4", q: "حدود مدة الخمول التي يضبطها المالك", o: ["من 5 إلى 120 دقيقة (توصيتي)", "من 15 إلى 60 دقيقة", "أخرى (في المربع)"] },
+  { id: "5", q: "متى يسري تغيير مدة الخمول؟", o: ["فوراً على كل الجلسات المفتوحة (توصيتي)", "من الدخول التالي لكل مستخدم"] },
+  { id: "6", q: "بعد اعتماد النسخة 2", o: ["ابدأ بناء الشاشات", "عندي ملاحظات أولاً (في المربع)"] }
 ];
-var KEY = "rased-phase2-auth-users", st = {};
+var KEY = "rased-phase2-auth-users-v2", st = {};
 try { st = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e){ st = {}; }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e){} }
 $("#tot").textContent = QS.length;
@@ -886,7 +943,7 @@ $$("#qs .note").forEach(function(t){ t.addEventListener("input", function(){ var
 function count(){ var n = 0; QS.forEach(function(q, i){ var s = st[i] || {}; var d = !!(s.a || (s.n && s.n.trim())); if (d) n++; $("#q" + i).classList.toggle("done", d); }); $("#cnt").textContent = n; }
 count();
 function text(){
-  var L = ["إجاباتي على نماذج المرحلة 2 (الدخول والمستخدمون والإسناد) لمشروع «رصيد»:", ""];
+  var L = ["إجاباتي على النسخة 2 من نماذج المرحلة 2 لمشروع «رصيد»:", ""];
   QS.forEach(function(q, i){ var s = st[i] || {}; L.push(q.id + ". " + q.q + ": " + (s.a || "لم يُجب") + (s.n && s.n.trim() ? " — ملاحظة: " + s.n.trim().replace(/\s*\n\s*/g, " / ") : "")); });
   return L.join("\n");
 }

@@ -11,7 +11,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tools/tsconfig.json",
     "lint": "eslint . --max-warnings 0",
     "lint:css": "stylelint \"src/**/*.css\"",
     "format": "prettier --write .",
@@ -20,7 +20,9 @@
     "test:watch": "vitest --project unit",
     "test:rules": "firebase emulators:exec --only firestore --project demo-raseed \"vitest run --project rules\"",
     "test:e2e": "playwright test",
-    "audit:prod": "npm audit --omit=dev --audit-level=high"
+    "audit:prod": "npm audit --omit=dev --audit-level=high",
+    "admin:create-owner": "node tools/admin/create-owner.ts",
+    "admin:reset-password": "node tools/admin/reset-password.ts"
   },
   "dependencies": {
     "react": "^19.3.0",
@@ -42,6 +44,7 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.1.1",
     "firebase": "^12.19.0",
+    "firebase-admin": "^13.10.0",
     "firebase-tools": "^15.33.0",
     "globals": "^17.13.0",
     "jsdom": "^29.1.1",

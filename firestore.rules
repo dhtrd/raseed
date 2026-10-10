@@ -9,7 +9,9 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function userPath(uid) { return /databases/$(database)/documents/users/$(uid); }
     function me() { return get(userPath(request.auth.uid)).data; }
-    function isActive() { return signedIn() && exists(userPath(request.auth.uid)) && me().active == true; }
+    function isEnabled() { return signedIn() && exists(userPath(request.auth.uid)) && me().active == true; }
+    // من عليه تغيير كلمة المرور المؤقتة لا يصل لشيء قبل تغييرها (عدا مستنده وإزالة العلم)
+    function isActive() { return isEnabled() && me().get('mustChangePassword', false) != true; }
     function role() { return me().role; }
     function isOwner() { return isActive() && role() == 'owner'; }
     function isManager() { return isActive() && role() in ['owner', 'admin']; }
@@ -99,20 +101,32 @@ service cloud.firestore {
     // ---------- المستخدمون ----------
     match /users/{uid} {
       function validUser(d) {
-        return d.keys().hasOnly(['displayName', 'login', 'role', 'assigned', 'active', 'auditId', 'createdAt', 'updatedAt'])
+        return d.keys().hasOnly(['displayName', 'login', 'role', 'assigned', 'active', 'mustChangePassword', 'auditId', 'createdAt', 'updatedAt'])
           && d.displayName is string && d.displayName.size() > 0 && d.displayName.size() <= 80
           && d.login is string && d.login.size() <= 120
-          && d.role in ['owner', 'admin', 'entry'] && d.assigned is list && d.active is bool;
+          && d.role in ['owner', 'admin', 'entry'] && d.assigned is list && d.active is bool
+          && (!('mustChangePassword' in d) || d.mustChangePassword is bool);
+      }
+      // أول دخول بكلمة مؤقتة (DECISIONS 2026-10-10): صاحب الحساب يزيل العلم فقط، ولا يغيّر غيره
+      function clearsOwnPasswordFlag() {
+        return uid == request.auth.uid && isEnabled()
+          && resource.data.get('mustChangePassword', false) == true
+          && request.resource.data.mustChangePassword == false
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['mustChangePassword', 'updatedAt', 'auditId'])
+          && audited('users', uid);
       }
       allow read: if signedIn() && (request.auth.uid == uid || isManager());
       // المالك يُنشأ بسكربت الإعداد فقط؛ الإدارة تدير الجميع عدا المالك
+      // الحساب الجديد يبدأ بكلمة مؤقتة دائماً، فيُلزَم بتغييرها
       allow create: if isManager() && validUser(request.resource.data)
         && request.resource.data.role in ['admin', 'entry']
+        && request.resource.data.mustChangePassword == true
         && audited('users', uid);
       allow update: if isManager() && validUser(request.resource.data) && audited('users', uid)
         && ((resource.data.role != 'owner' && request.resource.data.role != 'owner')
             || (isOwner() && uid == request.auth.uid
-                && request.resource.data.role == 'owner' && request.resource.data.active == true));
+                && request.resource.data.role == 'owner' && request.resource.data.active == true))
+        || clearsOwnPasswordFlag();
       allow delete: if false;
     }
 
@@ -121,6 +135,14 @@ service cloud.firestore {
       allow read: if isActive();
       allow write: if isOwner() && isIsoDate(request.resource.data.lockedThrough)
         && request.resource.data.keys().hasOnly(['lockedThrough', 'auditId']) && audited('settings', 'lock');
+    }
+    // مدة الخمول قبل إنهاء الجلسة (دقائق): يضبطها المالك (DECISIONS 2026-10-10)
+    match /settings/session {
+      allow read: if isActive();
+      allow write: if isOwner() && request.resource.data.keys().hasOnly(['idleMinutes', 'auditId'])
+        && request.resource.data.idleMinutes is int
+        && request.resource.data.idleMinutes >= 5 && request.resource.data.idleMinutes <= 120
+        && audited('settings', 'session');
     }
     match /settings/roleNames {
       allow read: if isActive();
@@ -232,7 +254,9 @@ service cloud.firestore {
     // ---------- سجل التدقيق: إضافة فقط، لا تعديل ولا حذف ----------
     match /auditLog/{aid} {
       allow read: if isManager();
-      allow create: if isActive()
+      allow create: if (isActive()
+          || (isEnabled() && request.resource.data.entity == 'users' && request.resource.data.entityId == request.auth.uid
+              && request.resource.data.action == 'passwordChanged'))
         && request.resource.data.keys().hasOnly(['actor', 'at', 'action', 'entity', 'entityId', 'before', 'after', 'reason'])
         && request.resource.data.actor == request.auth.uid
         && request.resource.data.at == request.time

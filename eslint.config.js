@@ -45,4 +45,10 @@ export default tseslint.config(
     files: ["tools/**/*.js", "*.config.{js,ts}", "tests/**/*.ts"],
     languageOptions: { globals: { ...globals.node } },
   },
+  {
+    // سكربتات المالك في الطرفية: الطباعة هي واجهتها
+    files: ["tools/admin/**/*.ts"],
+    languageOptions: { globals: { ...globals.node } },
+    rules: { "no-console": "off" },
+  },
 );

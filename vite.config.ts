@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => ({
           environment: "jsdom",
           globals: true,
           setupFiles: ["./tests/setup.ts"],
-          include: ["src/**/*.test.{ts,tsx}"],
+          include: ["src/**/*.test.{ts,tsx}", "tools/**/*.test.ts"],
           css: { modules: { classNameStrategy: "non-scoped" } },
         },
       },
