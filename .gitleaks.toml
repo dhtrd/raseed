@@ -1,0 +1,7 @@
+# إعداد gitleaks: القواعد الافتراضية + استثناء ملفات القفل والنماذج الثابتة.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "ملفات لا تحوي أسراراً"
+paths = ['''package-lock\.json''', '''rased-mockups/.*\.png''']

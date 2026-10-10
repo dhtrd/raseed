@@ -26,3 +26,9 @@ dist/
 .firebase/
 *-debug.log
 .DS_Store
+
+# مخرجات الاختبار
+test-results/
+playwright-report/
+coverage/
+*.log

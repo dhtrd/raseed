@@ -1,0 +1,219 @@
+rules_version = '2';
+
+// قواعد «رصيد»: الصلاحيات تُفرض هنا من الخادم (خطة Spark بلا Cloud Functions).
+// المرجع: SPEC.md §1 «الأدوار» و§3-ب، وDECISIONS.md. الافتراضي: الرفض.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- الهوية والأدوار ----------
+    function signedIn() { return request.auth != null; }
+    function userPath(uid) { return /databases/$(database)/documents/users/$(uid); }
+    function me() { return get(userPath(request.auth.uid)).data; }
+    function isActive() { return signedIn() && exists(userPath(request.auth.uid)) && me().active == true; }
+    function role() { return me().role; }
+    function isOwner() { return isActive() && role() == 'owner'; }
+    function isManager() { return isActive() && role() in ['owner', 'admin']; }
+    function canSeeSupplier(sid) {
+      return isManager() || (isActive() && role() == 'entry' && sid in me().assigned);
+    }
+
+    // ---------- قفل الفترات (تاريخ إقفال واحد) ----------
+    function lockPath() { return /databases/$(database)/documents/settings/lock; }
+    function lockedThrough() { return exists(lockPath()) ? get(lockPath()).data.lockedThrough : '0000-00-00'; }
+    function isOpenDate(d) { return d is string && d > lockedThrough(); }
+    function isIsoDate(d) { return d is string && d.matches('^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'); }
+
+    // ---------- سجل التدقيق: كل كتابة تُرفق بسجل جديد في الدفعة نفسها ----------
+    function auditPath(aid) { return /databases/$(database)/documents/auditLog/$(aid); }
+    function audited(entity, id) {
+      let aid = request.resource.data.auditId;
+      let a = getAfter(auditPath(aid)).data;
+      return aid is string
+        && !exists(auditPath(aid))
+        && a.entity == entity && a.entityId == id && a.actor == request.auth.uid;
+    }
+
+    // ---------- المال والمرجع ----------
+    function money(x) { return x is int && x >= 0 && x <= 9999999999; }
+    function computedRefNo(d) {
+      return d.kind == 'inv' ? 'P' + d.mainRef : 'MISC/' + d.date[0:4] + '/' + d.date[5:7] + '/' + d.mainRef;
+    }
+    function refKey(refNo) { return refNo.replace('/', '|'); }
+    function refPath(key) { return /databases/$(database)/documents/refs/$(key); }
+    // الفاتورة 5 أرقام والقيد 4؛ المراجع ببادئة (OUT/…) بلا فرض طول (DECISIONS 2026-10-10)
+    function refFormatOk(d) {
+      return d.mainRef is string && d.mainRef.size() > 0 && d.mainRef.size() <= 40
+        && d.mainRef.matches('^[A-Z0-9ء-ي/-]+$')
+        && (!d.mainRef.matches('^[0-9]+$') || d.mainRef.size() == (d.kind == 'inv' ? 5 : 4));
+    }
+    // الفاتورة دائن والقيد مدين، والعكس فقط بعلم صريح reversed (مرتجع/استرداد)
+    function directionOk(d) {
+      let credit = (d.kind == 'inv') != d.reversed;
+      return d.reversed is bool
+        && (credit ? (d.credit > 0 && d.debit == 0) : (d.debit > 0 && d.credit == 0));
+    }
+    // فهرس الرقم المرجعي يُكتب مع الحركة؛ التكرار مسموح بتأكيد وسبب (تحذير صارم غير حاجب)
+    function refIndexed(d, eid) {
+      let key = refKey(d.refNo);
+      return eid in getAfter(refPath(key)).data.ids
+        && (!exists(refPath(key)) || (d.dup is map && d.dup.reason is string && d.dup.reason.size() > 0 && d.dup.reason.size() <= 300));
+    }
+
+    // ---------- حالة Odoo (للفواتير فقط) ----------
+    function odooInitial(d) {
+      return d.kind == 'inv'
+        ? (d.odoo is map && d.odoo.entered == false && d.odoo.keys().hasOnly(['entered', 'by', 'at', 'reason', 'reasonText']))
+        : !('odoo' in d);
+    }
+    function odooChangeOk(before, after) {
+      return (!('odoo' in after) && !('odoo' in before))
+        || ('odoo' in after && 'odoo' in before && after.odoo == before.odoo)
+        || (after.kind == 'inv' && after.odoo.keys().hasOnly(['entered', 'by', 'at', 'reason', 'reasonText'])
+            && after.odoo.by == request.auth.uid && after.odoo.at == request.time
+            && (after.odoo.entered == true
+                || (after.odoo.reason in ['wrong', 'cancelled', 'other']
+                    && after.odoo.reasonText is string && after.odoo.reasonText.size() <= 300
+                    && (after.odoo.reason != 'other' || after.odoo.reasonText.size() > 0))));
+    }
+
+    // ---------- شكل الحركة ----------
+    function entryKeys() {
+      return ['supplierId', 'kind', 'date', 'mainRef', 'refNo', 'voucher', 'details', 'debit', 'credit', 'reversed',
+              'note', 'odoo', 'dup', 'needsManualFix', 'deleted', 'auditId', 'createdBy', 'createdAt', 'updatedAt'];
+    }
+    function commonShapeOk(d) {
+      return d.keys().hasOnly(entryKeys())
+        && d.supplierId is string && isIsoDate(d.date)
+        && money(d.debit) && money(d.credit) && !(d.debit > 0 && d.credit > 0)
+        && d.deleted is bool && d.needsManualFix is bool;
+    }
+    function financialOk(d) {
+      return d.voucher is string && d.voucher.matches('^[0-9]{0,12}$')
+        && d.details is string && d.details.size() <= 200
+        && directionOk(d) && refFormatOk(d) && d.refNo == computedRefNo(d);
+    }
+    function noteOk(d) {
+      return d.debit == 0 && d.credit == 0 && d.note is string && d.note.size() > 0 && d.note.size() <= 1000;
+    }
+
+    // ---------- المستخدمون ----------
+    match /users/{uid} {
+      function validUser(d) {
+        return d.keys().hasOnly(['displayName', 'login', 'role', 'assigned', 'active', 'auditId', 'createdAt', 'updatedAt'])
+          && d.displayName is string && d.displayName.size() > 0 && d.displayName.size() <= 80
+          && d.login is string && d.login.size() <= 120
+          && d.role in ['owner', 'admin', 'entry'] && d.assigned is list && d.active is bool;
+      }
+      allow read: if signedIn() && (request.auth.uid == uid || isManager());
+      // المالك يُنشأ بسكربت الإعداد فقط؛ الإدارة تدير الجميع عدا المالك
+      allow create: if isManager() && validUser(request.resource.data)
+        && request.resource.data.role in ['admin', 'entry']
+        && audited('users', uid);
+      allow update: if isManager() && validUser(request.resource.data) && audited('users', uid)
+        && ((resource.data.role != 'owner' && request.resource.data.role != 'owner')
+            || (isOwner() && uid == request.auth.uid
+                && request.resource.data.role == 'owner' && request.resource.data.active == true));
+      allow delete: if false;
+    }
+
+    // ---------- الإعدادات ----------
+    match /settings/lock {
+      allow read: if isActive();
+      allow write: if isOwner() && isIsoDate(request.resource.data.lockedThrough)
+        && request.resource.data.keys().hasOnly(['lockedThrough', 'auditId']) && audited('settings', 'lock');
+    }
+    match /settings/roleNames {
+      allow read: if isActive();
+      allow write: if isOwner() && request.resource.data.keys().hasOnly(['owner', 'admin', 'entry', 'auditId'])
+        && request.resource.data.owner is string && request.resource.data.owner.size() <= 40
+        && request.resource.data.admin is string && request.resource.data.admin.size() <= 40
+        && request.resource.data.entry is string && request.resource.data.entry.size() <= 40
+        && audited('settings', 'roleNames');
+    }
+
+    // ---------- الموردون ----------
+    match /suppliers/{sid} {
+      allow read: if canSeeSupplier(sid);
+      allow create, update: if isManager()
+        && request.resource.data.keys().hasOnly(['name', 'status', 'auditId', 'createdAt', 'updatedAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 100
+        && request.resource.data.status in ['active', 'archived']
+        && audited('suppliers', sid);
+      allow delete: if false;
+    }
+
+    // ---------- الحركات ----------
+    match /entries/{eid} {
+      function entryUpdateShapeOk(before, after, id) {
+        return after.kind == 'note' ? noteOk(after)
+          // حركة منقولة بلا نوع تبقى كما هي حتى تُصنَّف
+          : after.kind == 'untyped' ? before.kind == 'untyped'
+          : after.kind in ['inv', 'misc'] && directionOk(after)
+            && after.voucher is string && after.voucher.matches('^[0-9]{0,12}$')
+            && after.details is string && after.details.size() <= 200
+            // المراجع المنقولة المخالفة للطول تبقى قابلة للتعديل ما دام المرجع لم يتغير
+            && (refFormatOk(after) || (after.mainRef == before.mainRef && after.kind == before.kind))
+            && (after.refNo == computedRefNo(after) || after.refNo == before.refNo)
+            && (after.refNo == before.refNo || refIndexed(after, id));
+      }
+
+      allow read: if isManager() || (canSeeSupplier(resource.data.supplierId) && resource.data.deleted == false);
+
+      // الإضافة: كل الأدوار، ومدخل البيانات لموردينه فقط
+      allow create: if isActive() && canSeeSupplier(request.resource.data.supplierId)
+        && commonShapeOk(request.resource.data)
+        && request.resource.data.kind in ['inv', 'misc', 'note']
+        && (request.resource.data.kind == 'note' ? noteOk(request.resource.data)
+            : (financialOk(request.resource.data) && refIndexed(request.resource.data, eid)))
+        && odooInitial(request.resource.data)
+        && isOpenDate(request.resource.data.date)
+        && request.resource.data.deleted == false && request.resource.data.needsManualFix == false
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time
+        && audited('entries', eid);
+
+      // التعديل: المالك والإدارة فقط، خارج الفترة المقفلة، مع سجل تدقيق
+      allow update: if isManager()
+        && isOpenDate(resource.data.date) && isOpenDate(request.resource.data.date)
+        && commonShapeOk(request.resource.data)
+        && request.resource.data.supplierId == resource.data.supplierId
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && entryUpdateShapeOk(resource.data, request.resource.data, eid)
+        && odooChangeOk(resource.data, request.resource.data)
+        && (request.resource.data.deleted == resource.data.deleted || isOwner())
+        && audited('entries', eid);
+
+      allow delete: if false;
+    }
+
+    // ---------- فهرس الأرقام المرجعية ----------
+    match /refs/{key} {
+      allow read: if isActive();
+      allow create: if isActive()
+        && request.resource.data.keys().hasOnly(['ids'])
+        && request.resource.data.ids.size() == 1
+        && refKey(getAfter(/databases/$(database)/documents/entries/$(request.resource.data.ids[0])).data.refNo) == key;
+      allow update: if isActive()
+        && request.resource.data.keys().hasOnly(['ids'])
+        && request.resource.data.ids.size() == resource.data.ids.size() + 1
+        && request.resource.data.ids.hasAll(resource.data.ids)
+        && refKey(getAfter(/databases/$(database)/documents/entries/$(request.resource.data.ids[request.resource.data.ids.size() - 1])).data.refNo) == key;
+      allow delete: if false;
+    }
+
+    // ---------- سجل التدقيق: إضافة فقط، لا تعديل ولا حذف ----------
+    match /auditLog/{aid} {
+      allow read: if isManager();
+      allow create: if isActive()
+        && request.resource.data.keys().hasOnly(['actor', 'at', 'action', 'entity', 'entityId', 'before', 'after', 'reason'])
+        && request.resource.data.actor == request.auth.uid
+        && request.resource.data.at == request.time
+        && request.resource.data.entity in ['entries', 'users', 'suppliers', 'settings']
+        && request.resource.data.entityId is string
+        && request.resource.data.action is string && request.resource.data.action.size() <= 40;
+      allow update, delete: if false;
+    }
+  }
+}

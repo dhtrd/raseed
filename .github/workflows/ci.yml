@@ -1,0 +1,83 @@
+name: CI
+
+# كل PR وكل دفع: lint + typecheck + اختبارات + بناء + فحص أمني. لا دمج قبل اللون الأخضر (SPEC §3-ز).
+on:
+  pull_request:
+  push:
+    branches: ["**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: lint · typecheck · unit · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run lint:css
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  rules:
+    name: Firestore rules (emulator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - run: npm ci
+      - run: npm run test:rules
+
+  e2e:
+    name: e2e (Chromium · Firefox · WebKit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:e2e
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+  security:
+    name: security (npm audit · gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      # يحجب: ثغرات high فأعلى في اعتماديات الإنتاج
+      - run: npm audit --omit=dev --audit-level=high
+      # للعلم فقط: أدوات التطوير (firebase-tools, stylelint) — لا تُشحن مع التطبيق
+      - run: npm audit --audit-level=high || echo "::warning::ثغرات في اعتماديات التطوير فقط؛ راجع المخرجات أعلاه."
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
