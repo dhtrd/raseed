@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AmountField } from "./AmountField";
 import { DebitCreditBar } from "./DebitCreditBar";
@@ -41,6 +41,13 @@ describe("AmountField", () => {
     render(<Amount />);
     const input = screen.getByLabelText(/المبلغ/);
     await userEvent.type(input, "١٢٥٠٠٫٥");
+    expect(input).toHaveValue("12,500.5");
+  });
+  it("يحوّل الأرقام الهندية حتى بلا beforeinput (IME وأندرويد)", () => {
+    render(<Amount />);
+    const input = screen.getByLabelText(/المبلغ/);
+    input.focus();
+    fireEvent.change(input, { target: { value: "١٢٥٠٠٫٥" } });
     expect(input).toHaveValue("12,500.5");
   });
   it("يرفض الإشارة برسالة واضحة", async () => {

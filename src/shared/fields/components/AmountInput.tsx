@@ -103,7 +103,10 @@ export function AmountInput(p: AmountInputProps) {
       onKeyDown={p.onKeyDown}
       onChange={(e) => {
         onValidity(null);
-        apply(e.target.value, e.target.selectionStart ?? e.target.value.length);
+        // احتياط: بعض لوحات المفاتيح وIME لا تطلق beforeinput (Firefox، أندرويد)،
+        // فنحوّل الأرقام الهندية والفاصلة العربية هنا أيضاً. «,» تبقى فاصل آلاف من تنسيقنا.
+        const raw = normalizeDigits(e.target.value).replace(/[٫،]/g, ".");
+        apply(raw, e.target.selectionStart ?? raw.length);
       }}
       onPaste={(e) => {
         e.preventDefault();
