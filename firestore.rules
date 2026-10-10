@@ -62,13 +62,13 @@ service cloud.firestore {
     // ---------- حالة Odoo (للفواتير فقط) ----------
     function odooInitial(d) {
       return d.kind == 'inv'
-        ? (d.odoo is map && d.odoo.entered == false && d.odoo.keys().hasOnly(['entered', 'by', 'at', 'reason', 'reasonText']))
+        ? (d.odoo is map && d.odoo.entered == false && d.odoo.keys().hasOnly(['entered', 'by', 'at', 'reason', 'reasonText', 'lockReason']))
         : !('odoo' in d);
     }
     function odooChangeOk(before, after) {
       return (!('odoo' in after) && !('odoo' in before))
         || ('odoo' in after && 'odoo' in before && after.odoo == before.odoo)
-        || (after.kind == 'inv' && after.odoo.keys().hasOnly(['entered', 'by', 'at', 'reason', 'reasonText'])
+        || (after.kind == 'inv' && after.odoo.keys().hasOnly(['entered', 'by', 'at', 'reason', 'reasonText', 'lockReason'])
             && after.odoo.by == request.auth.uid && after.odoo.at == request.time
             && (after.odoo.entered == true
                 || (after.odoo.reason in ['wrong', 'cancelled', 'other']
@@ -185,21 +185,47 @@ service cloud.firestore {
         && (request.resource.data.deleted == resource.data.deleted || isOwner())
         && audited('entries', eid);
 
+      // استثناء الفترة المقفلة (DECISIONS 2026-10-10): المالك وحده يغيّر حالة Odoo لفاتورة مقفلة،
+      // بسبب مكتوب إلزامي، ولا يتغير أي حقل آخر.
+      allow update: if isOwner()
+        && !isOpenDate(resource.data.date)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['odoo', 'updatedAt', 'auditId'])
+        && request.resource.data.updatedAt == request.time
+        && resource.data.kind == 'inv'
+        && odooChangeOk(resource.data, request.resource.data)
+        && request.resource.data.odoo.lockReason is string
+        && request.resource.data.odoo.lockReason.size() > 0 && request.resource.data.odoo.lockReason.size() <= 300
+        && audited('entries', eid);
+
       allow delete: if false;
     }
 
     // ---------- فهرس الأرقام المرجعية ----------
     match /refs/{key} {
+      // places: مكان كل حركة بالرقم نفسه (المورد واسمه)، ليظهر في التحذير الصارم
+      // لكل مستخدم ولو كان المورد غير مسند إليه (DECISIONS 2026-10-10)
+      function entryAfter(id) { return getAfter(/databases/$(database)/documents/entries/$(id)).data; }
+      function placeOk(p, id) {
+        return p.keys().hasOnly(['entryId', 'supplierId', 'supplierName'])
+          && p.entryId == id
+          && p.supplierId == entryAfter(id).supplierId
+          && p.supplierName == get(/databases/$(database)/documents/suppliers/$(p.supplierId)).data.name;
+      }
       allow read: if isActive();
       allow create: if isActive()
-        && request.resource.data.keys().hasOnly(['ids'])
-        && request.resource.data.ids.size() == 1
-        && refKey(getAfter(/databases/$(database)/documents/entries/$(request.resource.data.ids[0])).data.refNo) == key;
+        && request.resource.data.keys().hasOnly(['ids', 'places'])
+        && request.resource.data.ids.size() == 1 && request.resource.data.places.size() == 1
+        && refKey(entryAfter(request.resource.data.ids[0]).refNo) == key
+        && placeOk(request.resource.data.places[0], request.resource.data.ids[0]);
       allow update: if isActive()
-        && request.resource.data.keys().hasOnly(['ids'])
+        && request.resource.data.keys().hasOnly(['ids', 'places'])
         && request.resource.data.ids.size() == resource.data.ids.size() + 1
+        && request.resource.data.places.size() == resource.data.places.size() + 1
         && request.resource.data.ids.hasAll(resource.data.ids)
-        && refKey(getAfter(/databases/$(database)/documents/entries/$(request.resource.data.ids[request.resource.data.ids.size() - 1])).data.refNo) == key;
+        && request.resource.data.places.hasAll(resource.data.places)
+        && refKey(entryAfter(request.resource.data.ids[request.resource.data.ids.size() - 1]).refNo) == key
+        && placeOk(request.resource.data.places[request.resource.data.places.size() - 1],
+                   request.resource.data.ids[request.resource.data.ids.size() - 1]);
       allow delete: if false;
     }
 

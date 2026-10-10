@@ -40,6 +40,7 @@ beforeAll(async () => {
 afterAll(async () => env.cleanup());
 
 const ODOO_NEW = { entered: false, by: null, at: null, reason: null, reasonText: "" };
+const NAMES: Record<string, string> = { s1: "المورد (أ)", s2: "المورد (ب)" };
 
 beforeEach(async () => {
   await env.clearFirestore();
@@ -71,7 +72,18 @@ beforeEach(async () => {
       updatedAt: new Date(),
       auditId: "seed",
     });
-    await setDoc(doc(db, `refs/${refKey("P10590")}`), { ids: ["e0"] });
+    await setDoc(doc(db, `refs/${refKey("P10590")}`), {
+      ids: ["e0"],
+      places: [{ entryId: "e0", supplierId: "s1", supplierName: "المورد (أ)" }],
+    });
+    // فاتورة في الفترة المقفلة
+    await setDoc(doc(db, "entries/eL"), {
+      ...invoice("s1", "10111", { date: "2026-05-10" }),
+      createdBy: "owner",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      auditId: "seed",
+    });
     await setDoc(doc(db, "entries/e2"), {
       ...invoice("s2", "20001"),
       createdBy: "owner",
@@ -148,7 +160,7 @@ function createEntry(
   uid: string,
   eid: string,
   data: Record<string, unknown>,
-  opts: { refExists?: boolean; skipAudit?: boolean; skipRef?: boolean } = {},
+  opts: { refExists?: boolean; skipAudit?: boolean; skipRef?: boolean; wrongName?: boolean } = {},
 ) {
   const b = writeBatch(db);
   const aid = newAuditId();
@@ -169,8 +181,14 @@ function createEntry(
     });
   if (data.kind !== "note" && !opts.skipRef) {
     const ref = doc(db, `refs/${refKey(String(data.refNo))}`);
-    if (opts.refExists) b.update(ref, { ids: arrayUnion(eid) });
-    else b.set(ref, { ids: [eid] });
+    const sid = String(data.supplierId);
+    const place = {
+      entryId: eid,
+      supplierId: sid,
+      supplierName: opts.wrongName ? "اسم مزيف" : (NAMES[sid] ?? ""),
+    };
+    if (opts.refExists) b.update(ref, { ids: arrayUnion(eid), places: arrayUnion(place) });
+    else b.set(ref, { ids: [eid], places: [place] });
   }
   return b.commit();
 }
@@ -194,7 +212,11 @@ function updateEntry(
       entity: "entries",
       entityId: eid,
     });
-  if (opts.refSet) b.set(doc(db, `refs/${refKey(opts.refSet)}`), { ids: [eid] });
+  if (opts.refSet)
+    b.set(doc(db, `refs/${refKey(opts.refSet)}`), {
+      ids: [eid],
+      places: [{ entryId: eid, supplierId: "s1", supplierName: "المورد (أ)" }],
+    });
   return b.commit();
 }
 
@@ -541,4 +563,34 @@ describe("الموردون والإعدادات", () => {
       writeWithAudit(as("owner"), "owner", "settings/roleNames", "settings", "roleNames", names),
     );
   });
+});
+
+describe("Odoo في الفترة المقفلة (DECISIONS 2026-10-10)", () => {
+  const odoo = (uid: string, lockReason?: string) => ({
+    odoo: {
+      entered: true,
+      by: uid,
+      at: serverTimestamp(),
+      reason: null,
+      reasonText: "",
+      ...(lockReason !== undefined ? { lockReason } : {}),
+    },
+  });
+  it("الإدارة لا تغيّر حالة فاتورة مقفلة", () =>
+    assertFails(updateEntry(as("admin"), "admin", "eL", odoo("admin", "سبب"))));
+  it("المالك بلا سبب مرفوض", () => assertFails(updateEntry(as("owner"), "owner", "eL", odoo("owner"))));
+  it("المالك بسبب مكتوب مقبول", () =>
+    assertSucceeds(updateEntry(as("owner"), "owner", "eL", odoo("owner", "تصحيح بعد مطابقة Odoo السنوية"))));
+  it("المالك لا يعدّل غير Odoo في الفترة المقفلة", () =>
+    assertFails(updateEntry(as("owner"), "owner", "eL", { ...odoo("owner", "سبب"), details: "تعديل" })));
+});
+
+describe("مكان التكرار لكل المستخدمين", () => {
+  it("مدخل البيانات يقرأ اسم المورد صاحب الرقم المكرر ولو لم يُسند إليه", async () => {
+    await createEntry(as("owner"), "owner", "p1", invoice("s2", "30001"));
+    const snap = await assertSucceeds(getDoc(doc(as("entry"), `refs/${refKey("P30001")}`)));
+    if (snap.data()?.places?.[0]?.supplierName !== "المورد (ب)") throw new Error("الاسم غير ظاهر");
+  });
+  it("اسم مورد مزيف في الفهرس مرفوض", () =>
+    assertFails(createEntry(as("owner"), "owner", "p2", invoice("s1", "30002"), { wrongName: true })));
 });
