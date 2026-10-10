@@ -1,0 +1,8 @@
+rased-mockups/
+proposals/
+reports/
+private/
+data/
+dist/
+package-lock.json
+*.md

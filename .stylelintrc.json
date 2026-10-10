@@ -1,0 +1,14 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "plugins": ["stylelint-use-logical"],
+  "rules": {
+    "csstools/use-logical": ["always", { "except": ["top", "bottom", "height", "width", "min-height", "max-height", "min-width", "max-width"] }],
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "declaration-property-value-no-unknown": true,
+    "no-descending-specificity": null,
+    "selector-pseudo-class-no-unknown": [true, { "ignorePseudoClasses": ["global"] }],
+    "property-no-vendor-prefix": null,
+    "value-keyword-case": ["lower", { "ignoreProperties": ["font-family", "/^--f-/"] }]
+  }
+}
