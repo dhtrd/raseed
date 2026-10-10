@@ -11,7 +11,9 @@ const ALLOWED = /^[A-Z0-9ء-ي/-]+$/;
 
 /** أرقام لاتينية، قص المسافات الطرفية، وحروف لاتينية كبيرة. الأصفار البادئة تبقى. */
 export function normalizeRef(raw: string): string {
-  return normalizeDigits(raw).trim().replace(/[a-z]+/g, (x) => x.toUpperCase());
+  return normalizeDigits(raw)
+    .trim()
+    .replace(/[a-z]+/g, (x) => x.toUpperCase());
 }
 
 export function validateRef(ref: string, kind: EntryKind): string | null {

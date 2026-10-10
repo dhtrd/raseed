@@ -1,0 +1,75 @@
+/* رموز التصميم من CHOSEN.md §2 (الاتجاه 1 «الدفتر» + شعار «نخلة وتمر»). لا قيم ألوان خارج هذا الملف. */
+:root {
+  --paper: #eef2f5;
+  --surface: #fff;
+  --ink: #1b2a44;
+  --ink-2: #46546d;
+  --rule: #c9d3de;
+  --neg: #a3242b;
+  --accent: #2b4c7e;
+  --on-accent: #fff;
+  --margin: #e2b6b9;
+  --wash: #e3eaf4;
+  --wash-2: #f5f8fb;
+  --neg-wash: #f8e8e9;
+  --tab: #e2e8ee;
+  --mark-ink: #1e4634;
+  --mark-acc: #b8752a;
+  --scrim: rgb(20 27 38 / 42%);
+  --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  --r-xs: 3px;
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-tab: 10px;
+  --field-h: 46px;
+  --touch: 44px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #141b26;
+    --surface: #1c2533;
+    --ink: #e3e8ef;
+    --ink-2: #aab5c6;
+    --rule: #33415a;
+    --neg: #f08a8f;
+    --accent: #8fb0e6;
+    --on-accent: #141b26;
+    --margin: #5a3a46;
+    --wash: #243452;
+    --wash-2: #202b3b;
+    --neg-wash: #3a2530;
+    --tab: #18202c;
+    --mark-ink: #d7eae1;
+    --mark-acc: #c9822b;
+    --shadow: 0 8px 22px rgb(0 0 0 / 45%);
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #141b26;
+  --surface: #1c2533;
+  --ink: #e3e8ef;
+  --ink-2: #aab5c6;
+  --rule: #33415a;
+  --neg: #f08a8f;
+  --accent: #8fb0e6;
+  --on-accent: #141b26;
+  --margin: #5a3a46;
+  --wash: #243452;
+  --wash-2: #202b3b;
+  --neg-wash: #3a2530;
+  --tab: #18202c;
+  --mark-ink: #d7eae1;
+  --mark-acc: #c9822b;
+  --shadow: 0 8px 22px rgb(0 0 0 / 45%);
+
+  color-scheme: dark;
+}

@@ -1,0 +1,53 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  border-block-start: 3px double var(--ink);
+}
+
+.head {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+  padding: 4px 10px;
+  border-block-end: 1px solid var(--rule);
+}
+
+.head + .head,
+.cell + .cell {
+  border-inline-start: 1px solid var(--margin);
+}
+
+.on {
+  color: var(--accent);
+  background: var(--wash);
+}
+
+.cell {
+  padding: 8px 10px 4px;
+}
+
+.locked {
+  opacity: 0.5;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 700;
+  border: 1.5px solid var(--neg);
+  color: var(--neg);
+  border-radius: var(--r-xs);
+  padding: 0 6px;
+  margin-inline-start: 6px;
+}
+
+.hint {
+  font-size: 14px;
+  color: var(--ink-2);
+}

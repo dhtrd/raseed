@@ -5,14 +5,29 @@ export type IsoDate = string;
 
 export const DAY_NAMES = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"] as const;
 export const MONTH_NAMES = [
-  "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
-  "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
+  "يناير",
+  "فبراير",
+  "مارس",
+  "أبريل",
+  "مايو",
+  "يونيو",
+  "يوليو",
+  "أغسطس",
+  "سبتمبر",
+  "أكتوبر",
+  "نوفمبر",
+  "ديسمبر",
 ] as const;
 
 export const DATE_FORMS_HINT = "اكتب: 15 أو 1508 أو 15/8 أو 150826 أو +1";
 
 export function todayInRiyadh(now: Date = new Date()): IsoDate {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Riyadh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
 }
 
 export function toIso(y: number, m: number, d: number): IsoDate {
@@ -28,7 +43,9 @@ export function splitIso(iso: IsoDate): { y: number; m: number; d: number } {
 export function makeDate(y: number, m: number, d: number): IsoDate | null {
   if (m < 1 || m > 12 || d < 1 || y < 1900 || y > 2200) return null;
   const t = new Date(Date.UTC(y, m - 1, d));
-  return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d ? toIso(y, m, d) : null;
+  return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d
+    ? toIso(y, m, d)
+    : null;
 }
 
 export function addDays(iso: IsoDate, n: number): IsoDate {
@@ -92,8 +109,8 @@ export function parseDateInput(raw: string, opts: ParseDateOptions): ParseDateRe
     if (iso) return check(Number(iso[3]), Number(iso[2]), Number(iso[1]));
   }
 
-  if (/[/.\-]/.test(s)) {
-    const parts = s.split(/[/.\-]/);
+  if (/[/.-]/.test(s)) {
+    const parts = s.split(/[/.-]/);
     if (parts.length < 2 || parts.length > 3 || parts.some((p) => !/^\d+$/.test(p))) {
       return { ok: false, error: `صيغة غير مفهومة. ${DATE_FORMS_HINT}` };
     }
@@ -135,7 +152,9 @@ export type DateCheck = { error?: string; warning?: string };
 /** الفترة المقفلة تمنع، والمستقبل أو الأقدم من 12 شهراً ينبّه فقط. */
 export function checkDate(iso: IsoDate, opts: { today: IsoDate; lockedThrough?: IsoDate | null }): DateCheck {
   if (opts.lockedThrough && iso <= opts.lockedThrough) {
-    return { error: `الفترة مقفلة حتى ${formatDate(opts.lockedThrough)}. اختر تاريخاً بعده أو اطلب فك القفل من المالك.` };
+    return {
+      error: `الفترة مقفلة حتى ${formatDate(opts.lockedThrough)}. اختر تاريخاً بعده أو اطلب فك القفل من المالك.`,
+    };
   }
   if (iso > opts.today) return { warning: "تاريخ في المستقبل. تأكد منه قبل الحفظ." };
   if (iso < addMonthsClamped(opts.today, -12)) return { warning: "أقدم من 12 شهراً. تأكد منه قبل الحفظ." };

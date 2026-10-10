@@ -1,0 +1,64 @@
+.popover {
+  inline-size: var(--trigger-width);
+  min-inline-size: 260px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow);
+  border-end-start-radius: var(--r-md);
+  border-end-end-radius: var(--r-md);
+  max-block-size: 320px;
+  overflow: auto;
+  padding-block: 4px;
+}
+
+.list {
+  outline: none;
+}
+
+.header {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  padding: 6px 12px 2px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  min-block-size: var(--touch);
+  padding: 4px 12px;
+  cursor: pointer;
+  outline: none;
+  color: var(--ink);
+}
+
+.item[data-focused],
+.item[data-hovered] {
+  background: var(--wash);
+  box-shadow: inset -4px 0 0 var(--accent);
+}
+
+.item[data-selected] {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.last {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.empty {
+  padding: 10px 12px;
+  color: var(--ink-2);
+  font-size: 14.5px;
+}
+
+.count {
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--ink-2);
+}

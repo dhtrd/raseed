@@ -84,7 +84,7 @@ export function parseAmount(display: string): AmountResult {
 export function cleanPastedAmount(text: string): { ok: true; value: string } | { ok: false; error: string } {
   let s = normalizeDigits(text)
     .replace(/ر\.?\s?س\.?|SAR|ريال|⃁/gi, "")
-    .replace(/[\s  ]/g, "");
+    .replace(/[\s\u00a0\u202f]/g, "");
   if (/[-−(]/.test(s)) return { ok: false, error: AMOUNT_MESSAGES.positiveOnly };
   if (s.includes(".") || s.includes("٫")) s = s.replace(/[,،٬]/g, "").replace("٫", ".");
   else if (/^\d{1,3}([,٬]\d{3})+$/.test(s)) s = s.replace(/[,٬]/g, "");

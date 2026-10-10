@@ -1,0 +1,53 @@
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: var(--touch);
+  padding-inline: 4px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: start;
+}
+
+.box {
+  inline-size: 22px;
+  block-size: 22px;
+  border: 2px solid var(--ink-2);
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  flex: none;
+  background: var(--surface);
+}
+
+.box svg {
+  inline-size: 15px;
+  block-size: 15px;
+  opacity: 0;
+  color: var(--on-accent);
+}
+
+.check[aria-checked="true"] .box {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.check[aria-checked="true"] .box svg {
+  opacity: 1;
+}
+
+.danger[aria-checked="true"] .box {
+  background: var(--neg);
+  border-color: var(--neg);
+}
+
+.check[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.invalid .box {
+  border-color: var(--neg);
+}

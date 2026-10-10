@@ -6,7 +6,20 @@ import globals from "globals";
 import noNativeControls from "./tools/eslint/no-native-controls.js";
 
 export default tseslint.config(
-  { ignores: ["dist", "node_modules", "rased-mockups", "proposals", "reports", "private", "data", "coverage", "playwright-report", "test-results"] },
+  {
+    ignores: [
+      "dist",
+      "node_modules",
+      "rased-mockups",
+      "proposals",
+      "reports",
+      "private",
+      "data",
+      "coverage",
+      "playwright-report",
+      "test-results",
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

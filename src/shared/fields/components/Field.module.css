@@ -1,0 +1,194 @@
+/* الحالات الست لكل حقل (CHOSEN §4 + خيار «أ. هادئ» المعتمد 2026-10-10) */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-inline-size: 0;
+  position: relative;
+}
+
+.label {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.required {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--neg);
+}
+
+.optional {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.anchor {
+  position: relative;
+}
+
+.box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: var(--field-h);
+  padding-inline: 10px;
+  background: var(--wash-2);
+  border-block-end: 1.5px solid var(--rule);
+  border-start-start-radius: var(--r-sm);
+  border-start-end-radius: var(--r-sm);
+}
+
+.box:focus-within {
+  border-block-end-color: var(--accent);
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.input,
+.textarea {
+  all: unset;
+  flex: 1;
+  min-inline-size: 0;
+  font-family: var(--f-text);
+  font-size: 17px;
+  color: var(--ink);
+  caret-color: var(--accent);
+}
+
+.input {
+  block-size: 44px;
+  inline-size: 100%;
+}
+
+.textarea {
+  display: block;
+  min-block-size: 44px;
+  padding-block: 9px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--ink-2);
+  opacity: 0.75;
+}
+
+.num {
+  direction: ltr;
+  text-align: end;
+  font-family: var(--f-num);
+  font-size: 18px;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.affix {
+  inline-size: 1em;
+  block-size: 1.1em;
+  flex: none;
+  color: var(--ink-2);
+}
+
+.hint {
+  font-size: 14.5px;
+  color: var(--ink-2);
+  font-family: var(--f-num);
+}
+
+.message {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--neg);
+}
+
+.warning {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.warning b {
+  color: var(--neg);
+}
+
+.counter {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  font-family: var(--f-num);
+  text-align: end;
+}
+
+/* خطأ */
+.error .box {
+  border-block-end: 2px solid var(--neg);
+}
+
+.error .label {
+  color: var(--neg);
+}
+
+/* معطّل */
+.disabled {
+  opacity: 0.5;
+}
+
+.disabled .input {
+  cursor: not-allowed;
+}
+
+/* للقراءة فقط */
+.readonly .box {
+  background: transparent;
+  border-block-end: 1.5px dotted var(--ink-2);
+}
+
+.iconButton {
+  all: unset;
+  inline-size: 40px;
+  block-size: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--ink-2);
+  flex: none;
+}
+
+.iconButton:hover {
+  background: var(--wash);
+}
+
+.iconButton:focus-visible {
+  outline: 3px solid var(--accent);
+}
+
+.iconButton svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.refno {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-block-size: var(--field-h);
+  padding-inline: 10px;
+  direction: ltr;
+  font-family: var(--f-num);
+  font-weight: 700;
+  font-size: 19px;
+  border-block-end: 1.5px dotted var(--ink-2);
+}
+
+.refnoDup {
+  color: var(--neg);
+  border-block-end: 2px solid var(--neg);
+}

@@ -3,7 +3,7 @@ import { normalizeDigits } from "./digits";
 export const VOUCHER_MAX_DIGITS = 12;
 
 export function normalizeVoucher(raw: string): string {
-  return normalizeDigits(raw).replace(/[\s ]/g, "");
+  return normalizeDigits(raw).replace(/[\s\u00a0]/g, "");
 }
 
 /** اختياري؛ أرقام فقط تُحفظ نصاً بأصفارها. */

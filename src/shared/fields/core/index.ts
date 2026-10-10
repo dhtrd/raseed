@@ -4,3 +4,4 @@ export * from "./date";
 export * from "./ref";
 export * from "./voucher";
 export * from "./text";
+export * from "./password";

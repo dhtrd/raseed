@@ -1,0 +1,42 @@
+.seg {
+  display: inline-flex;
+  align-self: flex-start;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.seg button {
+  min-block-size: var(--field-h);
+  padding: 4px 16px;
+  border: 0;
+  background: var(--surface);
+  color: var(--accent);
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seg button + button {
+  border-inline-start: 1.5px solid var(--accent);
+}
+
+.seg button[aria-checked="true"] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.kbd {
+  font-family: var(--f-num);
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+@media (width <= 600px) {
+  .kbd {
+    display: none;
+  }
+}

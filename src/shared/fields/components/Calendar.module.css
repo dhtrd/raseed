@@ -1,0 +1,226 @@
+/* التقويم المنبثق المتدرّج (DECISIONS 2026-10-10): ملتصق بالحقل وبعرضه، والأسهم داخل شريط رأسه */
+.cal {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline: 0;
+  min-inline-size: 260px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-block-start: 0;
+  box-shadow: var(--shadow);
+  border-end-start-radius: var(--r-sm);
+  border-end-end-radius: var(--r-sm);
+  overflow: hidden;
+  z-index: 30;
+}
+
+.head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 2px;
+  min-block-size: var(--field-h);
+  padding-inline: 4px;
+  background: var(--wash-2);
+  border-block-end: 1.5px solid var(--accent);
+}
+
+.group {
+  display: flex;
+  gap: 2px;
+}
+
+.title {
+  justify-self: center;
+  min-block-size: 36px;
+  padding-inline: 8px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 16px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.title:hover {
+  background: var(--wash);
+}
+
+.title[aria-disabled="true"] {
+  cursor: default;
+}
+
+.arrow {
+  inline-size: 34px;
+  block-size: 34px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-2);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.arrow:hover {
+  background: var(--wash);
+  color: var(--accent);
+}
+
+.arrow svg {
+  inline-size: 15px;
+  block-size: 15px;
+}
+
+.body {
+  padding: 8px 10px 4px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.wd {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  text-align: center;
+  padding-block: 2px;
+}
+
+.fri {
+  color: var(--neg);
+}
+
+.day {
+  block-size: 40px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--ink);
+  font-family: var(--f-num);
+  font-size: 15.5px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.day:hover {
+  background: var(--wash);
+}
+
+.out {
+  color: var(--ink-2);
+  opacity: 0.55;
+}
+
+.today {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.sel {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.sel:hover {
+  background: var(--accent);
+}
+
+.lock {
+  background: repeating-linear-gradient(135deg, transparent 0 5px, var(--wash) 5px 9px);
+  color: var(--ink-2);
+  cursor: not-allowed;
+  text-decoration: line-through;
+  text-decoration-color: var(--rule);
+}
+
+.day:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 0;
+}
+
+.cells {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.cells button {
+  min-block-size: var(--touch);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.cells .cur {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 10px 0;
+  padding-block: 8px 10px;
+  border-block-start: 1px solid var(--rule);
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.foot button {
+  min-block-size: 38px;
+  padding-inline: 12px;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* اللمس: هدف 44px */
+@media (pointer: coarse) {
+  .arrow {
+    inline-size: var(--touch);
+    block-size: var(--touch);
+  }
+
+  .day {
+    block-size: var(--touch);
+  }
+}
+
+/* الجوال: لوحة من أسفل الشاشة */
+@media (width <= 600px) {
+  .cal {
+    position: fixed;
+    inset-block: auto 0;
+    inset-inline: 0;
+    min-inline-size: 0;
+    border-block-start: 1px solid var(--rule);
+    border-radius: 14px 14px 0 0;
+    padding-block-end: env(safe-area-inset-bottom, 0);
+  }
+}
+
+.row {
+  display: contents;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}

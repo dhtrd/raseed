@@ -49,7 +49,9 @@ describe("لا يُقبل تاريخ غير صالح بصمت (SPEC §3-د)", ()
   it("29/02 في سنة كبيسة صحيح", () => expect(ok("29/2/2028")).toBe("2028-02-29"));
   it("شهر 13", () => expect(bad("0113")).toMatch(/شهر رقم 13/));
   it("لا قراءة شهر/يوم: 08/15 خطأ لأن الشهر 15", () => expect(bad("08/15")).toMatch(/شهر رقم 15/));
-  it.each(["158", "15082", "1508202"])("طول ملتبس %s يُرفض", (s) => expect(bad(s)).toMatch(/لا يُفهم بلا لبس/));
+  it.each(["158", "15082", "1508202"])("طول ملتبس %s يُرفض", (s) =>
+    expect(bad(s)).toMatch(/لا يُفهم بلا لبس/),
+  );
   it("حروف", () => expect(bad("15أ")).toMatch(/أرقام/));
   it("سنة بثلاثة أرقام", () => expect(bad("15/8/202")).toMatch(/السنة/));
   it("يوم صفر", () => expect(bad("00")).toMatch(/لا يوجد يوم 0/));
@@ -60,9 +62,14 @@ describe("العرض والتحققات", () => {
     expect(formatDate("2026-08-15")).toBe("15/08/2026");
     expect(formatDateWithDay("2026-08-15")).toBe("السبت 15/08/2026");
   });
-  it("الفترة المقفلة تمنع", () => expect(checkDate("2026-06-30", { today, lockedThrough: "2026-06-30" }).error).toMatch(/مقفلة حتى 30\/06\/2026/));
-  it("بعد القفل مسموح", () => expect(checkDate("2026-07-01", { today, lockedThrough: "2026-06-30" })).toEqual({}));
-  it("المستقبل تنبيه لا منع", () => expect(checkDate("2026-10-11", { today })).toEqual({ warning: expect.stringMatching(/المستقبل/) }));
+  it("الفترة المقفلة تمنع", () =>
+    expect(checkDate("2026-06-30", { today, lockedThrough: "2026-06-30" }).error).toMatch(
+      /مقفلة حتى 30\/06\/2026/,
+    ));
+  it("بعد القفل مسموح", () =>
+    expect(checkDate("2026-07-01", { today, lockedThrough: "2026-06-30" })).toEqual({}));
+  it("المستقبل تنبيه لا منع", () =>
+    expect(checkDate("2026-10-11", { today })).toEqual({ warning: expect.stringMatching(/المستقبل/) }));
   it("أقدم من 12 شهراً تنبيه", () => expect(checkDate("2025-10-09", { today }).warning).toMatch(/12 شهراً/));
   it("addDays", () => expect(addDays("2026-02-28", 1)).toBe("2026-03-01"));
   it("اليوم بتوقيت الرياض (UTC+3)", () => {
