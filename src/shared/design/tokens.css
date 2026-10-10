@@ -15,6 +15,11 @@
   --tab: #e2e8ee;
   --mark-ink: #1e4634;
   --mark-acc: #b8752a;
+
+  /* لوح الشعار الأخضر في شاشة الدخول (CHOSEN §2.2) */
+  --brand-panel: #1e4634;
+  --brand-on: #d7eae1;
+  --brand-acc: #c9822b;
   --scrim: rgb(20 27 38 / 42%);
   --shadow: 0 8px 22px rgb(27 42 68 / 22%);
   --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
@@ -47,6 +52,7 @@
     --tab: #18202c;
     --mark-ink: #d7eae1;
     --mark-acc: #c9822b;
+    --brand-panel: #101c16;
     --shadow: 0 8px 22px rgb(0 0 0 / 45%);
 
     color-scheme: dark;
@@ -69,6 +75,7 @@
   --tab: #18202c;
   --mark-ink: #d7eae1;
   --mark-acc: #c9822b;
+  --brand-panel: #101c16;
   --shadow: 0 8px 22px rgb(0 0 0 / 45%);
 
   color-scheme: dark;

@@ -1,0 +1,26 @@
+.center {
+  min-block-size: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.mark {
+  inline-size: 64px;
+  block-size: 64px;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+}
+
+.body {
+  margin: 0;
+  max-inline-size: 52ch;
+  color: var(--ink-2);
+}

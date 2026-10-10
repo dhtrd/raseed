@@ -41,3 +41,32 @@ export function identifierToEmail(
     return { ok: false, error: "اسم المستخدم 3 إلى 32 حرفاً لاتينياً أو رقماً أو . _ -" };
   return { ok: true, email: `${v}@${USERNAME_DOMAIN}` };
 }
+
+/** حروف بلا ملتبسات (0/O، 1/l/I) كي تُملى الكلمة المؤقتة وتُكتب دون خطأ. */
+const PASSWORD_SETS = ["ABCDEFGHJKLMNPQRSTUVWXYZ", "abcdefghijkmnopqrstuvwxyz", "23456789", "!@#$%*-_+?"];
+
+/**
+ * كلمة مرور مؤقتة قوية بالأنواع الأربعة. `randomInt(n)` يعيد عدداً منتظماً في [0, n)
+ * من مولّد تشفيري (المتصفح أو Node)، كي تبقى الدالة نقية وقابلة للاختبار.
+ */
+export function generatePassword(randomInt: (n: number) => number, length = 16): string {
+  const all = PASSWORD_SETS.join("");
+  const out = PASSWORD_SETS.map((s) => s[randomInt(s.length)] as string);
+  while (out.length < length) out.push(all[randomInt(all.length)] as string);
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = randomInt(i + 1);
+    [out[i], out[j]] = [out[j] as string, out[i] as string];
+  }
+  return out.join("");
+}
+
+/** مولّد المتصفح بلا انحياز (رفض القيم خارج أكبر مضاعف لـ n). */
+export function browserRandomInt(n: number): number {
+  const limit = Math.floor(0x1_0000_0000 / n) * n;
+  const buf = new Uint32Array(1);
+  for (;;) {
+    crypto.getRandomValues(buf);
+    const v = buf[0] as number;
+    if (v < limit) return v % n;
+  }
+}

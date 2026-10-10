@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { identifierToEmail, isStrongPassword, passwordStrength } from "./password";
+import {
+  browserRandomInt,
+  generatePassword,
+  identifierToEmail,
+  isStrongPassword,
+  passwordStrength,
+} from "./password";
 
 describe("الدخول", () => {
   it("اسم المستخدم يُحوَّل داخلياً إلى بريد ثابت", () => {
@@ -23,5 +29,20 @@ describe("الدخول", () => {
     expect(isStrongPassword("Tq7#mLx9!pR2")).toBe(true);
     expect(isStrongPassword("Tq7mLx9pR2vZab")).toBe(false);
     expect(isStrongPassword("Fahad#2026xyQ", ["fahad"])).toBe(false);
+  });
+  it("الكلمة المولّدة قوية دائماً وبلا حروف ملتبسة", () => {
+    for (let i = 0; i < 300; i++) {
+      const p = generatePassword(browserRandomInt);
+      expect(p).toHaveLength(16);
+      expect(isStrongPassword(p)).toBe(true);
+      expect(p).not.toMatch(/[0O1lI]/);
+    }
+  });
+  it("المولّد في المدى المطلوب", () => {
+    for (let i = 0; i < 500; i++) {
+      const v = browserRandomInt(7);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThan(7);
+    }
   });
 });

@@ -22,9 +22,11 @@
     "test:e2e": "playwright test",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "admin:create-owner": "node tools/admin/create-owner.ts",
-    "admin:reset-password": "node tools/admin/reset-password.ts"
+    "admin:reset-password": "node tools/admin/reset-password.ts",
+    "test:e2e:auth": "firebase emulators:exec --only auth,firestore --project demo-raseed \"playwright test -c playwright.auth.config.ts\""
   },
   "dependencies": {
+    "firebase": "^12.19.0",
     "react": "^19.3.0",
     "react-aria-components": "^1.22.1",
     "react-dom": "^19.3.0",
@@ -43,7 +45,6 @@
     "eslint": "^9.39.5",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "firebase": "^12.19.0",
     "firebase-admin": "^13.10.0",
     "firebase-tools": "^15.33.0",
     "globals": "^17.13.0",

@@ -17,6 +17,7 @@ export default tseslint.config(
       "data",
       "coverage",
       "playwright-report",
+      "playwright-report-auth",
       "test-results",
     ],
   },

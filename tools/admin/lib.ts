@@ -4,9 +4,24 @@
  */
 import { createInterface, type Interface } from "node:readline";
 import { randomInt } from "node:crypto";
-import { identifierToEmail, isStrongPassword } from "../../src/shared/fields/core/password.ts";
+import { fileURLToPath } from "node:url";
+import { relative, resolve, isAbsolute } from "node:path";
+import {
+  generatePassword,
+  identifierToEmail,
+  isStrongPassword,
+} from "../../src/shared/fields/core/password.ts";
 
 export { identifierToEmail, isStrongPassword };
+
+const repoRoot = resolve(fileURLToPath(new URL("../..", import.meta.url)));
+
+/** هل المسار داخل مجلد المستودع؟ (المفتاح يجب أن يكون خارجه لأن المستودع عام) */
+export function isInside(path: string, root: string): boolean {
+  if (!path) return false;
+  const rel = relative(resolve(root), resolve(path));
+  return rel === "" || (!rel.startsWith("..") && !isAbsolute(rel));
+}
 
 /** يتحقق من بيئة التشغيل قبل أي اتصال: مشروع صريح ومفتاح أو محاكي. */
 export function checkEnv(
@@ -21,7 +36,10 @@ export function checkEnv(
       error: "حدّد مسار مفتاح حساب الخدمة في GOOGLE_APPLICATION_CREDENTIALS (ملف خارج المستودع).",
     };
   }
-  if (!emulator && env.GOOGLE_APPLICATION_CREDENTIALS?.includes("/raseed/")) {
+  if (
+    !emulator &&
+    [repoRoot, process.cwd()].some((root) => isInside(env.GOOGLE_APPLICATION_CREDENTIALS ?? "", root))
+  ) {
     return { ok: false, error: "مفتاح حساب الخدمة داخل مجلد المستودع. انقله خارجه أولاً (المستودع عام)." };
   }
   return { ok: true, projectId, emulator };
@@ -29,15 +47,7 @@ export function checkEnv(
 
 /** كلمة مرور مؤقتة قوية بالأنواع الأربعة، بلا حروف ملتبسة (0/O، 1/l/I). */
 export function generateTempPassword(length = 16): string {
-  const sets = ["ABCDEFGHJKLMNPQRSTUVWXYZ", "abcdefghijkmnopqrstuvwxyz", "23456789", "!@#$%*-_+?"];
-  const all = sets.join("");
-  const out = sets.map((s) => s[randomInt(s.length)]!);
-  while (out.length < length) out.push(all[randomInt(all.length)]!);
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = randomInt(i + 1);
-    [out[i], out[j]] = [out[j]!, out[i]!];
-  }
-  return out.join("");
+  return generatePassword(randomInt, length);
 }
 
 /* قارئ أسطر واحد بطابور: الأسطر الملصوقة أو المُمرَّرة مسبقاً لا تضيع بين سؤال وآخر. */

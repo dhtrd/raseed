@@ -2,6 +2,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath, URL } from "node:url";
+import { copyFileSync } from "node:fs";
 
 // GitHub Pages لا يرسل ترويسات أمان، فتُحقن CSP كوسم meta في البناء فقط (Vite في التطوير يحتاج سكربتات مضمّنة).
 const CSP = [
@@ -23,10 +24,20 @@ const cspPlugin = {
     html.replace("<!--csp-->", `<meta http-equiv="Content-Security-Policy" content="${CSP}" />`),
 };
 
+// GitHub Pages لا يعرف مسارات الواجهة (مثل /raseed/users): 404.html نسخة من index.html كي يفتح الرابط المباشر
+const spaFallback = {
+  name: "raseed-spa-404",
+  apply: "build" as const,
+  closeBundle() {
+    const out = fileURLToPath(new URL("./dist/", import.meta.url));
+    copyFileSync(`${out}index.html`, `${out}404.html`);
+  },
+};
+
 // base: GitHub Pages يخدم المشروع تحت /raseed/
 export default defineConfig(({ mode }) => ({
   base: mode === "production" ? "/raseed/" : "/",
-  plugins: [react(), cspPlugin],
+  plugins: [react(), cspPlugin, spaFallback],
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   build: { sourcemap: false, target: "es2022" },
   test: {

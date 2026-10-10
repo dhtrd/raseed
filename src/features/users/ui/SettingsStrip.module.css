@@ -1,0 +1,23 @@
+.strip {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px clamp(16px, 2.4vw, 26px) 22px;
+  border-block-start: 1px solid var(--ink);
+}
+
+.h {
+  margin: 0;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.h span {
+  font-weight: 400;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px 18px;
+}

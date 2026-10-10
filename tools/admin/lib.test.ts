@@ -1,5 +1,9 @@
+// @vitest-environment node
 import { describe, expect, it } from "vitest";
-import { checkEnv, generateTempPassword, isStrongPassword } from "./lib.ts";
+import { fileURLToPath } from "node:url";
+import { checkEnv, generateTempPassword, isInside, isStrongPassword } from "./lib.ts";
+
+const repo = fileURLToPath(new URL("../..", import.meta.url));
 
 describe("سكربتات المالك", () => {
   it("الكلمة المؤقتة قوية وفريدة", () => {
@@ -13,11 +17,17 @@ describe("سكربتات المالك", () => {
     }
     expect(seen.size).toBe(200);
   });
+  it("المفتاح داخل المستودع مرفوض أينما كان", () => {
+    expect(isInside("/a/repo/x/key.json", "/a/repo")).toBe(true);
+    expect(isInside("/a/repo", "/a/repo")).toBe(true);
+    expect(isInside("/a/repo-keys/key.json", "/a/repo")).toBe(false);
+    expect(isInside("/a/keys/key.json", "/a/repo")).toBe(false);
+  });
   it("تتحقق من البيئة قبل أي اتصال", () => {
     expect(checkEnv({})).toMatchObject({ ok: false });
     expect(checkEnv({ RASEED_PROJECT_ID: "p" })).toMatchObject({ ok: false });
     expect(
-      checkEnv({ RASEED_PROJECT_ID: "p", GOOGLE_APPLICATION_CREDENTIALS: "/home/u/raseed/key.json" }),
+      checkEnv({ RASEED_PROJECT_ID: "p", GOOGLE_APPLICATION_CREDENTIALS: `${repo}private/key.json` }),
     ).toMatchObject({
       ok: false,
     });

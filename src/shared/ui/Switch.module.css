@@ -1,0 +1,49 @@
+.sw {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: var(--touch);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 15.5px;
+  cursor: pointer;
+  text-align: start;
+}
+
+.track {
+  position: relative;
+  inline-size: 46px;
+  block-size: 26px;
+  border-radius: 13px;
+  background: var(--rule);
+  flex: none;
+  transition: background 0.15s;
+}
+
+.track::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 3px;
+  inset-inline-start: 3px;
+  inline-size: 20px;
+  block-size: 20px;
+  border-radius: 50%;
+  background: var(--surface);
+  transition: inset-inline-start 0.15s;
+}
+
+.sw[aria-checked="true"] .track {
+  background: var(--accent);
+}
+
+.sw[aria-checked="true"] .track::after {
+  inset-inline-start: 23px;
+}
+
+.sw[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

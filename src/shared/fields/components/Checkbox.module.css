@@ -51,3 +51,19 @@
 .invalid .box {
   border-color: var(--neg);
 }
+
+.check[aria-checked="mixed"] .box {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.check[aria-checked="mixed"] .box::after {
+  content: "";
+  inline-size: 10px;
+  block-size: 2.5px;
+  background: var(--on-accent);
+}
+
+.check[aria-checked="mixed"] .box svg {
+  display: none;
+}

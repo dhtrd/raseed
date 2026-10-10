@@ -4,7 +4,12 @@ import { FieldShell } from "./Field";
 import s from "./Field.module.css";
 
 /** يبحث في المورد والمرجع والتفاصيل والمبلغ؛ الأرقام الهندية تُحوَّل. */
-export function SearchField(p: { value: string; onChange: (v: string) => void; label?: string }) {
+export function SearchField(p: {
+  value: string;
+  onChange: (v: string) => void;
+  label?: string;
+  placeholder?: string;
+}) {
   return (
     <FieldShell label={p.label ?? "بحث"}>
       {(ids) => (
@@ -17,7 +22,7 @@ export function SearchField(p: { value: string; onChange: (v: string) => void; l
             enterKeyHint="search"
             autoComplete="off"
             value={p.value}
-            placeholder="مورد، مرجع، تفاصيل أو مبلغ"
+            placeholder={p.placeholder ?? "مورد، مرجع، تفاصيل أو مبلغ"}
             onChange={(e) => p.onChange(normalizeDigits(e.target.value))}
             onKeyDown={(e) => {
               if (e.key === "Escape" && p.value) {
