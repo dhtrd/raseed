@@ -8,6 +8,7 @@ import { watchRoleNames } from "../features/users/data/settingsRepo";
 import { RoleNamesContext } from "../features/users/ui/roleNames";
 import { TempLockBar } from "../features/ledger/ui/TempLockBar";
 import { Icon } from "../shared/ui/Icon";
+import { BottomNav, type BottomItem } from "./BottomNav";
 import { SearchPalette } from "../features/ledger/ui/SearchPalette";
 import { clearSearchCache } from "../features/ledger/data/searchRepo";
 import s from "./AppShell.module.css";
@@ -27,18 +28,26 @@ export function AppShell() {
     [],
   );
 
+  // core: الأقسام الخمسة في التنقل السفلي على الجوال، فتُخفى من الألسنة العلوية هناك
   const tabs = [
-    { to: "/", label: "الأرصدة", end: true },
-    { to: "/statement", label: "كشف الحساب", end: false },
-    { to: "/invoices", label: "الفواتير", end: false },
-    { to: "/add", label: "إضافة حركة", end: false },
+    { to: "/", label: "الأرصدة", end: true, core: true },
+    { to: "/statement", label: "كشف الحساب", end: false, core: true },
+    { to: "/invoices", label: "الفواتير", end: false, core: true },
+    { to: "/add", label: "إضافة حركة", end: false, core: true },
+  ];
+  const bottom: BottomItem[] = [
+    { to: "/", label: "الأرصدة", end: true, icon: "balances" },
+    { to: "/statement", label: "الكشف", end: false, icon: "statement" },
+    { to: "/invoices", label: "الفواتير", end: false, icon: "invoices" },
+    { to: "/add", label: "إضافة", end: false, icon: "add" },
   ];
   if (isManager(profile.role)) {
+    bottom.push({ to: "/review", label: "المراجعة", end: false, icon: "review" });
     tabs.push(
-      { to: "/review", label: "المراجعة", end: false },
-      ...(profile.role === "owner" ? [{ to: "/lock", label: "قفل الفترات", end: false }] : []),
-      { to: "/users", label: "المستخدمون", end: false },
-      { to: "/assign", label: "الإسناد", end: false },
+      { to: "/review", label: "المراجعة", end: false, core: true },
+      ...(profile.role === "owner" ? [{ to: "/lock", label: "قفل الفترات", end: false, core: false }] : []),
+      { to: "/users", label: "المستخدمون", end: false, core: false },
+      { to: "/assign", label: "الإسناد", end: false, core: false },
     );
   }
 
@@ -51,7 +60,7 @@ export function AppShell() {
         </NavLink>
         <nav className={s.tabs} aria-label="أقسام الدفتر">
           {tabs.map((t) => (
-            <NavLink key={t.to} to={t.to} end={t.end}>
+            <NavLink key={t.to} to={t.to} end={t.end} className={t.core ? s.core : undefined}>
               {t.label}
             </NavLink>
           ))}
@@ -93,6 +102,7 @@ export function AppShell() {
       <div className={s.shell}>
         <Outlet />
       </div>
+      <BottomNav items={bottom} />
       <IdleGuard canReadSettings />
     </RoleNamesContext.Provider>
   );

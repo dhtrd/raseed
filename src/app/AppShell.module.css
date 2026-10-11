@@ -196,3 +196,18 @@
     display: none;
   }
 }
+
+/* الجوال: الأقسام الخمسة في التنقل السفلي (CHOSEN)، فيبقى في الألسنة العلوية ما سواها (للمالك والإدارة) */
+@media (width <= 600px) {
+  .tabs a.core {
+    display: none;
+  }
+
+  .tabs:not(:has(a:not(.core))) {
+    display: none;
+  }
+
+  .shell {
+    padding-block-end: calc(var(--bnav) + 24px);
+  }
+}

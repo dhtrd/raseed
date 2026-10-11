@@ -307,7 +307,7 @@
   .selbar {
     position: fixed;
     inset-inline: 0;
-    bottom: 0;
+    bottom: var(--bnav);
     z-index: 32;
     display: flex;
     flex-wrap: wrap;
