@@ -1,0 +1,169 @@
+<title>رصيد · التعديل من الكشف</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاثة خيارات لموضع «تعديل» في كشف المورد، كل منها جدول تفاعلي يتبدّل بين الحاسوب والجوال (بطاقات). الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --tab: #e2e8ee; --amber: #b8752a;
+  --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.lead { color: var(--ink-2); max-width: 76ch; margin: 6px 0 16px; }
+.eg { display: inline-block; font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 6px; margin-inline-start: 6px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+
+.opt { margin-bottom: 34px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 82ch; }
+.opt ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; position: relative; width: 1100px; margin-inline: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.screen.phone { width: 360px; border-radius: 24px; }
+.mast { display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: var(--surface); border-bottom: 3px double var(--ink); font-weight: 700; }
+.mast .brand { font-family: var(--f-brand); font-size: 20px; }
+.page { padding: 16px 20px 22px; display: grid; gap: 10px; }
+@container (width < 600px) { .page { padding: 12px 14px 18px; } }
+.page h3 { font-size: 22px; }
+.toast { padding: 8px 12px; background: var(--wash); border-inline-start: 4px solid var(--accent); font-size: 15px; }
+
+/* الجدول */
+table { width: 100%; border-collapse: collapse; background: var(--surface); border-top: 3px double var(--ink); font-size: 15px; }
+th { text-align: start; font-size: 13.5px; color: var(--ink-2); padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+td, tbody th { padding: 9px 8px; border-bottom: 1px solid var(--rule); text-align: start; font-weight: 400; color: var(--ink); font-size: 15px; vertical-align: middle; }
+.amt { text-align: end; border-inline-start: 1px solid var(--margin); }
+.xp { width: 30px; height: 30px; border: 1px solid var(--rule); border-radius: 50%; background: var(--surface); color: var(--ink-2); cursor: pointer; margin-inline-end: 8px; font: inherit; line-height: 1; }
+.xp[aria-expanded="true"] { background: var(--wash); color: var(--accent); }
+.tag { font-size: 12.5px; font-weight: 700; padding: 0 6px; border: 1px solid var(--accent); border-radius: 3px; color: var(--accent); }
+.tag.review { border-color: var(--neg); color: var(--neg); }
+.detail td { background: var(--wash-2); }
+.dl { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 22px; margin: 0; font-size: 14.5px; }
+.dl dt { color: var(--ink-2); display: inline; } .dl dd { display: inline; margin: 0 6px 0 0; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 2px 14px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.pen { width: 36px; height: 36px; display: inline-grid; place-items: center; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--accent); cursor: pointer; }
+.pen svg { width: 18px; height: 18px; }
+.pen:hover, .pen:focus-visible { border-color: var(--accent); background: var(--wash); }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td, tr.clickable:hover th { background: var(--wash-2); }
+.hint { font-size: 13.5px; color: var(--ink-2); }
+
+/* الجوال: بطاقات «سطر دفتر» */
+@container (width < 600px) {
+  thead { display: none; }
+  table, tbody { display: block; }
+  tbody tr:not(.detail) { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 0; border-bottom: 1px solid var(--rule); position: relative; }
+  tbody tr > * { display: block; border: 0; padding: 0; }
+  .hide-m { display: none; }
+  .amt { border: 0; }
+  .detail { display: none; }
+  .m-desc { grid-column: 1 / -1; font-size: 13.5px; color: var(--ink-2); }
+  .m-act { grid-column: 1 / -1; }
+  .m-corner { position: absolute; inset-inline-end: 0; top: 8px; }
+  tr.corner { padding-inline-end: 46px !important; }
+}
+@container (width >= 600px) { .m-only { display: none; } }
+@container (width < 600px) { .d-only { display: none !important; } }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 8px; }
+.qs b { color: var(--accent); }
+</style>
+
+<div class="wrap">
+  <h1>«تعديل» في كشف المورد</h1>
+  <p class="lead">زر يفتح نافذة تعديل الحركة المعتمدة (الخيار أ) من الكشف، للمالك والإدارة فقط؛ مدخل البيانات لا يرى الزر. ثلاثة مواضع تفاعلية، كل منها بين الحاسوب والجوال. البيانات وهمية<span class="eg">مثال</span>.</p>
+  <p class="common">في الأشكال الثلاثة: النافذة نفسها (سبب إلزامي، التغييرات قبل/بعد، الفترة المقفلة ممنوعة مع إرشاد المالك إلى الفتح المؤقت)، وبعد الحفظ يتحدث الكشف والرصيد الجاري تلقائياً.</p>
+
+  <section class="opt" aria-labelledby="ha">
+    <div class="opt-head"><h2 id="ha">أ. داخل التفاصيل المنسدلة</h2><div class="seg" data-view="a"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">زر «تعديل الحركة» في صف التفاصيل الذي يفتحه السهم. على الجوال زر نصي صغير أسفل كل بطاقة.</p>
+    <ul class="pc"><li class="pro">الجدول يبقى نظيفاً كما في النموذج المعتمد.</li><li class="pro">لا تعديل بالخطأ: يحتاج نقرتين.</li><li>أبطأ عند تصحيح حركات كثيرة.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <div class="opt-head"><h2 id="hb">ب. عمود إجراء بأيقونة قلم</h2><div class="seg" data-view="b"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">عمود أخير صغير بأيقونة قلم في كل صف. على الجوال القلم في زاوية البطاقة.</p>
+    <ul class="pc"><li class="pro">الأسرع: نقرة واحدة من أي صف.</li><li class="pro">واضح أين يُعدَّل.</li><li>عمود إضافي يضيّق الجدول على اللوحي.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <div class="opt-head"><h2 id="hc">ج. النقر على الصف</h2><div class="seg" data-view="c"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">النقر على أي مكان في الصف (أو البطاقة على الجوال) يفتح النافذة؛ السهم يبقى للتفاصيل. تلميح «انقر الصف للتعديل» فوق الجدول.</p>
+    <ul class="pc"><li class="pro">بلا عناصر إضافية.</li><li class="pro">هدف لمس كبير على الجوال.</li><li>أقل وضوحاً، وقد يُفتح بالخطأ أثناء التمرير أو التحديد.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol><li><b>الموضع:</b> أ أم ب أم ج؟</li></ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const ROWS = [
+    { d: "07/10/2026", k: "قيد", tag: "", ref: "0502", no: "MISC/2026/10/0502", desc: "سداد دفعة", dr: "1,200.00", cr: "", bal: "-1,050.75" },
+    { d: "05/10/2026", k: "فاتورة", tag: "للمراجعة", ref: "10003", no: "P10003", desc: "فاتورة مشتريات", dr: "", cr: "2,250.75", bal: "-2,250.75" },
+    { d: "02/10/2026", k: "فاتورة", tag: "", ref: "10002", no: "P10002", desc: "فاتورة مشتريات", dr: "", cr: "2,500.50", bal: "0.00" },
+    { d: "03/09/2026", k: "قيد", tag: "", ref: "0501", no: "MISC/2026/09/0501", desc: "سداد", dr: "2,500.50", cr: "", bal: "2,500.50" },
+  ];
+  const pen = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M14 6l4 4"/></svg>`;
+  const mast = `<div class="mast"><span class="brand">رصيد</span></div>`;
+  function build(id, mode) {
+    const el = document.getElementById(id); const open = new Set(); let toast = "";
+    const draw = () => {
+      const head = `<thead><tr><th>التاريخ</th><th class="hide-m">النوع</th><th class="hide-m">الرقم المرجعي</th><th class="hide-m">البيان</th><th class="amt">مدين</th><th class="amt">دائن</th><th class="amt">الرصيد</th>${mode === "b" ? '<th class="d-only"><span style="position:absolute;width:1px;height:1px;overflow:hidden">إجراء</span></th>' : ""}</tr></thead>`;
+      const body = ROWS.map((r, i) => {
+        const tags = `<span class="tag">${r.k}</span>${r.tag ? ` <span class="tag review">${r.tag}</span>` : ""}`;
+        const row = `<tr class="${mode === "c" ? "clickable" : mode === "b" ? "corner" : ""}" data-i="${i}" ${mode === "c" ? 'data-edit="1"' : ""}>
+          <th scope="row"><button type="button" class="xp" aria-expanded="${open.has(i)}" data-xp="${i}" aria-label="تفاصيل">⌄</button><span class="num">${r.d}</span></th>
+          <td class="hide-m">${tags}</td><td class="hide-m"><span class="num">${r.no}</span></td><td class="hide-m">${r.desc}</td>
+          <td class="amt">${r.dr ? `<span class="num">${r.dr}</span>` : ""}</td><td class="amt">${r.cr ? `<span class="num">${r.cr}</span>` : ""}</td><td class="amt"><b class="num">${r.bal}</b></td>
+          ${mode === "b" ? `<td class="d-only"><button type="button" class="pen" data-edit="1" aria-label="تعديل الحركة ${r.no}">${pen}</button></td>` : ""}
+          <td class="m-only m-desc">${tags} <span class="num">${r.no}</span> · ${r.desc}</td>
+          ${mode === "a" ? `<td class="m-only m-act"><button type="button" class="btn" data-edit="1" style="min-height:36px">تعديل</button></td>` : ""}
+          ${mode === "b" ? `<td class="m-only m-corner"><button type="button" class="pen" data-edit="1" aria-label="تعديل الحركة ${r.no}">${pen}</button></td>` : ""}
+        </tr>`;
+        const det = open.has(i) ? `<tr class="detail"><td colspan="${mode === "b" ? 8 : 7}"><dl class="dl"><div><dt>المرجع</dt><dd class="num">${r.ref}</dd></div><div><dt>الرقم المرجعي</dt><dd class="num">${r.no}</dd></div><div><dt>البيان</dt><dd>${r.desc}</dd></div>${mode === "a" ? `<div><button type="button" class="btn" data-edit="1">تعديل الحركة</button></div>` : ""}</dl></td></tr>` : "";
+        return row + det;
+      }).join("");
+      el.innerHTML = mast + `<div class="page"><h3>المورد (أ)</h3>${mode === "c" ? '<p class="hint">انقر الصف لتعديل الحركة؛ السهم للتفاصيل.</p>' : ""}${toast ? `<p class="toast" role="status">${toast}</p>` : ""}<table><caption style="position:absolute;width:1px;height:1px;overflow:hidden">حركات المورد</caption>${head}<tbody>${body}</tbody></table></div>`;
+    };
+    el.addEventListener("click", (e) => {
+      const xp = e.target.closest("[data-xp]");
+      if (xp) { e.stopPropagation(); const i = +xp.dataset.xp; open.has(i) ? open.delete(i) : open.add(i); draw(); return; }
+      const ed = e.target.closest("[data-edit]");
+      if (ed) { const tr = e.target.closest("tr[data-i]") || e.target.closest("tr").previousElementSibling; const i = tr ? +tr.dataset.i : 0; toast = `تُفتح نافذة تعديل الحركة ${ROWS[i]?.no ?? ""} (الخيار أ المعتمد).`; draw(); }
+    });
+    draw();
+  }
+  build("sa", "a"); build("sb", "b"); build("sc", "c");
+  document.querySelectorAll(".seg[data-view]").forEach((g) => g.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.getElementById("s" + g.dataset.view).classList.toggle("phone", b.dataset.v === "phone");
+  }));
+})();
+</script>

@@ -6,6 +6,7 @@ import { useProfile, useSession } from "../features/auth/session/SessionProvider
 import { isManager, DEFAULT_ROLE_NAMES, type RoleNames } from "../features/users/core/users";
 import { watchRoleNames } from "../features/users/data/settingsRepo";
 import { RoleNamesContext } from "../features/users/ui/roleNames";
+import { TempLockBar } from "../features/ledger/ui/TempLockBar";
 import s from "./AppShell.module.css";
 
 /** الرأس وألسنة الدفتر (direction-1). بقية أقسام المرحلة 4 (الفواتير، الإضافة، المراجعة) تُضاف تباعاً. */
@@ -32,6 +33,7 @@ export function AppShell() {
   if (isManager(profile.role)) {
     tabs.push(
       { to: "/review", label: "المراجعة", end: false },
+      ...(profile.role === "owner" ? [{ to: "/lock", label: "قفل الفترات", end: false }] : []),
       { to: "/users", label: "المستخدمون", end: false },
       { to: "/assign", label: "الإسناد", end: false },
     );
@@ -72,6 +74,7 @@ export function AppShell() {
           </button>
         </div>
       </header>
+      <TempLockBar enabled={profile.role === "owner"} />
       <div className={s.shell}>
         <Outlet />
       </div>

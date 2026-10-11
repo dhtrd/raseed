@@ -131,10 +131,24 @@ service cloud.firestore {
     }
 
     // ---------- الإعدادات ----------
+    // قفل الفترات (DECISIONS 2026-10-11، الخيار ب): المالك وحده، بسبب إلزامي في التدقيق، ولا تاريخ بعد اليوم.
+    // الفتح المؤقت يحفظ التاريخ السابق في tempFrom (بعد تاريخ القفل الجديد) ليُعاد إليه لاحقاً.
     match /settings/lock {
+      function notFuture(d) {
+        return timestamp.date(int(d[0:4]), int(d[5:7]), int(d[8:10])) <= request.time;
+      }
+      function lockReasonOk() {
+        let a = getAfter(auditPath(request.resource.data.auditId)).data;
+        return a.reason is string && a.reason.size() > 0 && a.reason.size() <= 300;
+      }
       allow read: if isActive();
       allow write: if isOwner() && isIsoDate(request.resource.data.lockedThrough)
-        && request.resource.data.keys().hasOnly(['lockedThrough', 'auditId']) && audited('settings', 'lock');
+        && notFuture(request.resource.data.lockedThrough)
+        && request.resource.data.keys().hasOnly(['lockedThrough', 'tempFrom', 'auditId'])
+        && (!('tempFrom' in request.resource.data)
+            || (isIsoDate(request.resource.data.tempFrom)
+                && request.resource.data.tempFrom > request.resource.data.lockedThrough))
+        && audited('settings', 'lock') && lockReasonOk();
     }
     // مدة الخمول قبل إنهاء الجلسة (دقائق): يضبطها المالك (DECISIONS 2026-10-10)
     match /settings/session {

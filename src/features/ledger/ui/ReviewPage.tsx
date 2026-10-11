@@ -257,6 +257,7 @@ export function ReviewPage() {
         target={editing}
         uid={profile.uid}
         lockedThrough={lockedThrough}
+        canUnlock={profile.role === "owner"}
         onClose={() => setEditing(null)}
         onSaved={(text) => {
           setEditing(null);
