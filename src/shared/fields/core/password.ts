@@ -42,6 +42,15 @@ export function identifierToEmail(
   return { ok: true, email: `${v}@${USERNAME_DOMAIN}` };
 }
 
+/** الدخول بالبريد فقط (DECISIONS 2026-10-11): يُنظَّف ويُصغَّر ويُتحقق من صيغته. */
+export function normalizeEmail(input: string): { ok: true; email: string } | { ok: false; error: string } {
+  const v = input.trim().toLowerCase();
+  if (!v) return { ok: false, error: "أدخل البريد الإلكتروني." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || v.length > 120)
+    return { ok: false, error: "البريد غير صالح. مثال صحيح: name@example.com" };
+  return { ok: true, email: v };
+}
+
 /** حروف بلا ملتبسات (0/O، 1/l/I) كي تُملى الكلمة المؤقتة وتُكتب دون خطأ. */
 const PASSWORD_SETS = ["ABCDEFGHJKLMNPQRSTUVWXYZ", "abcdefghijkmnopqrstuvwxyz", "23456789", "!@#$%*-_+?"];
 

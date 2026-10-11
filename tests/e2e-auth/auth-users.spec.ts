@@ -9,7 +9,7 @@ const NEW_PW = "Fh7#kLx9!pR2vNq";
 
 async function login(page: Page, id: string, pw: string) {
   await page.goto("/login");
-  await page.getByLabel("البريد أو اسم المستخدم").fill(id);
+  await page.getByLabel("البريد الإلكتروني").fill(id);
   await page.getByRole("textbox", { name: "كلمة المرور مطلوب" }).fill(pw);
   await page.getByRole("button", { name: "دخول" }).click();
 }
@@ -30,8 +30,8 @@ test("الدخول: الساعة، ورسالة عامة للبيانات الخ
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole("timer")).toContainText(/[صم]/);
   await login(page, OWNER.email, "Wrong#Pass2026x");
-  await expect(page.getByRole("alert")).toContainText("البريد أو اسم المستخدم أو كلمة المرور غير صحيحة.");
-  await page.getByLabel("البريد أو اسم المستخدم").fill("a@");
+  await expect(page.getByRole("alert")).toContainText("البريد أو كلمة المرور غير صحيحة.");
+  await page.getByLabel("البريد الإلكتروني").fill("a@");
   await page.getByRole("textbox", { name: "كلمة المرور مطلوب" }).click();
   await expect(page.getByText("البريد غير صالح.")).toBeVisible();
 });
@@ -44,7 +44,7 @@ test("المالك ينشئ مدخل بيانات بكلمة مؤقتة مولّ
   await page.getByRole("button", { name: "إضافة مستخدم" }).click();
   const dlg = page.getByRole("dialog");
   await dlg.getByLabel("الاسم الظاهر").fill("فهد");
-  await dlg.getByLabel("البريد أو اسم المستخدم للدخول").fill("fahad");
+  await dlg.getByLabel("البريد الإلكتروني للدخول").fill("fahad@example.com");
   await dlg.getByRole("button", { name: "توليد كلمة قوية" }).click();
   await dlg.getByRole("button", { name: "إنشاء الحساب" }).click();
   await expect(dlg.getByRole("heading", { name: "أُنشئ الحساب" })).toBeVisible();
@@ -55,13 +55,20 @@ test("المالك ينشئ مدخل بيانات بكلمة مؤقتة مولّ
   await expect(page.getByText("بانتظار أول دخول").first()).toBeVisible();
 });
 
+test("اسم المستخدم بلا بريد مرفوض (البريد فقط)", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("البريد الإلكتروني").fill("fahad");
+  await page.getByRole("button", { name: "دخول" }).click();
+  await expect(page.getByText("البريد غير صالح.", { exact: false })).toBeVisible();
+});
+
 test("تكرار الدخول نفسه مرفوض قبل الإرسال", async ({ page }) => {
   await loginOk(page, OWNER.email, OWNER.password);
   await page.goto("/users");
   await page.getByRole("button", { name: "إضافة مستخدم" }).click();
   const dlg = page.getByRole("dialog");
   await dlg.getByLabel("الاسم الظاهر").fill("مكرر");
-  await dlg.getByLabel("البريد أو اسم المستخدم للدخول").fill("FAHAD");
+  await dlg.getByLabel("البريد الإلكتروني للدخول").fill("FAHAD@Example.com");
   await dlg.getByRole("button", { name: "توليد كلمة قوية" }).click();
   await dlg.getByRole("button", { name: "إنشاء الحساب" }).click();
   await expect(dlg.getByText("هذا الدخول مستخدم لحساب آخر.")).toBeVisible();
@@ -97,7 +104,7 @@ test("مدة الخمول: المالك يضبطها ضمن 5–120", async ({ p
 });
 
 test("أول دخول: تغيير الكلمة المؤقتة إلزامي، ثم يرى مدخل البيانات الرئيسية فقط", async ({ page }) => {
-  await loginOk(page, "fahad", tempPassword);
+  await loginOk(page, "fahad@example.com", tempPassword);
   await expect(page).toHaveURL(/\/first-login$/);
   await page.goto("/users");
   await expect(page).toHaveURL(/\/first-login$/);
@@ -114,7 +121,7 @@ test("أول دخول: تغيير الكلمة المؤقتة إلزامي، ث�
   await page.goto("/users");
   await expect(page).toHaveURL(/\/$/);
   await logout(page);
-  await loginOk(page, "fahad", NEW_PW);
+  await loginOk(page, "fahad@example.com", NEW_PW);
   await expect(page.getByRole("heading", { name: "مرحباً فهد" })).toBeVisible();
 });
 
@@ -128,7 +135,7 @@ test("الإدارة ترى حساب المالك محمياً، وتوقف مد
   await page.getByRole("button", { name: "إيقاف" }).click();
   await expect(page.getByText("أُوقف الحساب وسُجّل في التدقيق.")).toBeVisible();
   await logout(page);
-  await login(page, "fahad", NEW_PW);
+  await login(page, "fahad@example.com", NEW_PW);
   await expect(page.getByText("حسابك موقوف")).toBeVisible();
 });
 

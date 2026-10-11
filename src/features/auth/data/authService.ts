@@ -7,10 +7,10 @@ import {
 import { doc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { firebase } from "../../../shared/firebase/client";
 import { addAudit } from "../../../shared/firebase/audit";
-import { identifierToEmail } from "../../../shared/fields/core/password";
+import { normalizeEmail } from "../../../shared/fields/core/password";
 
 export async function signIn(identifier: string, password: string): Promise<void> {
-  const id = identifierToEmail(identifier);
+  const id = normalizeEmail(identifier);
   if (!id.ok) throw Object.assign(new Error(id.error), { code: "auth/invalid-email" });
   await signInWithEmailAndPassword(firebase().auth, id.email, password);
 }
@@ -20,13 +20,11 @@ export function signOutNow(): Promise<void> {
 }
 
 /**
- * «نسيت كلمة المرور»: البريد يستلم رابطاً، واسم المستخدم يُوجَّه إلى المالك (الخيار «هجين»).
+ * «نسيت كلمة المرور»: رابط إلى البريد (الدخول بالبريد فقط، DECISIONS 2026-10-11).
  * النتيجة لا تكشف وجود البريد: «user-not-found» يُعامَل كنجاح.
  */
-export async function requestPasswordReset(identifier: string): Promise<"emailSent" | "askOwner"> {
-  const v = identifier.trim();
-  if (!v.includes("@")) return "askOwner";
-  const id = identifierToEmail(v);
+export async function requestPasswordReset(identifier: string): Promise<"emailSent"> {
+  const id = normalizeEmail(identifier);
   if (!id.ok) throw Object.assign(new Error(id.error), { code: "auth/invalid-email" });
   try {
     await sendPasswordResetEmail(firebase().auth, id.email);

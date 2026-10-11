@@ -46,15 +46,15 @@ describe("المستخدمون", () => {
   it("الاسم الظاهر والدخول الجديد", () => {
     expect(validateDisplayName("")).not.toBeNull();
     expect(validateDisplayName("x".repeat(81))).not.toBeNull();
-    expect(validateNewLogin("Fahad", ["fahad"])).toMatchObject({
+    expect(validateNewLogin("Fahad@Example.com", ["fahad@example.com"])).toMatchObject({
       ok: false,
       error: "هذا الدخول مستخدم لحساب آخر.",
     });
-    expect(validateNewLogin("fahad@users.raseed.internal", ["fahad"])).toMatchObject({ ok: false });
-    expect(validateNewLogin(" Layla ", ["fahad"])).toEqual({
+    expect(validateNewLogin("layla", [])).toMatchObject({ ok: false });
+    expect(validateNewLogin(" Layla@Example.com ", ["fahad@example.com"])).toEqual({
       ok: true,
-      login: "layla",
-      email: "layla@users.raseed.internal",
+      login: "layla@example.com",
+      email: "layla@example.com",
     });
   });
   it("الإدارة تدير الجميع عدا المالك، ولا أحد يغيّر دوره أو يوقف نفسه", () => {

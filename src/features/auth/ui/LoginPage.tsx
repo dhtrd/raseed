@@ -1,7 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Navigate } from "react-router";
 import { IdentifierField, PasswordField } from "../../../shared/fields";
-import { identifierToEmail } from "../../../shared/fields/core/password";
+import { normalizeEmail } from "../../../shared/fields/core/password";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
 import { Mark } from "../../../shared/ui/Logo";
@@ -44,7 +44,7 @@ export function LoginPage() {
       <SignInForm notice={notice ? NOTICE_TEXT[notice] : null} onForgot={() => setView("forgot")} />
     </AuthFrame>
   ) : (
-    <AuthFrame title="استعادة كلمة المرور" sub="اكتب بريدك أو اسم المستخدم.">
+    <AuthFrame title="استعادة كلمة المرور" sub="اكتب بريدك الإلكتروني.">
       <ForgotForm onBack={() => setView("signin")} />
     </AuthFrame>
   );
@@ -59,7 +59,7 @@ function SignInForm(p: { notice: { title: string; body: string } | null; onForgo
   const [busy, setBusy] = useState(false);
 
   const checkId = () => {
-    const r = identifierToEmail(id);
+    const r = normalizeEmail(id);
     setIdErr(r.ok ? null : r.error);
     return r.ok;
   };
@@ -75,6 +75,8 @@ function SignInForm(p: { notice: { title: string; body: string } | null; onForgo
       await signIn(id, pw);
     } catch (err) {
       setFailure(authErrorMessage(err));
+    } finally {
+      // النجاح ينقل للرئيسية؛ وإن رُفض الحساب بعده (موقوف أو غير مكتمل) يبقى الزر صالحاً لمحاولة أخرى
       setBusy(false);
     }
   };
@@ -91,10 +93,11 @@ function SignInForm(p: { notice: { title: string; body: string } | null; onForgo
         </Banner>
       ) : null}
       <IdentifierField
+        label="البريد الإلكتروني"
         value={id}
         onChange={(v) => {
           setId(v);
-          if (idErr) setIdErr(identifierToEmail(v).ok ? null : idErr);
+          if (idErr) setIdErr(normalizeEmail(v).ok ? null : idErr);
         }}
         onBlur={() => id && checkId()}
         error={idErr}
@@ -121,12 +124,12 @@ function SignInForm(p: { notice: { title: string; body: string } | null; onForgo
 function ForgotForm(p: { onBack: () => void }) {
   const [id, setId] = useState("");
   const [err, setErr] = useState<string | null>(null);
-  const [result, setResult] = useState<"emailSent" | "askOwner" | null>(null);
+  const [result, setResult] = useState<"emailSent" | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    const r = identifierToEmail(id);
+    const r = normalizeEmail(id);
     setErr(r.ok ? null : r.error);
     if (!r.ok || busy) return;
     setBusy(true);
@@ -141,15 +144,16 @@ function ForgotForm(p: { onBack: () => void }) {
   };
   return (
     <form className={s.fields} noValidate onSubmit={submit}>
-      <IdentifierField value={id} onChange={(v) => (setId(v), setResult(null))} error={err} />
+      <IdentifierField
+        label="البريد الإلكتروني"
+        value={id}
+        onChange={(v) => (setId(v), setResult(null))}
+        error={err}
+      />
       {failure ? <Banner tone="err">{failure}</Banner> : null}
       {result === "emailSent" ? (
         <Banner tone="info" title="تحقق من بريدك">
           إن كان البريد مسجلاً لدينا فستصلك رسالة برابط لتعيين كلمة مرور جديدة.
-        </Banner>
-      ) : result === "askOwner" ? (
-        <Banner tone="info" title="اطلب كلمة مؤقتة من المالك">
-          الحسابات باسم مستخدم لا تستقبل بريداً. المالك يعطيك كلمة مؤقتة جديدة، وتغيّرها عند أول دخول.
         </Banner>
       ) : null}
       <Button type="submit" variant="primary" wide busy={busy}>
