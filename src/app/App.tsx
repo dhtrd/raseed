@@ -12,6 +12,7 @@ import { InvoicesPage } from "../features/ledger/ui/InvoicesPage";
 import { AddEntryPage } from "../features/ledger/ui/AddEntryPage";
 import { QuickEntryPage } from "../features/ledger/ui/QuickEntryPage";
 import { ReviewPage } from "../features/ledger/ui/ReviewPage";
+import { LockPage } from "../features/ledger/ui/LockPage";
 import { AppShell } from "./AppShell";
 import { ErrorScreen, LoadingScreen, RouteError } from "./Screens";
 
@@ -42,6 +43,12 @@ function RequireSession() {
 function ManagersOnly(p: { children: ReactNode }) {
   const { state } = useSession();
   if (state.status !== "signedIn" || !isManager(state.profile.role)) return <Navigate to="/" replace />;
+  return p.children;
+}
+
+function OwnerOnly(p: { children: ReactNode }) {
+  const { state } = useSession();
+  if (state.status !== "signedIn" || state.profile.role !== "owner") return <Navigate to="/" replace />;
   return p.children;
 }
 
@@ -97,6 +104,14 @@ const router = createBrowserRouter(
                     <ManagersOnly>
                       <ReviewPage />
                     </ManagersOnly>
+                  ),
+                },
+                {
+                  path: "lock",
+                  element: (
+                    <OwnerOnly>
+                      <LockPage />
+                    </OwnerOnly>
                   ),
                 },
                 {

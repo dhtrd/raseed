@@ -230,12 +230,20 @@ function writeWithAudit(
   entityId: string,
   data: Record<string, unknown>,
   mode: "set" | "update" = "set",
+  reason?: string,
 ) {
   const b = writeBatch(db);
   const aid = newAuditId();
   if (mode === "set") b.set(doc(db, path), { ...data, auditId: aid });
   else b.update(doc(db, path), { ...data, auditId: aid });
-  b.set(doc(db, `auditLog/${aid}`), { actor: uid, at: serverTimestamp(), action: mode, entity, entityId });
+  b.set(doc(db, `auditLog/${aid}`), {
+    actor: uid,
+    at: serverTimestamp(),
+    action: mode,
+    entity,
+    entityId,
+    ...(reason === undefined ? {} : { reason }),
+  });
   return b.commit();
 }
 
@@ -322,12 +330,24 @@ describe("§3-ب: الفترة المقفلة", () => {
         lockedThrough: "2026-07-31",
       }),
     ));
-  it("المالك يغيّر تاريخ القفل", () =>
-    assertSucceeds(
-      writeWithAudit(as("owner"), "owner", "settings/lock", "settings", "lock", {
-        lockedThrough: "2026-07-31",
-      }),
-    ));
+  const lock = (uid: string, data: Record<string, unknown>, reason?: string) =>
+    writeWithAudit(as(uid), uid, "settings/lock", "settings", "lock", data, "set", reason);
+  it("المالك يغيّر تاريخ القفل بسبب مكتوب", () =>
+    assertSucceeds(lock("owner", { lockedThrough: "2026-07-31" }, "إقفال يوليو")));
+  it("قفل الفترات (DECISIONS 2026-10-11): السبب إلزامي، ولا تاريخ بعد اليوم", async () => {
+    await assertFails(lock("owner", { lockedThrough: "2026-07-31" }));
+    await assertFails(lock("owner", { lockedThrough: "2026-07-31" }, ""));
+    await assertFails(lock("owner", { lockedThrough: "2099-01-31" }, "مستقبل"));
+  });
+  it("الفتح المؤقت يحفظ التاريخ السابق بعد الجديد فقط", async () => {
+    await assertSucceeds(
+      lock("owner", { lockedThrough: "2026-02-28", tempFrom: "2026-06-30" }, "تصحيح تاريخ مقلوب"),
+    );
+    await assertFails(lock("owner", { lockedThrough: "2026-06-30", tempFrom: "2026-02-28" }, "x"));
+    await assertFails(lock("owner", { lockedThrough: "2026-06-30", tempFrom: "2026-06-30" }, "x"));
+    await assertFails(lock("owner", { lockedThrough: "2026-06-30", other: 1 }, "x"));
+    await assertFails(lock("admin", { lockedThrough: "2026-02-28", tempFrom: "2026-06-30" }, "x"));
+  });
 });
 
 describe("§3-ب: حماية حساب المالك", () => {

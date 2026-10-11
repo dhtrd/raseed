@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import { Checkbox } from "../../../shared/fields/components/Checkbox";
 import { DateField } from "../../../shared/fields/components/DateField";
 import { DebitCreditBar } from "../../../shared/fields/components/DebitCreditBar";
@@ -50,6 +51,8 @@ export function EditEntryDialog(p: {
   target: EditTarget | null;
   uid: string;
   lockedThrough: IsoDate | null;
+  /** المالك: يُرشد إلى فتح القفل مؤقتاً (DECISIONS 2026-10-11، الخيار ب) */
+  canUnlock: boolean;
   onClose: () => void;
   onSaved: (text: string) => void;
 }) {
@@ -61,6 +64,7 @@ export function EditEntryDialog(p: {
           target={p.target}
           uid={p.uid}
           lockedThrough={p.lockedThrough}
+          canUnlock={p.canUnlock}
           onClose={p.onClose}
           onSaved={p.onSaved}
         />
@@ -73,6 +77,7 @@ function EditBody(p: {
   target: EditTarget;
   uid: string;
   lockedThrough: IsoDate | null;
+  canUnlock: boolean;
   onClose: () => void;
   onSaved: (text: string) => void;
 }) {
@@ -197,6 +202,14 @@ function EditBody(p: {
         <Banner tone="err">
           الحركة بتاريخ {formatDate(orig.date)} داخل الفترة المقفلة حتى {formatDate(p.lockedThrough ?? "")}؛
           القواعد تمنع تعديلها.
+          {p.canUnlock ? (
+            <>
+              {" "}
+              <Link to="/lock">افتح القفل مؤقتاً من «قفل الفترات»</Link> ثم عد إلى هذه الحركة.
+            </>
+          ) : (
+            " يفتحها المالك مؤقتاً من «قفل الفترات»."
+          )}
         </Banner>
       ) : null}
 
