@@ -4,6 +4,7 @@ import {
   generatePassword,
   identifierToEmail,
   isStrongPassword,
+  normalizeEmail,
   passwordStrength,
 } from "./password";
 
@@ -13,6 +14,12 @@ describe("الدخول", () => {
     expect(identifierToEmail("a@b.co")).toEqual({ ok: true, email: "a@b.co" });
     expect(identifierToEmail("x")).toMatchObject({ ok: false });
     expect(identifierToEmail("bad@")).toMatchObject({ ok: false });
+  });
+  it("البريد فقط: يُنظَّف ويُصغَّر، واسم المستخدم مرفوض", () => {
+    expect(normalizeEmail("  A2@Dhtrd.com ")).toEqual({ ok: true, email: "a2@dhtrd.com" });
+    expect(normalizeEmail("fahad")).toMatchObject({ ok: false });
+    expect(normalizeEmail("")).toMatchObject({ ok: false, error: "أدخل البريد الإلكتروني." });
+    expect(normalizeEmail("a@b")).toMatchObject({ ok: false });
   });
   it("قوة كلمة المرور", () => {
     expect(passwordStrength("")).toBe(0);

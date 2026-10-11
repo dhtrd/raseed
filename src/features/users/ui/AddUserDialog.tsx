@@ -133,7 +133,7 @@ export function AddUserDialog(p: {
             error={err.name}
           />
           <IdentifierField
-            label="البريد أو اسم المستخدم للدخول"
+            label="البريد الإلكتروني للدخول"
             value={login}
             onChange={(v) => (setLogin(v), setErr((x) => ({ ...x, login: null })))}
             onBlur={() => {
@@ -145,7 +145,7 @@ export function AddUserDialog(p: {
               setErr((x) => ({ ...x, login: l.ok ? null : l.error }));
             }}
             error={err.login}
-            hint="البريد يتيح «نسيت كلمة المرور». اسم المستخدم يُعاد عبر المالك."
+            hint="يصله عليه رابط «نسيت كلمة المرور» عند الحاجة."
           />
           <Segment<NewRole>
             label="الدور"

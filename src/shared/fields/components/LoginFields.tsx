@@ -14,7 +14,7 @@ export function IdentifierField(p: {
   hint?: string;
 }) {
   return (
-    <FieldShell label={p.label ?? "البريد أو اسم المستخدم"} required error={p.error ?? null} hint={p.hint}>
+    <FieldShell label={p.label ?? "البريد الإلكتروني"} required error={p.error ?? null} hint={p.hint}>
       {(ids) => (
         <div className={f.box}>
           <input

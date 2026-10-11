@@ -1,4 +1,4 @@
-import { identifierToEmail } from "../../../shared/fields/core/password";
+import { identifierToEmail, normalizeEmail } from "../../../shared/fields/core/password";
 
 export type Role = "owner" | "admin" | "entry";
 export type RoleNames = Record<Role, string>;
@@ -72,14 +72,15 @@ export function validateNewLogin(
   v: string,
   existing: string[],
 ): { ok: true; login: string; email: string } | { ok: false; error: string } {
-  const r = identifierToEmail(v);
+  // البريد فقط (DECISIONS 2026-10-11)
+  const r = normalizeEmail(v);
   if (!r.ok) return r;
   const taken = existing.some((l) => {
     const e = identifierToEmail(l);
     return e.ok && e.email === r.email;
   });
   if (taken) return { ok: false, error: "هذا الدخول مستخدم لحساب آخر." };
-  return { ok: true, login: v.trim().toLowerCase(), email: r.email };
+  return { ok: true, login: r.email, email: r.email };
 }
 
 export type Viewer = Pick<UserProfile, "uid" | "role">;
