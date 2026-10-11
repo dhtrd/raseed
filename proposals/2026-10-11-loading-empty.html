@@ -1,0 +1,156 @@
+<title>رصيد · التحميل والفراغ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاثة خيارات لحالتي «جارٍ التحميل» و«لا بيانات» في جداول النظام، كل منها شاشة تفاعلية بين الحاسوب والجوال. الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --tab: #e2e8ee; --mark-acc: #b8752a; --mark-ink: #1e4634;
+  --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; }
+.lead { color: var(--ink-2); max-width: 78ch; margin: 6px 0 16px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+.opt { margin-bottom: 34px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 82ch; }
+.opt ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; position: relative; width: 980px; min-height: 460px; margin-inline: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.screen.phone { width: 360px; border-radius: 24px; }
+.page { padding: 18px 20px; display: grid; gap: 12px; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--rule); }
+.bar h3 { font-size: 22px; }
+.state { display: flex; gap: 6px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 14px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; text-decoration: none; }
+.btn.pri { background: var(--accent); color: var(--on-accent); }
+.btn[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+table { width: 100%; border-collapse: collapse; border-top: 3px double var(--ink); font-size: 15px; }
+th { text-align: start; font-size: 13.5px; color: var(--ink-2); padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+td { padding: 10px 8px; border-bottom: 1px solid var(--rule); }
+.amt { text-align: end; }
+@container (width < 600px) { .hide-m { display: none; } }
+
+/* أ: هيكل رمادي */
+.sk { display: block; height: 14px; border-radius: 3px; background: linear-gradient(90deg, var(--wash-2) 25%, var(--wash) 50%, var(--wash-2) 75%); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ب: شريط تقدم + سطر حالة */
+.progress { height: 3px; background: var(--wash-2); overflow: hidden; border-radius: 2px; }
+.progress i { display: block; height: 100%; width: 35%; background: var(--accent); animation: slide 1.1s ease-in-out infinite; }
+@keyframes slide { from { transform: translateX(120%); } to { transform: translateX(-300%); } }
+.status { font-size: 15px; color: var(--ink-2); }
+
+/* ج: سطور دفتر بالشعار */
+.ledger { position: relative; height: 260px; border-top: 3px double var(--ink); background: repeating-linear-gradient(to bottom, transparent 0 43px, var(--rule) 43px 44px); }
+.ledger::before { content: ""; position: absolute; inset-block: 0; inset-inline-end: 22%; border-inline-start: 1px solid var(--margin); }
+.mark { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 8px; color: var(--ink-2); font-size: 15px; }
+.mark svg { width: 46px; height: 46px; }
+.mark rect { animation: pulse 1.2s ease-in-out infinite; }
+.mark rect:nth-child(2) { animation-delay: .15s; }
+.mark rect:nth-child(3) { animation-delay: .3s; }
+@keyframes pulse { 50% { opacity: .25; } }
+
+/* الفراغ */
+.empty { display: grid; justify-items: center; gap: 8px; padding: 36px 16px; text-align: center; border: 1.5px dashed var(--rule); border-radius: 6px; background: var(--wash-2); }
+.empty h4 { font-size: 18px; }
+.empty p { color: var(--ink-2); max-width: 46ch; font-size: 15px; }
+.empty svg { width: 44px; height: 44px; color: var(--ink-2); }
+.empty.ledgerish { background: repeating-linear-gradient(to bottom, var(--surface) 0 43px, var(--wash-2) 43px 44px); border-style: solid; border-top: 3px double var(--ink); border-inline: 0; border-bottom: 0; border-radius: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+@media (prefers-reduced-motion: reduce) { .sk, .progress i, .mark rect { animation: none; } }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 10px; }
+.qs b { color: var(--accent); }
+</style>
+
+<div class="wrap">
+  <h1>حالتا التحميل والفراغ</h1>
+  <p class="lead">اليوم: التحميل سطر «جارٍ التحميل…» والفراغ سطر داخل الجدول. ثلاثة أشكال لتوحيدهما في كل الجداول (الأرصدة، الكشف، الفواتير، القيود، المراجعة، التدقيق). بدّل في كل شاشة بين «تحميل» و«فارغ» و«بيانات»، وبين الحاسوب والجوال.</p>
+  <div class="common">في الأشكال الثلاثة:
+    <ul>
+      <li>التحميل يُعلَن لقارئ الشاشة («جارٍ تحميل الكشف»)، ويحترم تقليل الحركة.</li>
+      <li>الفراغ يقول لماذا هو فارغ (لا حركات بعد / لا نتائج لهذا الفلتر) ويقترح الخطوة التالية بزر (إضافة حركة / إزالة الفلتر).</li>
+      <li>الخطأ يبقى كما هو اليوم: رسالة واضحة وزر «إعادة المحاولة».</li>
+    </ul>
+  </div>
+
+  <section class="opt" aria-labelledby="ha">
+    <div class="opt-head"><h2 id="ha">أ. هيكل رمادي بشكل الجدول</h2><div class="seg" data-view="a"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">أثناء التحميل تظهر صفوف رمادية متلألئة بمكان الأعمدة نفسها، فلا تقفز الصفحة حين تصل البيانات. الفراغ صندوق متقطع بأيقونة وزر.</p>
+    <ul class="pc"><li class="pro">إحساس بالسرعة، ولا قفز في التخطيط.</li><li class="pro">مألوف في التطبيقات الحديثة.</li><li>يحتاج هيكلاً لكل جدول.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <div class="opt-head"><h2 id="hb">ب. شريط تقدم رفيع + سطر حالة</h2><div class="seg" data-view="b"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">شريط كحلي رفيع أعلى الجدول يتحرك، وتحته «جارٍ تحميل الكشف…». الفراغ كما في (أ). أقرب إلى الوضع الحالي.</p>
+    <ul class="pc"><li class="pro">بسيط ومتسق في كل مكان.</li><li class="pro">أقل كوداً.</li><li>الصفحة تقفز قليلاً عند وصول البيانات.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <div class="opt-head"><h2 id="hc">ج. سطور الدفتر والشعار</h2><div class="seg" data-view="c"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">التحميل صفحة دفتر مسطّرة بهامشها الأحمر، وفي وسطها شعار «علامة التوازن» تنبض أشرطته الثلاثة. الفراغ صفحة دفتر بيضاء بعبارة وزر.</p>
+    <ul class="pc"><li class="pro">هوية «رصيد» حاضرة حتى في الانتظار.</li><li class="pro">هادئ وغير مزعج.</li><li>لا يُظهر شكل الجدول القادم.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol><li><b>الشكل:</b> أ أم ب أم ج؟</li></ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const ROWS = [["07/10/2026", "MISC/2026/10/0502", "سداد دفعة", "1,200.00"], ["05/10/2026", "P10003", "فاتورة مشتريات", "2,250.75"], ["02/10/2026", "P10002", "فاتورة مشتريات", "2,500.50"], ["03/09/2026", "MISC/2026/09/0501", "سداد", "2,500.50"]];
+  const DOC = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h3"/></svg>`;
+  const MARK = `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="9" width="32" height="6" rx="2" fill="#1e4634"/><rect x="4" y="18" width="32" height="6" rx="2" fill="#1e4634" opacity=".55"/><rect x="4" y="27" width="32" height="6" rx="2" fill="#b8752a"/></svg>`;
+  const head = `<thead><tr><th>التاريخ</th><th class="hide-m">الرقم المرجعي</th><th class="hide-m">البيان</th><th class="amt">المبلغ</th></tr></thead>`;
+  function build(id, mode) {
+    const el = document.getElementById(id);
+    const st = { s: "loading" };
+    const empty = (cls = "") => `<div class="empty ${cls}" role="status">${mode === "c" ? "" : DOC}<h4>لا حركات لهذا المورد بعد</h4><p>أول ما تضيف فاتورة أو قيداً للمورد (ب) يظهر هنا بكشفه ورصيده الجاري.</p><div class="row"><a class="btn pri" href="#" onclick="return false">إضافة حركة</a><a class="btn" href="#" onclick="return false">عرض كل الفترات</a></div></div>`;
+    const data = `<table>${head}<tbody>${ROWS.map((r) => `<tr><td class="num">${r[0]}</td><td class="hide-m num">${r[1]}</td><td class="hide-m">${r[2]}</td><td class="amt num">${r[3]}</td></tr>`).join("")}</tbody></table>`;
+    const loading = () => {
+      if (mode === "a") return `<p class="status" role="status" style="position:absolute;width:1px;height:1px;overflow:hidden">جارٍ تحميل الكشف</p><table aria-hidden="true">${head}<tbody>${[70, 55, 80, 60, 75].map((w) => `<tr><td><span class="sk" style="width:80px"></span></td><td class="hide-m"><span class="sk" style="width:140px"></span></td><td class="hide-m"><span class="sk" style="width:${w}%"></span></td><td class="amt"><span class="sk" style="width:70px;margin-inline-start:auto"></span></td></tr>`).join("")}</tbody></table>`;
+      if (mode === "b") return `<div class="progress" aria-hidden="true"><i></i></div><p class="status" role="status">جارٍ تحميل الكشف…</p>`;
+      return `<div class="ledger"><div class="mark" role="status">${MARK}<span>جارٍ تحميل الكشف…</span></div></div>`;
+    };
+    const draw = () => {
+      const body = st.s === "loading" ? loading() : st.s === "empty" ? empty(mode === "c" ? "ledgerish" : "") : data;
+      el.innerHTML = `<div class="page"><div class="bar"><h3>المورد (ب)</h3><div class="state" role="group" aria-label="الحالة">${[["loading", "تحميل"], ["empty", "فارغ"], ["data", "بيانات"]].map(([k, t]) => `<button type="button" class="btn" aria-pressed="${st.s === k}" data-s="${k}">${t}</button>`).join("")}</div></div>${body}</div>`;
+    };
+    el.addEventListener("click", (e) => { const b = e.target.closest("[data-s]"); if (b) { st.s = b.dataset.s; draw(); } });
+    draw();
+  }
+  build("sa", "a"); build("sb", "b"); build("sc", "c");
+  document.querySelectorAll(".seg[data-view]").forEach((g) => g.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.getElementById("s" + g.dataset.view).classList.toggle("phone", b.dataset.v === "phone");
+  }));
+})();
+</script>
