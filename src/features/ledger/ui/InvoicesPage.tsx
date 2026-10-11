@@ -57,6 +57,23 @@ export function InvoicesPage() {
   const [selectMode, setSelectMode] = useState(false);
   const [reverting, setReverting] = useState(false);
   const [progress, setProgress] = useState<{ done: number; of: number } | null>(null);
+  // الزر السريع أمام كل فاتورة (طلب المستخدم 2026-10-11): تُكتب وحدها بتدقيقها كالتحديد الجماعي
+  const [marking, setMarking] = useState<Set<string>>(new Set());
+  const markOne = async (r: InvoiceRow) => {
+    setMarking((m) => new Set(m).add(r.id));
+    const res = await setOdooStatus(profile.uid, [r], { entered: true });
+    setMarking((m) => {
+      const n = new Set(m);
+      n.delete(r.id);
+      return n;
+    });
+    const f = res.failed[0];
+    setOutcome(
+      f
+        ? { tone: "err", lines: [`تعذّر تغيير ${f.refNo}: ${f.message}`] }
+        : { tone: "ok", lines: [`حُددت ${r.refNo} كـ«دخلت» وسُجّل التغيير في التدقيق.`] },
+    );
+  };
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [xlsxBusy, setXlsxBusy] = useState(false);
 
@@ -402,6 +419,9 @@ export function InvoicesPage() {
                       key={r.id}
                       r={r}
                       manager={manager}
+                      locked={Boolean(lockedThrough && r.date <= lockedThrough)}
+                      marking={marking.has(r.id)}
+                      onMarkEntered={() => void markOne(r)}
                       selected={selected.has(r.id)}
                       selectMode={selectMode}
                       open={open.has(r.id)}
@@ -511,6 +531,10 @@ function Stamp({ entered }: { entered: boolean }) {
 function InvoiceLine(p: {
   r: InvoiceRow;
   manager: boolean;
+  /** في الفترة المقفلة: الزر السريع معطّل */
+  locked: boolean;
+  marking: boolean;
+  onMarkEntered: () => void;
   selected: boolean;
   selectMode: boolean;
   open: boolean;
@@ -592,7 +616,21 @@ function InvoiceLine(p: {
           {tag ? <span className={s.flag}>{tag}</span> : null}
         </td>
         <td className={s.cSt}>
-          <Stamp entered={isEntered(r)} />
+          <span className={s.stWrap}>
+            <Stamp entered={isEntered(r)} />
+            {p.manager && !isEntered(r) && !p.selectMode ? (
+              <Button
+                size="sm"
+                busy={p.marking}
+                disabled={p.locked}
+                title={p.locked ? "في فترة مقفلة: لا تتغير حالتها" : undefined}
+                aria-label={`تحديد ${r.refNo} كـدخلت${p.locked ? " (فترة مقفلة)" : ""}`}
+                onClick={p.onMarkEntered}
+              >
+                دخلت ✓
+              </Button>
+            ) : null}
+          </span>
         </td>
       </tr>
       {p.open ? (
