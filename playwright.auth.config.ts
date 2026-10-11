@@ -19,6 +19,8 @@ export default defineConfig({
     trace: "retain-on-failure",
     locale: "ar-SA",
     timezoneId: "Asia/Riyadh",
+    // تشغيل محلي بمتصفح مثبت مسبقاً (اختياري): PW_CHROMIUM=/path/to/chrome
+    launchOptions: process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {},
   },
   webServer: {
     command: "npx vite --port 5174 --strictPort",
