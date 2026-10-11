@@ -33,8 +33,20 @@
   color: var(--surface);
 }
 
+.caution {
+  border-color: var(--mark-acc);
+  background: var(--wash-2);
+  color: var(--mark-acc);
+}
+
+.caution svg {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
 .secondary:hover,
-.ghost:hover {
+.ghost:hover,
+.caution:hover {
   background: var(--wash);
 }
 

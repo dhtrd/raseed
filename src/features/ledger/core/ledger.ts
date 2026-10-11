@@ -22,6 +22,8 @@ export interface LedgerEntry {
   reversed: boolean;
   needsManualFix: boolean;
   odooEntered: boolean | null;
+  /** سبب استثناء الفترة المقفلة لآخر تغيير في حالة Odoo (المالك)، أو "" */
+  odooLockReason: string;
 }
 
 const fmt = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -90,7 +92,7 @@ export function parseEntry(id: string, d: Record<string, unknown>): LedgerEntry 
   const str = (v: unknown) => (typeof v === "string" ? v : "");
   const int = (v: unknown) => (typeof v === "number" && Number.isInteger(v) ? v : 0);
   const kind = (["inv", "misc", "note", "untyped"] as const).find((k) => k === d.kind) ?? "untyped";
-  const odoo = d.odoo as { entered?: unknown } | undefined;
+  const odoo = d.odoo as { entered?: unknown; lockReason?: unknown } | undefined;
   return {
     id,
     supplierId: str(d.supplierId),
@@ -106,6 +108,7 @@ export function parseEntry(id: string, d: Record<string, unknown>): LedgerEntry 
     reversed: d.reversed === true,
     needsManualFix: d.needsManualFix === true,
     odooEntered: kind === "inv" ? odoo?.entered === true : null,
+    odooLockReason: kind === "inv" ? str(odoo?.lockReason) : "",
   };
 }
 

@@ -1,12 +1,15 @@
 import { expect, test, type Page } from "@playwright/test";
 import { adminDb } from "./cleanup";
-import { ENTRY, OWNER } from "./seed";
+import { ADMIN, ENTRY, OWNER } from "./seed";
 
 /** زر «دخلت ✓» أمام كل فاتورة لم تدخل (طلب المستخدم 2026-10-11). يعيد حالة الفاتورة في النهاية. */
 test.describe.configure({ mode: "serial" });
 test.afterAll(async () => {
   await adminDb()
     .doc("entries/e103")
+    .update({ odoo: { entered: false } });
+  await adminDb()
+    .doc("entries/e101")
     .update({ odoo: { entered: false } });
 });
 
@@ -23,8 +26,10 @@ test("المالك: نقرة واحدة تحوّل الفاتورة إلى «د�
   await loginOk(page, OWNER.email, OWNER.password);
   await page.goto("/invoices/s1");
   await page.getByRole("radio", { name: "كل الفترات" }).click();
-  // المقفلة (يونيو) لا تتغير
-  await expect(page.getByRole("button", { name: "تحديد P10001 كـدخلت (فترة مقفلة)" })).toBeDisabled();
+  // المقفلة (يونيو): للمالك زر الاستثناء بدل الزر العادي
+  await expect(
+    page.getByRole("button", { name: "تحديد P10001 كـدخلت باستثناء الفترة المقفلة" }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "تحديد P10002 كـدخلت" }).click();
   await expect(page.getByText("حُددت P10002 كـ«دخلت» وسُجّل التغيير في التدقيق.")).toBeVisible();
   await expect(page.getByRole("button", { name: "تحديد P10002 كـدخلت" })).toHaveCount(0);
@@ -55,4 +60,56 @@ test("الجوال: الزر بجانب الختم بلا تمرير أفقي", 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
   await page.screenshot({ path: "test-results/invoice-mark-360.png", fullPage: true });
+});
+
+test("المالك: استثناء الفترة المقفلة بسبب إلزامي، ووسم «استثناء» على الفاتورة", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await loginOk(page, OWNER.email, OWNER.password);
+  await page.goto("/invoices/s1");
+  await page.getByRole("radio", { name: "كل الفترات" }).click();
+  await page.getByRole("button", { name: "تحديد P10001 كـدخلت باستثناء الفترة المقفلة" }).click();
+  const d = page.getByRole("dialog", { name: "استثناء الفترة المقفلة" });
+  await expect(d).toContainText("P10001");
+  await d.getByRole("button", { name: "تطبيق الاستثناء" }).click();
+  await expect(d.getByText(/اكتب سبب الاستثناء/)).toBeVisible();
+  await d.getByRole("textbox", { name: /سبب الاستثناء/ }).fill("أُدخلت في Odoo قبل الإقفال ولم تُعلَّم");
+  await page.screenshot({ path: "test-results/odoo-lock-1440.png" });
+  await d.getByRole("button", { name: "تطبيق الاستثناء" }).click();
+  await expect(page.getByText("حُددت 1 فاتورة مقفلة كـ«دخلت» باستثناء مسجّل في التدقيق.")).toBeVisible();
+  const row = page.locator("main tbody tr").filter({ hasText: "P10001" }).first();
+  await expect(row).toContainText("دخلت");
+  await expect(row).toContainText("استثناء");
+  const e = await adminDb().doc("entries/e101").get();
+  expect(e.get("odoo.entered")).toBe(true);
+  expect(e.get("odoo.lockReason")).toBe("أُدخلت في Odoo قبل الإقفال ولم تُعلَّم");
+  const audit = await adminDb()
+    .doc(`auditLog/${e.get("auditId") as string}`)
+    .get();
+  expect(audit.get("action")).toBe("odooEnteredLocked");
+  expect(audit.get("reason")).toContain("استثناء الفترة المقفلة");
+
+  // الإرجاع الجماعي: المقفلة لا تتغير، ثم رابط «تغيير المقفلة باستثناء» بسبب واحد
+  await page.getByRole("checkbox", { name: "تحديد الفاتورة P10001" }).click();
+  await page.getByRole("button", { name: "إرجاع إلى «لم تدخل»" }).first().click();
+  const rd = page.getByRole("dialog");
+  await rd.getByRole("radio", { name: /حُددت بالخطأ/ }).click();
+  await rd.getByRole("button", { name: "إرجاع إلى «لم تدخل»" }).click();
+  await expect(page.getByText(/فاتورة في فترة مقفلة .* لم تتغير: P10001/)).toBeVisible();
+  await page.getByRole("button", { name: /تغيير المقفلة باستثناء \(1\)/ }).click();
+  await d.getByRole("textbox", { name: /سبب الاستثناء/ }).fill("تصحيح تحديد خاطئ");
+  await d.getByRole("button", { name: "تطبيق الاستثناء" }).click();
+  await expect(
+    page.getByText("أُرجعت 1 فاتورة مقفلة إلى «لم تدخل» باستثناء مسجّل في التدقيق."),
+  ).toBeVisible();
+  const back = await adminDb().doc("entries/e101").get();
+  expect([back.get("odoo.entered"), back.get("odoo.lockReason")]).toEqual([false, "تصحيح تحديد خاطئ"]);
+});
+
+test("الإدارة: الفاتورة المقفلة معطّلة بلا استثناء", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await loginOk(page, ADMIN.email, ADMIN.password);
+  await page.goto("/invoices/s1");
+  await page.getByRole("radio", { name: "كل الفترات" }).click();
+  await expect(page.getByRole("button", { name: "تحديد P10001 كـدخلت (فترة مقفلة)" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: /باستثناء الفترة المقفلة/ })).toHaveCount(0);
 });

@@ -8,7 +8,7 @@ import { SupplierCombobox } from "../../../shared/fields/components/SupplierComb
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
-import { RIYAL_PATH } from "../../../shared/ui/Icon";
+import { Icon, RIYAL_PATH } from "../../../shared/ui/Icon";
 import { useProfile } from "../../auth/session/SessionProvider";
 import { isManager } from "../../users/core/users";
 import { riyadhStamp, safeFileName } from "../core/exportModel";
@@ -25,6 +25,7 @@ import { currentQuarter, kindLabel, type LedgerEntry } from "../core/ledger";
 import { sortRows, type SortState } from "../core/sort";
 import { setOdooStatus, watchInvoices, watchLockedThrough, type OdooChange } from "../data/invoicesRepo";
 import { downloadNotEnteredXlsx } from "../export/invoicesXlsx";
+import { LockExceptionDialog, type LockException } from "./LockExceptionDialog";
 import { Amount, HeadSar } from "./Amount";
 import { MobileSort, SortTh } from "./Sorting";
 import { SupplierIndex, useIndexCollapse } from "./SupplierIndex";
@@ -34,7 +35,12 @@ import s from "./Invoices.module.css";
 
 type Scope = "all" | "period";
 type Col = "date" | "ref" | "amount";
-type Outcome = { tone: "ok" | "err" | "info"; lines: string[] };
+type Outcome = {
+  tone: "ok" | "err" | "info";
+  lines: string[];
+  /** المالك: الفواتير المقفلة التي لم تتغير، لتغييرها باستثناء */
+  locked?: LockException;
+};
 
 const LONG_PRESS_MS = 500;
 const REPORT_PREVIEW = 12;
@@ -43,6 +49,9 @@ const REPORT_PREVIEW = 12;
 export function InvoicesPage() {
   const profile = useProfile();
   const manager = isManager(profile.role);
+  // استثناء الفترة المقفلة للمالك وحده (DECISIONS 2026-10-11، الخيار أ)
+  const owner = profile.role === "owner";
+  const [exception, setException] = useState<LockException | null>(null);
   const { sid } = useParams();
   const navigate = useNavigate();
   const today = todayInRiyadh();
@@ -157,8 +166,9 @@ export function InvoicesPage() {
           .map((r) => r.refNo)
           .join("، ")}.`,
       );
+    const locked = owner && plan.locked.length ? { rows: plan.locked, change } : undefined;
     if (!plan.change.length) {
-      setOutcome({ tone: "info", lines: lines.length ? lines : ["لا شيء لتغييره."] });
+      setOutcome({ tone: "info", lines: lines.length ? lines : ["لا شيء لتغييره."], locked });
       return;
     }
     setOutcome(null);
@@ -172,6 +182,34 @@ export function InvoicesPage() {
         `${change.entered ? "حُددت" : "أُرجعت"} ${res.done.length} فاتورة ${
           change.entered ? "كـ«دخلت»" : "إلى «لم تدخل»"
         } وسُجّل كل تغيير في التدقيق.`,
+      );
+    for (const f of res.failed) lines.push(`تعذّر تغيير ${f.refNo}: ${f.message}`);
+    setOutcome({ tone: res.failed.length ? "err" : "ok", lines, locked });
+    setSelected((cur) => {
+      const n = new Set(cur);
+      res.done.forEach((id) => n.delete(id));
+      return n;
+    });
+  };
+
+  const runException = async (x: LockException, reason: string) => {
+    setException(null);
+    setOutcome(null);
+    setProgress({ done: 0, of: x.rows.length });
+    const res = await setOdooStatus(
+      profile.uid,
+      x.rows,
+      x.change,
+      (done) => setProgress({ done, of: x.rows.length }),
+      reason,
+    );
+    setProgress(null);
+    const lines: string[] = [];
+    if (res.done.length)
+      lines.push(
+        `${x.change.entered ? "حُددت" : "أُرجعت"} ${res.done.length} فاتورة مقفلة ${
+          x.change.entered ? "كـ«دخلت»" : "إلى «لم تدخل»"
+        } باستثناء مسجّل في التدقيق.`,
       );
     for (const f of res.failed) lines.push(`تعذّر تغيير ${f.refNo}: ${f.message}`);
     setOutcome({ tone: res.failed.length ? "err" : "ok", lines });
@@ -347,6 +385,18 @@ export function InvoicesPage() {
                   {t}
                 </span>
               ))}
+              {outcome.locked ? (
+                <span className={s.retry}>
+                  <Button
+                    size="sm"
+                    variant="caution"
+                    disabled={busy}
+                    onClick={() => setException(outcome.locked ?? null)}
+                  >
+                    <Icon name="lock" /> تغيير المقفلة باستثناء ({outcome.locked.rows.length})
+                  </Button>
+                </span>
+              ) : null}
             </Banner>
           </div>
         ) : null}
@@ -422,6 +472,9 @@ export function InvoicesPage() {
                       locked={Boolean(lockedThrough && r.date <= lockedThrough)}
                       marking={marking.has(r.id)}
                       onMarkEntered={() => void markOne(r)}
+                      onException={
+                        owner ? () => setException({ rows: [r], change: { entered: true } }) : undefined
+                      }
                       selected={selected.has(r.id)}
                       selectMode={selectMode}
                       open={open.has(r.id)}
@@ -487,7 +540,8 @@ export function InvoicesPage() {
           {manager ? (
             <p>
               حدّد الفواتير ثم «تحديد كـدخلت»، أو «إرجاع إلى لم تدخل» بسبب إلزامي. كل تغيير يُسجَّل في
-              التدقيق، والفواتير في الفترة المقفلة لا تتغير.
+              التدقيق، والفواتير في الفترة المقفلة لا تتغير
+              {owner ? " إلا باستثناء منك بسبب مكتوب (الزر بالقفل)" : ""}.
             </p>
           ) : (
             <p>صلاحية مدخل البيانات للاطلاع فقط؛ تحديث الحالة للمالك والإدارة.</p>
@@ -511,6 +565,14 @@ export function InvoicesPage() {
         </div>
       ) : null}
 
+      <LockExceptionDialog
+        target={exception}
+        lockedThrough={lockedThrough}
+        onCancel={() => setException(null)}
+        onConfirm={(reason) => {
+          if (exception) void runException(exception, reason);
+        }}
+      />
       <ReasonDialog
         isOpen={reverting}
         count={visibleSelected.length}
@@ -535,6 +597,8 @@ function InvoiceLine(p: {
   locked: boolean;
   marking: boolean;
   onMarkEntered: () => void;
+  /** المالك: استثناء الفترة المقفلة */
+  onException?: () => void;
   selected: boolean;
   selectMode: boolean;
   open: boolean;
@@ -618,7 +682,22 @@ function InvoiceLine(p: {
         <td className={s.cSt}>
           <span className={s.stWrap}>
             <Stamp entered={isEntered(r)} />
-            {p.manager && !isEntered(r) && !p.selectMode ? (
+            {r.odooLockReason ? (
+              <span className={s.exc} title={`استثناء الفترة المقفلة: ${r.odooLockReason}`}>
+                استثناء
+              </span>
+            ) : null}
+            {p.manager && !isEntered(r) && !p.selectMode && p.locked && p.onException ? (
+              <Button
+                size="sm"
+                variant="caution"
+                aria-label={`تحديد ${r.refNo} كـدخلت باستثناء الفترة المقفلة`}
+                title="فترة مقفلة: التغيير باستثناء وسبب مكتوب"
+                onClick={p.onException}
+              >
+                <Icon name="lock" /> دخلت ✓
+              </Button>
+            ) : p.manager && !isEntered(r) && !p.selectMode ? (
               <Button
                 size="sm"
                 busy={p.marking}
@@ -653,6 +732,12 @@ function InvoiceLine(p: {
                 <dt>البيان</dt>
                 <dd>{r.details || "—"}</dd>
               </div>
+              {r.odooLockReason ? (
+                <div>
+                  <dt>سبب الاستثناء</dt>
+                  <dd>{r.odooLockReason}</dd>
+                </div>
+              ) : null}
             </dl>
           </td>
         </tr>

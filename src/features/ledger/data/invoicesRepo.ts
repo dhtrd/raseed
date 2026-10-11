@@ -101,6 +101,8 @@ export async function setOdooStatus(
   rows: Pick<LedgerEntry, "id" | "refNo" | "odooEntered">[],
   change: OdooChange,
   onProgress?: (done: number) => void,
+  /** استثناء الفترة المقفلة للمالك: السبب يُحفظ مع الحالة وفي التدقيق (القواعد تشترطه) */
+  lockReason?: string,
 ): Promise<OdooResult> {
   const { db } = firebase();
   const result: OdooResult = { done: [], failed: [] };
@@ -111,7 +113,7 @@ export async function setOdooStatus(
       if (!r) break;
       try {
         const batch = writeBatch(db);
-        const odoo = change.entered
+        const base = change.entered
           ? { entered: true, by: uid, at: serverTimestamp() }
           : {
               entered: false,
@@ -120,14 +122,18 @@ export async function setOdooStatus(
               reason: change.reason,
               reasonText: change.text,
             };
+        const odoo = lockReason ? { ...base, lockReason } : base;
+        const why = change.entered ? "" : [change.reason, change.text].filter(Boolean).join(": ");
         const auditId = addAudit(batch, db, {
           actor: uid,
-          action: change.entered ? "odooEntered" : "odooReverted",
+          action: `${change.entered ? "odooEntered" : "odooReverted"}${lockReason ? "Locked" : ""}`,
           entity: "entries",
           entityId: r.id,
           before: { odooEntered: r.odooEntered === true },
           after: { odooEntered: change.entered },
-          reason: change.entered ? undefined : [change.reason, change.text].filter(Boolean).join(": "),
+          reason: lockReason
+            ? [`استثناء الفترة المقفلة: ${lockReason}`, why].filter(Boolean).join(" · ")
+            : why || undefined,
         });
         batch.update(doc(db, "entries", r.id), { odoo, auditId, updatedAt: serverTimestamp() });
         await batch.commit();

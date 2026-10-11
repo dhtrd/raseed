@@ -5,6 +5,19 @@
 import type { IsoDate } from "../../../shared/fields/core/date";
 import type { LedgerEntry } from "./ledger";
 
+export const LOCK_REASON_MAX = 300;
+
+/**
+ * سبب استثناء الفترة المقفلة (المالك، الخيار أ المعتمد في proposals/2026-10-11-odoo-lock-exception.html):
+ * إلزامي حتى 300 حرف، والقواعد تفرض الشيء نفسه (odoo.lockReason).
+ */
+export function validateLockReason(text: string): string | null {
+  const t = text.trim();
+  if (!t) return "اكتب سبب الاستثناء: لا تتغير حالة فاتورة مقفلة بلا سبب.";
+  if (t.length > LOCK_REASON_MAX) return `السبب أطول من ${LOCK_REASON_MAX} حرف.`;
+  return null;
+}
+
 export type OdooFilter = "all" | "in" | "out";
 
 export interface InvoiceRow extends LedgerEntry {

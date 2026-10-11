@@ -95,6 +95,21 @@ const PATHS = {
       <path d="M13 13l4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </>
   ),
+  lock: (
+    <>
+      <rect
+        x="4.5"
+        y="9"
+        width="11"
+        height="8"
+        rx="1.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path d="M7 9V6.5a3 3 0 0 1 6 0V9" fill="none" stroke="currentColor" strokeWidth="1.8" />
+    </>
+  ),
   reload: (
     <>
       <path
