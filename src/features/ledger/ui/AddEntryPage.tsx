@@ -14,6 +14,7 @@ import { LIMITS } from "../../../shared/fields/core/text";
 import { useEnterToNext } from "../../../shared/fields/useEnterToNext";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
+import { useToast } from "../../../shared/ui/Toast";
 import { Dialog, dialogStyles as d } from "../../../shared/ui/Dialog";
 import { useProfile } from "../../auth/session/SessionProvider";
 import {
@@ -78,7 +79,8 @@ export function AddEntryPage() {
   const [form, setForm] = useState<EntryForm>(() => emptyForm(sid ?? null));
   const [errors, setErrors] = useState<FormErrors>({});
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState<{ text: string; sid: string } | null>(null);
+  // نتيجة الحفظ إشعار عائم بإجراء «فتح الكشف» (DECISIONS 2026-10-11، الخيار ج)
+  const toast = useToast();
   const [failure, setFailure] = useState<string | null>(null);
   const [savedCount, setSavedCount] = useState(0);
   const [checkRef, setCheckRef] = useState<string | null>(null);
@@ -124,7 +126,6 @@ export function AddEntryPage() {
 
   const set = <K extends keyof EntryForm>(k: K, v: EntryForm[K]) => {
     setForm((f) => ({ ...f, [k]: v }));
-    setSaved(null);
     if (errors[k as keyof FormErrors]) setErrors((e) => ({ ...e, [k]: undefined }));
   };
   const changeType = (t: DocType) => {
@@ -193,11 +194,17 @@ export function AddEntryPage() {
         // حفظ وجديد: يبقى المورد والنوع والتاريخ، ويُقترح المرجع التالي
         setForm((f) => ({ ...emptyForm(supplier.id, f.type), date: f.date }));
         setAutoRef(true);
-        setSaved({ text: `حُفظت ${what} للمورد ${supplier.name} وسُجّلت في التدقيق.`, sid: supplier.id });
+        const sid2 = supplier.id;
+        toast({
+          tone: "ok",
+          text: `حُفظت ${what} للمورد ${supplier.name} وسُجّلت في التدقيق.`,
+          action: { label: "عرض كشف المورد", onAction: () => navigate(`/statement/${sid2}`) },
+        });
         firstField.current?.querySelector<HTMLElement>("input")?.focus();
       } else {
         setForm((f) => ({ ...emptyForm(supplier.id, f.type), date: f.date }));
         navigate(`/statement/${supplier.id}`);
+        toast({ tone: "ok", text: `حُفظت ${what} للمورد ${supplier.name} وسُجّلت في التدقيق.` });
       }
     } catch (e) {
       console.error("تعذّر حفظ الحركة", e);
@@ -272,13 +279,6 @@ export function AddEntryPage() {
           </Link>
         </div>
 
-        {saved ? (
-          <div className={s.msg}>
-            <Banner tone="ok">
-              {saved.text} <Link to={`/statement/${saved.sid}`}>عرض كشف المورد</Link>
-            </Banner>
-          </div>
-        ) : null}
         {failure ? (
           <div className={s.msg}>
             <Banner tone="err">{failure}</Banner>

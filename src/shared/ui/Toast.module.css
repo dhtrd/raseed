@@ -1,0 +1,144 @@
+/* الإشعارات العائمة (الخيار ج، proposals/2026-10-11-notifications.html) */
+.region {
+  position: fixed;
+  inset-inline-start: 16px;
+  inset-block-end: calc(16px + var(--bnav));
+  z-index: 45;
+  display: grid;
+  gap: 8px;
+  inline-size: min(400px, calc(100% - 32px));
+  pointer-events: none;
+}
+
+.toast {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  align-items: start;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-inline-start: 5px solid var(--accent);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+  font-size: 15.5px;
+  pointer-events: auto;
+  animation: rise 0.18s ease-out;
+}
+
+.ok {
+  border-inline-start-color: var(--ok);
+}
+
+.err {
+  border-inline-start-color: var(--neg);
+}
+
+.ic {
+  display: grid;
+  place-items: center;
+  inline-size: 22px;
+  block-size: 22px;
+  margin-block-start: 2px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ok .ic {
+  background: var(--ok);
+}
+
+.err .ic {
+  background: var(--neg);
+}
+
+.text {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.x {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.act {
+  grid-column: 2;
+}
+
+.act button {
+  min-block-size: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.bar {
+  grid-column: 1 / -1;
+  block-size: 3px;
+  overflow: hidden;
+  background: var(--wash-2);
+  border-radius: 2px;
+}
+
+.bar i {
+  display: block;
+  block-size: 100%;
+  background: var(--accent);
+  animation: drain 5s linear forwards;
+}
+
+.ok .bar i {
+  background: var(--ok);
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+}
+
+@keyframes drain {
+  from {
+    inline-size: 100%;
+  }
+
+  to {
+    inline-size: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .bar i {
+    animation: none;
+  }
+}
+
+@media (width <= 600px) {
+  .region {
+    inset-inline: 12px;
+    inline-size: auto;
+  }
+}
+
+@media print {
+  .region {
+    display: none;
+  }
+}

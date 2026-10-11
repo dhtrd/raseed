@@ -6,6 +6,7 @@ import { SupplierCombobox } from "../../../shared/fields/components/SupplierComb
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
+import { useToast } from "../../../shared/ui/Toast";
 import { Icon, RIYAL_PATH } from "../../../shared/ui/Icon";
 import { useProfile } from "../../auth/session/SessionProvider";
 import { isManager } from "../../users/core/users";
@@ -53,7 +54,9 @@ export function JournalsPage() {
   const [sort, setSort] = useState<SortState<Col>>({ key: "date", dir: "desc" });
   const [editing, setEditing] = useState<EditTarget | null>(null);
   const [deleting, setDeleting] = useState<DeleteTarget | null>(null);
-  const [saved, setSaved] = useState<string | null>(null);
+  // نتائج الحفظ إشعار عائم (DECISIONS 2026-10-11، الخيار ج)
+  const toast = useToast();
+  const setSaved = (text: string) => toast({ tone: "ok", text });
   const [xlsxBusy, setXlsxBusy] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
@@ -234,11 +237,6 @@ export function JournalsPage() {
         </p>
         {error ? <Banner tone="err">{error}</Banner> : null}
         {exportError ? <Banner tone="err">{exportError}</Banner> : null}
-        {saved ? (
-          <div className={s.banner}>
-            <Banner tone="ok">{saved}</Banner>
-          </div>
-        ) : null}
         {sid && suppliers.status === "ready" && !supplier ? (
           <Banner tone="err">هذا المورد غير موجود أو غير مسند إليك.</Banner>
         ) : null}
@@ -322,7 +320,6 @@ export function JournalsPage() {
                             aria-label={`تعديل الحركة ${r.refNo || formatDate(r.date)}`}
                             title="تعديل القيد"
                             onClick={() => {
-                              setSaved(null);
                               setEditing({
                                 entry: r,
                                 supplierName: r.supplierName,

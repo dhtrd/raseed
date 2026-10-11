@@ -51,10 +51,6 @@
   color: var(--accent);
 }
 
-.banner {
-  margin-block-end: 12px;
-}
-
 .cDesc {
   min-inline-size: 12em;
   font-size: 15.5px;

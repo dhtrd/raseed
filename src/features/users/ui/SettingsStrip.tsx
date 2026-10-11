@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { TextField } from "../../../shared/fields";
 import { Banner } from "../../../shared/ui/Banner";
+import { useToast } from "../../../shared/ui/Toast";
 import { useProfile } from "../../auth/session/SessionProvider";
 import { IDLE_DEFAULT_MINUTES, parseIdleMinutes } from "../../auth/core/sessionSettings";
 import { ROLE_NAME_MAX, validateRoleName, type Role } from "../core/users";
@@ -26,6 +27,8 @@ export function SettingsStrip() {
   const [idleDraft, setIdleDraft] = useState(String(IDLE_DEFAULT_MINUTES));
   const [idleErr, setIdleErr] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ tone: "ok" | "err"; text: string } | null>(null);
+  // النجاح إشعار عائم، والخطأ يبقى بجانب النموذج (DECISIONS 2026-10-11)
+  const toast = useToast();
 
   // تحديث المسودة حين تتغير المسميات في الخادم (نمط «الحالة المشتقة» بلا تأثير)
   const [seen, setSeen] = useState(names);
@@ -55,7 +58,7 @@ export function SettingsStrip() {
     if (e || next[r] === names[r]) return;
     try {
       await saveRoleNames(next, names, viewer.uid);
-      setMsg({ tone: "ok", text: `حُفظ مسمى «${next[r]}» وسُجّل في التدقيق.` });
+      toast({ tone: "ok", text: `حُفظ مسمى «${next[r]}» وسُجّل في التدقيق.` });
     } catch (x) {
       console.error(x);
       setMsg({ tone: "err", text: errorText(x) });
@@ -67,7 +70,7 @@ export function SettingsStrip() {
     if (!r.ok || r.value === idle) return;
     try {
       await saveIdleMinutes(r.value, idle, viewer.uid);
-      setMsg({ tone: "ok", text: `حُفظت مدة الخمول ${r.value} دقيقة، وتسري فوراً على كل الجلسات المفتوحة.` });
+      toast({ tone: "ok", text: `حُفظت مدة الخمول ${r.value} دقيقة، وتسري فوراً على كل الجلسات المفتوحة.` });
     } catch (x) {
       console.error(x);
       setMsg({ tone: "err", text: errorText(x) });

@@ -153,6 +153,12 @@ service cloud.firestore {
                 && request.resource.data.tempFrom > request.resource.data.lockedThrough))
         && audited('settings', 'lock') && auditReasonOk();
     }
+    // حالة النسخ الاحتياطي اليومي: يكتبها سير GitHub Actions بمفتاح الخادم وحده، ويقرؤها المالك والإدارة
+    // في مركز الإشعارات (DECISIONS 2026-10-11).
+    match /settings/backup {
+      allow read: if isManager();
+      allow write: if false;
+    }
     // مدة الخمول قبل إنهاء الجلسة (دقائق): يضبطها المالك (DECISIONS 2026-10-10)
     match /settings/session {
       allow read: if isActive();
