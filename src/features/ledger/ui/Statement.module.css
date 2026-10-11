@@ -297,6 +297,15 @@
   }
 }
 
+/* الحركة المطلوبة من البحث العام */
+.stmt tbody tr.hl > * {
+  background: var(--wash);
+}
+
+.stmt tbody tr.hl {
+  box-shadow: inset -5px 0 0 var(--mark-acc);
+}
+
 /* عمود «تعديل» (الخيار ب، proposals/2026-10-11-statement-edit.html) */
 .cEdit {
   inline-size: 48px;

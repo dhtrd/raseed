@@ -7,6 +7,8 @@ import { isManager, DEFAULT_ROLE_NAMES, type RoleNames } from "../features/users
 import { watchRoleNames } from "../features/users/data/settingsRepo";
 import { RoleNamesContext } from "../features/users/ui/roleNames";
 import { TempLockBar } from "../features/ledger/ui/TempLockBar";
+import { SearchPalette } from "../features/ledger/ui/SearchPalette";
+import { clearSearchCache } from "../features/ledger/data/searchRepo";
 import s from "./AppShell.module.css";
 
 /** الرأس وألسنة الدفتر (direction-1). بقية أقسام المرحلة 4 (الفواتير، الإضافة، المراجعة) تُضاف تباعاً. */
@@ -54,6 +56,7 @@ export function AppShell() {
           ))}
         </nav>
         <div className={s.tools}>
+          <SearchPalette profile={profile} />
           <span className={s.who}>
             <b>{profile.displayName}</b>
             <span>{names[profile.role]}</span>
@@ -64,6 +67,7 @@ export function AppShell() {
             disabled={busy}
             onClick={() => {
               setBusy(true);
+              clearSearchCache();
               endSession().catch((e: unknown) => {
                 console.error(e);
                 setBusy(false);

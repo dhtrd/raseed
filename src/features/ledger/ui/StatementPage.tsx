@@ -47,9 +47,18 @@ export function StatementPage() {
   // القادم من لوحة الأرصدة يفتح بفترتها نفسها، و«كل الحركات» يزيل الفلترة
   const location = useLocation();
   const [fromDashboard] = useState(() => asPeriod((location.state as { period?: unknown } | null)?.period));
+  // القادم من البحث العام: إبراز الحركة، وفتح «كل الحركات» كي تظهر أياً كانت الفترة
+  const nav = location.state as { highlight?: unknown; deleted?: unknown } | null;
+  const highlightId = typeof nav?.highlight === "string" ? nav.highlight : null;
+  const highlightDeleted = nav?.deleted === true;
+  const [navKey, setNavKey] = useState(location.key);
   const [scope, setScope] = useState<Scope>(fromDashboard ? "period" : "all");
   const [period, setPeriod] = useState<Period>(() => fromDashboard ?? currentQuarter(today));
   const [sort, setSort] = useState<SortState<Col>>({ key: "date", dir: "desc" });
+  if (navKey !== location.key) {
+    setNavKey(location.key);
+    if (highlightId) setScope("all");
+  }
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [retry, setRetry] = useState(0);
   // التعديل من الكشف (DECISIONS 2026-10-11، الخيار ب): للمالك والإدارة فقط، والقواعد تفرض ذلك
@@ -232,6 +241,11 @@ export function StatementPage() {
             <Banner tone="err">{exportError}</Banner>
           </div>
         ) : null}
+        {highlightId && highlightDeleted ? (
+          <div className={s.err}>
+            <Banner tone="info">الحركة المطلوبة محذوفة، فلا تظهر في الكشف.</Banner>
+          </div>
+        ) : null}
         {saved ? (
           <div className={s.err}>
             <Banner tone="ok">{saved}</Banner>
@@ -327,6 +341,7 @@ export function StatementPage() {
                       key={r.id}
                       r={r}
                       cols={cols}
+                      highlighted={r.id === highlightId}
                       onEdit={
                         canEdit
                           ? () => {
@@ -464,6 +479,8 @@ export function StatementPage() {
 function EntryRow(p: {
   r: StatementRow;
   cols: number;
+  /** الحركة المطلوبة من البحث العام */
+  highlighted: boolean;
   open: boolean;
   onToggle: () => void;
   /** للمالك والإدارة فقط */
@@ -481,7 +498,15 @@ function EntryRow(p: {
   );
   return (
     <>
-      <tr className={`${r.kind === "note" ? s.noteRow : ""} ${p.onEdit ? s.withEdit : ""}`}>
+      <tr
+        className={`${r.kind === "note" ? s.noteRow : ""} ${p.onEdit ? s.withEdit : ""} ${
+          p.highlighted ? s.hl : ""
+        }`}
+        data-entry={r.id}
+        ref={(el) => {
+          if (el && p.highlighted) el.scrollIntoView({ block: "center" });
+        }}
+      >
         <th scope="row" className={s.cDate}>
           <span className={l.cellIn}>
             <button

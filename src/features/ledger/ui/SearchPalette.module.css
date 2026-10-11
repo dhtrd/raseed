@@ -1,0 +1,327 @@
+/* البحث العام (الخيار أ، proposals/2026-10-11-global-search.html): نافذة من الرأس، وشاشة كاملة على الجوال */
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 40px;
+  min-inline-size: 180px;
+  padding: 0 12px;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--wash-2);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.trigger:hover,
+.trigger:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tIcon,
+.qIcon {
+  inline-size: 18px;
+  block-size: 18px;
+  flex: none;
+}
+
+.tText {
+  flex: 1;
+  text-align: start;
+}
+
+.kbd {
+  display: inline-block;
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-family: var(--f-num);
+  font-size: 12.5px;
+  padding: 0 5px;
+  border: 1px solid currentcolor;
+  border-block-end-width: 2px;
+  border-radius: var(--r-sm);
+  opacity: 0.85;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: start center;
+  padding: 64px 16px 16px;
+  background: var(--scrim);
+}
+
+.modal {
+  inline-size: min(100%, 700px);
+  max-block-size: calc(100dvh - 96px);
+  display: flex;
+  background: var(--paper);
+  border-block-start: 4px solid var(--accent);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  min-block-size: 0;
+  outline: none;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px 0;
+  background: var(--surface);
+}
+
+.title {
+  margin: 0;
+  font-size: 17px;
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 40px;
+  padding: 0 12px;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.close span:first-child {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.close:hover,
+.close:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.q {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 12px 0;
+  min-block-size: 48px;
+  padding: 0 12px;
+  background: var(--wash-2);
+  border-block-end: 2px solid var(--accent);
+  border-start-start-radius: var(--r-md);
+  border-start-end-radius: var(--r-md);
+  color: var(--ink-2);
+}
+
+.q:focus-within {
+  background: var(--wash);
+}
+
+.q input {
+  flex: 1;
+  min-inline-size: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 17px;
+}
+
+.q input:focus {
+  outline: none;
+}
+
+.status {
+  margin: 0;
+  padding: 6px 12px 8px;
+  font-size: 14px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border-block-end: 1px solid var(--rule);
+}
+
+.err {
+  color: var(--neg);
+  font-weight: 700;
+}
+
+.list {
+  flex: 1;
+  min-block-size: 0;
+  overflow: auto;
+  padding: 0 12px 12px;
+}
+
+.group {
+  margin: 10px 0 2px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.res {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  align-items: center;
+  padding: 9px 8px;
+  border-block-end: 1px solid var(--rule);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.act {
+  background: var(--wash);
+  box-shadow: inset -4px 0 0 var(--accent);
+}
+
+.gone {
+  opacity: 0.75;
+}
+
+.k {
+  padding: 0 6px;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-xs);
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.kSup {
+  border-color: var(--ink-2);
+  color: var(--ink-2);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.t1 {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.t2 {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.tag {
+  display: inline-block;
+  margin-inline-start: 6px;
+  padding: 0 5px;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-xs);
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.del {
+  border-color: var(--neg);
+  color: var(--neg);
+}
+
+.end {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: end;
+}
+
+.amt {
+  font-weight: 700;
+}
+
+.in,
+.out {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.in {
+  color: var(--accent);
+}
+
+.out {
+  color: var(--neg);
+}
+
+.res mark {
+  background: var(--mark-acc);
+  color: var(--on-accent);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+.empty {
+  margin: 14px 0;
+  padding: 16px;
+  text-align: center;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px dashed var(--rule);
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border-block-start: 1px solid var(--rule);
+}
+
+/* الجوال: الزر أيقونة فقط، والنافذة تملأ الشاشة بزر «إغلاق» ظاهر (شرط المستخدم) */
+@media (width <= 600px) {
+  .trigger {
+    min-inline-size: 0;
+    padding: 0 10px;
+  }
+
+  .tText,
+  .trigger .kbd,
+  .foot {
+    display: none;
+  }
+
+  .overlay {
+    padding: 0;
+  }
+
+  .modal {
+    inline-size: 100%;
+    block-size: 100dvh;
+    max-block-size: none;
+    border-radius: 0;
+    padding-block-end: env(safe-area-inset-bottom, 0);
+  }
+
+  .head {
+    padding-block-start: calc(10px + env(safe-area-inset-top, 0));
+  }
+}
