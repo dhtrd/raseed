@@ -27,6 +27,7 @@ export function AppShell() {
     { to: "/", label: "الأرصدة", end: true },
     { to: "/statement", label: "كشف الحساب", end: false },
     { to: "/invoices", label: "الفواتير", end: false },
+    { to: "/add", label: "إضافة حركة", end: false },
   ];
   if (isManager(profile.role)) {
     tabs.push(

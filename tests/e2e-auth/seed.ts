@@ -89,7 +89,7 @@ export default async function seed() {
   const db = getFirestore();
   const existing = await auth.listUsers();
   if (existing.users.length) await auth.deleteUsers(existing.users.map((u) => u.uid));
-  for (const c of ["users", "suppliers", "settings", "auditLog", "entries", "migrationIssues"]) {
+  for (const c of ["users", "suppliers", "settings", "auditLog", "entries", "migrationIssues", "refs"]) {
     const snap = await db.collection(c).get();
     await Promise.all(snap.docs.map((d) => d.ref.delete()));
   }
@@ -137,6 +137,20 @@ export default async function seed() {
       createdBy: "seed",
       createdAt: new Date(),
       updatedAt: new Date(),
+    });
+  }
+  // فهرس الأرقام المرجعية كما يكتبه النقل: يلزم لفحص التكرار في «إضافة حركة»
+  const names: Record<string, string> = {};
+  (await db.collection("suppliers").get()).docs.forEach((d) => (names[d.id] = d.get("name") as string));
+  for (const e of ENTRIES) {
+    const r = refNo(e);
+    if (!r) continue;
+    const key = r.replace(/\//g, "|");
+    const cur = await db.doc(`refs/${key}`).get();
+    const place = { entryId: e.id, supplierId: e.sup, supplierName: names[e.sup] ?? e.sup };
+    await db.doc(`refs/${key}`).set({
+      ids: [...((cur.get("ids") as string[] | undefined) ?? []), e.id],
+      places: [...((cur.get("places") as (typeof place)[] | undefined) ?? []), place],
     });
   }
   const issue = (entryId: string, sup: string, code: string, resolved = false) =>
