@@ -119,12 +119,57 @@ test("التعبئة التسلسلية للصفوف المحددة", async ({ p
   await expect(cell(page, "المرجع", 5)).toHaveValue("50103");
 });
 
-test("الجوال: تنبيه بانتظار تصميم البطاقة، بلا تمرير أفقي", async ({ page }) => {
+test("الجوال: خطوة لكل صف، ثم مراجعة وحفظ، بلا تمرير أفقي ولا عنصر أصلي", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 780 });
   await loginOk(page);
-  await page.goto("/quick/s4");
-  await expect(page.getByText(/تصميم بطاقته على الجوال بانتظار الاعتماد/)).toBeVisible();
-  await expect(grid(page)).toBeHidden();
+  await page.goto("/quick/s5");
+  const card = page.getByRole("region", { name: "الإدخال السريع على الجوال" });
+  await expect(card.getByRole("heading", { name: "الصف 1 من 1" })).toBeVisible();
+  await expect(grid(page)).toHaveCount(0);
+  // التعبئة التسلسلية مخفية على الجوال (DECISIONS 2026-10-11)
+  await expect(page.getByRole("radio", { name: "2. التعبئة التسلسلية" })).toHaveCount(0);
+
+  await card.getByRole("textbox", { name: "التاريخ الصف 1" }).fill("101026");
+  await card.getByRole("textbox", { name: "المرجع الصف 1" }).fill("50001");
+  await card.getByRole("textbox", { name: "دائن الصف 1" }).click();
+  await page.keyboard.type("250");
+  await card.getByRole("textbox", { name: "التفاصيل الصف 1" }).fill("فاتورة من الجوال");
+  await card.getByRole("button", { name: "التالي (صف جديد)" }).click();
+
+  await expect(card.getByRole("heading", { name: "الصف 2 من 2" })).toBeVisible();
+  await expect(card.getByRole("textbox", { name: "التاريخ الصف 2" })).toHaveValue("10/10/2026");
+  await expect(card.getByRole("textbox", { name: "المرجع الصف 2" })).toHaveValue("50002");
+  await expect(card.getByRole("textbox", { name: "دائن الصف 2" })).toBeFocused();
+  await page.keyboard.type("75.5");
+  await page.screenshot({ path: "test-results/quick-360-step.png", fullPage: true });
+
+  await card.getByRole("button", { name: "مراجعة وحفظ" }).click();
+  await expect(card.getByRole("heading", { name: "مراجعة الدفعة" })).toBeVisible();
+  const list = card.getByRole("list", { name: "صفوف الدفعة للمراجعة" });
+  await expect(list.getByRole("button")).toHaveCount(2);
+  await expect(list.getByRole("button", { name: /الصف 2: P50002، ✓ جاهز/ })).toBeVisible();
+
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
+  const banned = await page.evaluate(
+    () =>
+      document.querySelectorAll(
+        'select, input[type="checkbox"], input[type="radio"], input[type="number"], input[type="date"]',
+      ).length,
+  );
+  expect(banned).toBe(0);
+  await page.screenshot({ path: "test-results/quick-360-review.png", fullPage: true });
+
+  // الرجوع من المراجعة إلى صف بعينه
+  await list.getByRole("button", { name: /الصف 1:/ }).click();
+  await expect(card.getByRole("heading", { name: "الصف 1 من 2" })).toBeVisible();
+  await card.getByRole("button", { name: "مراجعة وحفظ" }).click();
+
+  await card.getByRole("button", { name: "حفظ الدفعة (2)" }).click();
+  await expect(card.getByText(/^حُفظت 2 حركة للمورد/)).toBeVisible();
+  await expect(card.getByRole("heading", { name: "الصف 1 من 1" })).toBeVisible();
+  await expect(card.getByRole("textbox", { name: "المرجع الصف 1" })).toHaveValue("50003");
+  const saved = await adminDb().collection("entries").where("supplierId", "==", "s5").get();
+  const mine = saved.docs.filter((x) => ["50001", "50002"].includes(x.get("mainRef") as string));
+  expect(mine.map((x) => x.get("credit") as number).sort((a, b) => a - b)).toEqual([7550, 25000]);
 });

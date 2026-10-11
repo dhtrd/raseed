@@ -3,6 +3,7 @@ import {
   batchSummary,
   blankRow,
   checkRows,
+  cleanTypedAmount,
   fillSequence,
   isBlank,
   parsePasted,
@@ -120,5 +121,13 @@ describe("اللصق من الإكسل (5 أعمدة)", () => {
     expect(rows[1]?.pasteError).toMatch(/غير معروف/);
     expect(rows[2]?.pasteError).toBeTruthy();
     expect(checkRows(rows, ctx()).every((c) => c.errors.amount)).toBe(true);
+  });
+});
+
+describe("المبلغ أثناء الكتابة", () => {
+  it("أرقام عربية وفاصلة عشرية واحدة ومنزلتان وفواصل آلاف", () => {
+    expect(cleanTypedAmount("١٢٣٤٥٫٦٧٨")).toBe("12,345.67");
+    expect(cleanTypedAmount("4750.5.1")).toBe("4,750.51");
+    expect(cleanTypedAmount("abc")).toBe("");
   });
 });
