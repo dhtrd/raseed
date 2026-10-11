@@ -1,0 +1,286 @@
+<title>رصيد · البحث العام</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاثة أشكال للبحث العام مكدّسة، كل منها تفاعلي يتبدّل بين الحاسوب والجوال، ثم الأسئلة. الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --tab: #e2e8ee; --amber: #b8752a; --hit: #fbecc8;
+  --scrim: rgb(20 27 38 / 42%); --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.lead { color: var(--ink-2); max-width: 78ch; margin: 6px 0 16px; }
+.eg { display: inline-block; font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 6px; margin-inline-start: 6px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; display: grid; gap: 6px; }
+.opt { margin-bottom: 36px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 82ch; }
+.opt ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; position: relative; width: 1100px; height: 640px; margin-inline: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; }
+.screen.phone { width: 360px; height: 720px; border-radius: 24px; }
+.mast { display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: var(--surface); border-bottom: 3px double var(--ink); font-weight: 700; flex: none; }
+.mast .brand { font-family: var(--f-brand); font-size: 20px; }
+.mast .tabs { display: flex; gap: 6px; font-size: 14px; color: var(--ink-2); }
+.mast .tabs span { padding: 2px 10px; border-radius: 8px 8px 0 0; background: var(--tab); white-space: nowrap; }
+.mast .tabs span.on { background: var(--paper); color: var(--ink); }
+.mast .sp { flex: 1; }
+@container (width < 600px) { .mast .tabs { display: none; } }
+.body { flex: 1; overflow: auto; padding: 16px 20px; display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; gap: 12px; align-content: start; }
+@container (width < 600px) { .body { padding: 12px 14px; } }
+.muted { color: var(--ink-2); font-size: 14.5px; }
+
+.q { display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 12px; background: var(--wash-2); border-bottom: 2px solid var(--accent); border-radius: 6px 6px 0 0; }
+.q svg { width: 20px; height: 20px; color: var(--ink-2); flex: none; }
+.q input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 17px; color: var(--ink); }
+.q input:focus { outline: none; }
+.q:focus-within { background: var(--wash); }
+.kbd { font-family: var(--f-num); font-size: 12.5px; padding: 0 5px; border: 1px solid currentcolor; border-bottom-width: 2px; border-radius: 4px; color: var(--ink-2); direction: ltr; }
+.qbtn { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--wash-2); color: var(--ink-2); font: inherit; font-size: 14.5px; cursor: pointer; min-width: 220px; }
+.qbtn svg { width: 18px; height: 18px; }
+@container (width < 600px) { .qbtn { min-width: 0; padding: 0 10px; } .qbtn .t, .qbtn .kbd { display: none; } }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { min-height: 36px; padding: 0 12px; border: 1.5px solid var(--accent); border-radius: 18px; background: var(--surface); color: var(--accent); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+@container (width < 600px) { .chips { flex-wrap: nowrap; overflow-x: auto; margin-inline: -14px; padding-inline: 14px; scrollbar-width: none; } }
+
+.group h4 { font-size: 14px; color: var(--ink-2); margin: 6px 0 2px; display: flex; justify-content: space-between; }
+.res { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; padding: 9px 8px; border-bottom: 1px solid var(--rule); cursor: pointer; background: var(--surface); }
+.res:hover, .res.act { background: var(--wash); }
+.res .k { font-size: 12.5px; font-weight: 700; padding: 0 6px; border: 1px solid var(--accent); border-radius: 3px; color: var(--accent); white-space: nowrap; }
+.res .k.sup { border-color: var(--ink-2); color: var(--ink-2); }
+.res .main { min-width: 0; }
+.res .t1 { font-weight: 700; overflow-wrap: anywhere; }
+.res .t2 { font-size: 13.5px; color: var(--ink-2); overflow-wrap: anywhere; }
+.res .amt { font-family: var(--f-num); font-weight: 700; text-align: end; }
+.res .odoo { font-size: 12px; font-weight: 700; }
+.res .odoo.in { color: var(--accent); } .res .odoo.out { color: var(--neg); }
+mark { background: var(--hit); color: inherit; border-radius: 2px; padding: 0 1px; }
+.empty { padding: 18px; text-align: center; color: var(--ink-2); background: var(--surface); border: 1px dashed var(--rule); }
+.toast { padding: 8px 12px; background: var(--wash); border-inline-start: 4px solid var(--accent); font-size: 15px; }
+.count { font-size: 14px; color: var(--ink-2); }
+
+/* أ. نافذة أعلى الشاشة */
+.palette-scrim { position: absolute; inset: 0; background: var(--scrim); display: grid; justify-items: center; align-items: start; padding: 60px 18px 18px; }
+.palette { width: 680px; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; background: var(--paper); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; border-top: 4px solid var(--accent); }
+.palette .in { padding: 10px 12px 6px; background: var(--surface); display: grid; gap: 8px; }
+.palette .list { overflow: auto; padding: 0 12px 12px; }
+.palette .foot { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 6px 12px; font-size: 12.5px; color: var(--ink-2); background: var(--surface); border-top: 1px solid var(--rule); }
+.screen.phone .palette-scrim { padding: 0; }
+.screen.phone .palette { border-radius: 0; height: 100%; width: 100%; }
+@container (width < 600px) { .palette .foot { display: none; } }
+
+/* ب. صفحة بحث */
+.filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 12px; }
+@container (width < 600px) { .filters { grid-template-columns: 1fr 1fr; } }
+.sel { min-width: 0; display: grid; gap: 2px; font-size: 13.5px; color: var(--ink-2); font-weight: 700; }
+.sel .fake { min-width: 0; overflow: hidden; white-space: nowrap; min-height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; background: var(--wash-2); border-bottom: 1.5px solid var(--rule); color: var(--ink); font-weight: 400; font-size: 15px; border-radius: 4px 4px 0 0; cursor: pointer; }
+.tbl { width: 100%; border-collapse: collapse; background: var(--surface); border-top: 3px double var(--ink); font-size: 15px; }
+.tbl th { text-align: start; font-size: 13px; color: var(--ink-2); padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+.tbl td { padding: 8px; border-bottom: 1px solid var(--rule); }
+.tbl tr.row { cursor: pointer; } .tbl tr.row:hover td { background: var(--wash-2); }
+.tbl .a { text-align: end; font-family: var(--f-num); }
+@container (width < 600px) {
+  .tbl thead { display: none; }
+  .tbl, .tbl tbody { display: block; }
+  .tbl tr.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 10px; padding: 9px 0; border-bottom: 1px solid var(--rule); }
+  .tbl td { display: block; border: 0; padding: 0; grid-column: 1; }
+  .tbl td.a { grid-column: 2; grid-row: 1 / span 3; align-self: center; font-weight: 700; }
+  .tbl .hm { display: none; }
+}
+
+/* ج. شريط جانبي */
+.split { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 380px; min-height: 0; }
+.split .behind { padding: 16px 20px; overflow: hidden; color: var(--ink-2); }
+.split .behind .fake-tbl { height: 14px; background: var(--rule); border-radius: 3px; margin: 10px 0; opacity: .5; }
+.drawer { background: var(--surface); border-inline-start: 1px solid var(--rule); box-shadow: -6px 0 18px rgb(27 42 68 / 10%); display: flex; flex-direction: column; min-height: 0; }
+.drawer .in { padding: 12px; display: grid; gap: 8px; border-bottom: 1px solid var(--rule); }
+.drawer .list { overflow: auto; padding: 0 12px 12px; }
+.recent { display: flex; flex-wrap: wrap; gap: 6px; }
+.recent button { min-height: 32px; padding: 0 10px; border: 1px dashed var(--rule); border-radius: 16px; background: var(--wash-2); font: inherit; font-size: 13.5px; color: var(--ink-2); cursor: pointer; }
+@container (width < 600px) { .split { grid-template-columns: 1fr; } .split .behind { display: none; } .drawer { border: 0; box-shadow: none; } }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 8px; }
+.qs b { color: var(--accent); }
+</style>
+
+<div class="wrap">
+  <h1>البحث العام</h1>
+  <p class="lead">بحث واحد في الموردين والفواتير والقيود والملاحظات: بالاسم، والرقم المرجعي، والمرجع، والسند، والبيان، والمبلغ. ثلاثة أشكال تفاعلية؛ اكتب في الحقل (جرّب: <b>مشتريات</b>، <b>10002</b>، <b>المورد ب</b>، <b>2500</b>، <b>اسمنت</b>) وبدّل بين الحاسوب والجوال. البيانات وهمية<span class="eg">مثال</span>.</p>
+
+  <div class="common">
+    <p><b>في الأشكال الثلاثة (الخيار ب المعتمد):</b> عند أول بحث في الجلسة تُحمَّل كل الحركات مرة واحدة (نحو 2,600 قراءة)، ثم تُجلب التغييرات فقط، فيصير البحث فورياً بلا قراءات إضافية. مدخل البيانات يبحث في موردِيه المسندين فقط.</p>
+    <p><b>العربية:</b> لا فرق بين أ/إ/آ/ا، ولا ة/ه، ولا ى/ي، ويُتجاهل التشكيل والتطويل، والأرقام العربية تساوي اللاتينية. المبلغ يُطابَق بلا فواصل (2500 = 2,500.00).</p>
+    <p><b>النتيجة:</b> المورد يفتح كشفه، والحركة تفتح كشف موردها مع إبراز الصف؛ وللمالك والإدارة قلم التعديل مباشرة.</p>
+  </div>
+
+  <section class="opt" aria-labelledby="ha">
+    <div class="opt-head"><h2 id="ha">أ. نافذة بحث سريعة من الرأس (Ctrl+K)</h2><div class="seg" data-view="a"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">زر «بحث» في الرأس بكل الشاشات (أو Ctrl+K) يفتح نافذة فوق الشاشة الحالية، والنتائج مجمّعة: موردون ثم حركات، بالأسهم وEnter. على الجوال تملأ الشاشة.</p>
+    <ul class="pc"><li class="pro">متاح من أي مكان دون مغادرة الشاشة.</li><li class="pro">الأسرع بلوحة المفاتيح.</li><li>بلا فلاتر تفصيلية ولا تصدير؛ للوصول السريع.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <div class="opt-head"><h2 id="hb">ب. صفحة «البحث» بفلاتر</h2><div class="seg" data-view="b"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">تبويب مستقل بحقل كبير وفلاتر: النوع، المورد، الفترة، حالة Odoo؛ والنتائج جدول قابل للترتيب بعدّاد ومجموع، وعلى الجوال بطاقات.</p>
+    <ul class="pc"><li class="pro">الأقوى للتدقيق: تضييق بالفلاتر ومجموع للنتائج.</li><li class="pro">يمكن لاحقاً تصدير النتائج Excel.</li><li>يغادر الشاشة الحالية؛ تبويب إضافي في الرأس.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <div class="opt-head"><h2 id="hc">ج. لوحة بحث جانبية تبقى مفتوحة</h2><div class="seg" data-view="c"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">زر «بحث» يفتح لوحة على جانب الشاشة تبقى مفتوحة أثناء التنقل؛ النقر على نتيجة يفتح الكشف بجانبها، مع شرائح نوع سريعة وآخر عمليات البحث.</p>
+    <ul class="pc"><li class="pro">مقارنة النتيجة بالكشف دون فقدان البحث.</li><li class="pro">آخر عمليات البحث بنقرة.</li><li>تضيّق الشاشة على اللوحي؛ على الجوال شاشة كاملة.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الشكل:</b> أ أم ب أم ج؟</li>
+      <li><b>المحذوف ناعماً</b> (بعد بناء الحذف): يُستبعد من البحث دائماً، أم يظهر للمالك بوسم «محذوف»؟</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const SUP = ["المورد (أ)", "المورد (ب)", "المورد (ج)", "المورد (د)", "المورد (هـ)"];
+  const ENT = [
+    { s: 0, k: "inv", d: "02/10/2026", ref: "10002", no: "P10002", v: "", t: "فاتورة مشتريات", a: 250050, odoo: false },
+    { s: 0, k: "inv", d: "04/10/2026", ref: "10003", no: "P10003", v: "", t: "مرتجع بضاعة", a: -30000, odoo: false },
+    { s: 0, k: "misc", d: "05/07/2026", ref: "0501", no: "MISC/2026/07/0501", v: "305", t: "سداد الفاتورة 10001", a: 100000 },
+    { s: 1, k: "inv", d: "15/09/2026", ref: "20001", no: "P20001", v: "", t: "فاتورة مشتريات إسمنت", a: 400000, odoo: true },
+    { s: 1, k: "misc", d: "08/10/2026", ref: "0601", no: "MISC/2026/10/0601", v: "6031", t: "تحويل بنكي", a: 150000 },
+    { s: 2, k: "inv", d: "01/10/2026", ref: "30001", no: "P30001", v: "", t: "فاتورة مشتريات حديد", a: 75000, odoo: true },
+    { s: 2, k: "note", d: "03/10/2026", ref: "", no: "", v: "", t: "اتصال لتأكيد موعد التوريد", a: 0 },
+    { s: 3, k: "inv", d: "10/10/2026", ref: "40001", no: "P40001", v: "", t: "فاتورة اسمنت مقاوم", a: 120000, odoo: false },
+    { s: 3, k: "misc", d: "11/10/2026", ref: "0412", no: "MISC/2026/10/0412", v: "", t: "سداد دفعة أولى", a: 250000 },
+    { s: 4, k: "inv", d: "28/08/2026", ref: "50002", no: "P50002", v: "7720", t: "فاتورة مشتريات أدوات", a: 25000, odoo: true },
+  ];
+  const KIND = { inv: "فاتورة", misc: "قيد", note: "ملاحظة" };
+  const money = (h) => (Math.abs(h) / 100).toLocaleString("en-US", { minimumFractionDigits: 2 });
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  // تطبيع العربية للبحث
+  const norm = (s) => String(s).replace(/[ً-ْـ]/g, "").replace(/[أإآ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي")
+    .replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[()]/g, "").toLowerCase();
+  const terms = (q) => norm(q).split(/\s+/).filter(Boolean);
+  const hay = (e) => norm([SUP[e.s], e.no, e.ref, e.v, e.t, KIND[e.k], (Math.abs(e.a) / 100).toFixed(2), String(Math.abs(e.a) / 100)].join(" "));
+  function search(q, f = {}) {
+    const ts = terms(q).map((t) => t.replace(/,/g, ""));
+    const sups = ts.length ? SUP.map((n, i) => ({ n, i })).filter((x) => ts.every((t) => norm(x.n).includes(t))) : [];
+    let ents = ts.length ? ENT.filter((e) => ts.every((t) => hay(e).includes(t))) : [];
+    if (f.kind && f.kind !== "all") ents = ents.filter((e) => e.k === f.kind);
+    if (f.odoo === "out") ents = ents.filter((e) => e.k === "inv" && !e.odoo);
+    if (f.odoo === "in") ents = ents.filter((e) => e.k === "inv" && e.odoo);
+    return { sups, ents };
+  }
+  // إبراز المطابقة على النص الأصلي بحرف مقابل حرف (التطبيع لا يغير الطول إلا بالتشكيل، والبيانات بلا تشكيل)
+  function hl(text, q) {
+    const t = String(text); const n = norm(t); const ts = terms(q).map((x) => x.replace(/,/g, "")).filter((x) => x.length > 1);
+    const marks = new Array(t.length).fill(false);
+    for (const term of ts) { let i = n.indexOf(term); while (i >= 0) { for (let k = i; k < i + term.length && k < t.length; k++) marks[k] = true; i = n.indexOf(term, i + 1); } }
+    let out = "", open = false;
+    for (let i = 0; i < t.length; i++) { if (marks[i] && !open) { out += "<mark>"; open = true; } if (!marks[i] && open) { out += "</mark>"; open = false; } out += esc(t[i]); }
+    return out + (open ? "</mark>" : "");
+  }
+  const icon = `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5" stroke-linecap="round"/></svg>`;
+  const resRow = (e, q, i, act) => `<div class="res${act ? " act" : ""}" data-pick="${i}" role="option" aria-selected="${act}"><span class="k">${KIND[e.k]}</span><div class="main"><div class="t1">${e.no ? `<span class="num">${hl(e.no, q)}</span> · ` : ""}${hl(SUP[e.s], q)}</div><div class="t2"><span class="num">${e.d}</span> · ${hl(e.t, q)}${e.v ? ` · سند <span class="num">${hl(e.v, q)}</span>` : ""}</div></div><div>${e.a ? `<div class="amt">${hl(money(e.a), q)}</div>` : ""}${e.k === "inv" ? `<div class="odoo ${e.odoo ? "in" : "out"}">${e.odoo ? "دخلت" : "لم تدخل"}</div>` : ""}</div></div>`;
+  const supRow = (x, q) => `<div class="res" data-sup="${x.i}"><span class="k sup">مورد</span><div class="main"><div class="t1">${hl(x.n, q)}</div><div class="t2">فتح كشف الحساب</div></div><div></div></div>`;
+  const mast = (extra = "", tab = "") => `<div class="mast"><span class="brand">رصيد</span><div class="tabs"><span>الأرصدة</span><span>كشف الحساب</span><span>الفواتير</span>${tab}</div><span class="sp"></span>${extra}</div>`;
+  const toastText = (el, t) => { el.dataset.toast = t; };
+
+  // أ
+  (() => { const el = document.getElementById("sa"); let q = "اسمنت", open = true, act = 0, msg = "";
+    const draw = () => {
+      const r = search(q); const items = [...r.sups.map((x) => ({ x, sup: true })), ...r.ents.map((e) => ({ e }))];
+      act = Math.min(act, Math.max(0, items.length - 1));
+      el.innerHTML = mast(`<button type="button" class="qbtn" data-open>${icon}<span class="t">ابحث في كل شيء…</span><span class="kbd">Ctrl+K</span></button>`)
+        + `<div class="body"><h3>الأرصدة</h3><p class="muted">الشاشة الحالية خلف النافذة.</p>${msg ? `<p class="toast">${msg}</p>` : ""}</div>`
+        + (open ? `<div class="palette-scrim" data-close><div class="palette" role="dialog" aria-label="البحث"><div class="in"><label class="q">${icon}<input data-q value="${esc(q)}" placeholder="مورد، رقم مرجعي، سند، بيان، مبلغ…" aria-label="البحث"></label><span class="count">${q.trim() ? `${r.sups.length} مورد · ${r.ents.length} حركة` : "اكتب للبحث"}</span></div>
+          <div class="list" role="listbox">${r.sups.length ? `<div class="group"><h4>الموردون</h4>${r.sups.map((x) => supRow(x, q)).join("")}</div>` : ""}${r.ents.length ? `<div class="group"><h4>الحركات</h4>${r.ents.map((e, i) => resRow(e, q, i, i + r.sups.length === act)).join("")}</div>` : ""}${q.trim() && !items.length ? `<p class="empty">لا نتائج لـ«${esc(q)}».</p>` : ""}</div>
+          <div class="foot"><span><span class="kbd">↑↓</span> تنقل</span><span><span class="kbd">Enter</span> فتح</span><span><span class="kbd">Esc</span> إغلاق</span></div></div></div>` : "");
+    };
+    el.addEventListener("input", (e) => { if (e.target.dataset.q !== undefined) { q = e.target.value; act = 0; const p = e.target.selectionStart; draw(); const n = el.querySelector("[data-q]"); n.focus(); n.setSelectionRange(p, p); } });
+    el.addEventListener("keydown", (e) => { if (e.target.dataset.q === undefined) return; if (e.key === "ArrowDown") { act++; e.preventDefault(); draw(); el.querySelector("[data-q]").focus(); } if (e.key === "ArrowUp") { act = Math.max(0, act - 1); e.preventDefault(); draw(); el.querySelector("[data-q]").focus(); } if (e.key === "Escape") { open = false; draw(); } });
+    el.addEventListener("click", (e) => {
+      if (e.target.closest("[data-open]")) { open = true; draw(); el.querySelector("[data-q]").focus(); return; }
+      const p = e.target.closest("[data-pick]"), s = e.target.closest("[data-sup]");
+      if (p) { const r = search(q); const x = r.ents[+p.dataset.pick]; msg = `فُتح كشف ${SUP[x.s]} مع إبراز ${x.no || "الملاحظة"}.`; open = false; draw(); return; }
+      if (s) { msg = `فُتح كشف ${SUP[+s.dataset.sup]}.`; open = false; draw(); return; }
+      if (e.target.matches("[data-close]")) { open = false; draw(); }
+    });
+    draw(); })();
+
+  // ب
+  (() => { const el = document.getElementById("sb"); let q = "مشتريات", kind = "all", odoo = "all", msg = "";
+    const draw = () => {
+      const r = search(q, { kind, odoo }); const total = r.ents.reduce((s, e) => s + Math.abs(e.a), 0);
+      el.innerHTML = mast("", `<span class="on">البحث</span>`) + `<div class="body"><h3>البحث</h3>
+        <label class="q">${icon}<input data-q value="${esc(q)}" placeholder="مورد، رقم مرجعي، سند، بيان، مبلغ…" aria-label="البحث"></label>
+        <div class="chips" role="group" aria-label="النوع">${[["all", "الكل"], ["inv", "فواتير"], ["misc", "قيود"], ["note", "ملاحظات"]].map(([v, l]) => `<button type="button" class="chip" data-kind="${v}" aria-pressed="${kind === v}">${l}</button>`).join("")}</div>
+        <div class="filters"><div class="sel">المورد<span class="fake">كل الموردين ▾</span></div><div class="sel">الفترة<span class="fake">كل الفترات ▾</span></div><div class="sel">حالة Odoo<span class="fake" data-odoo>${odoo === "all" ? "الكل" : odoo === "in" ? "دخلت" : "لم تدخل"} ▾</span></div><div class="sel">الترتيب<span class="fake">الأحدث ▾</span></div></div>
+        ${msg ? `<p class="toast">${msg}</p>` : ""}
+        <p class="count">${r.sups.length ? `الموردون: ${r.sups.map((x) => `<a href="#" data-sup="${x.i}">${esc(x.n)}</a>`).join("، ")} · ` : ""}<b class="num">${r.ents.length}</b> حركة · المجموع <b class="num">${money(total)}</b></p>
+        <table class="tbl"><thead><tr><th>التاريخ</th><th>النوع</th><th>الرقم المرجعي</th><th>المورد</th><th>البيان</th><th class="a">المبلغ</th><th>Odoo</th></tr></thead><tbody>
+        ${r.ents.map((e, i) => `<tr class="row" data-pick="${i}"><td class="num">${e.d}</td><td class="hm">${KIND[e.k]}</td><td class="num">${hl(e.no || "—", q)}</td><td>${hl(SUP[e.s], q)}</td><td class="hm">${hl(e.t, q)}</td><td class="a">${e.a ? hl(money(e.a), q) : ""}</td><td class="hm">${e.k === "inv" ? (e.odoo ? "دخلت" : "لم تدخل") : ""}</td></tr>`).join("")}
+        ${!r.ents.length ? `<tr><td colspan="7" class="empty">لا نتائج.</td></tr>` : ""}</tbody></table></div>`;
+    };
+    el.addEventListener("input", (e) => { if (e.target.dataset.q !== undefined) { q = e.target.value; const p = e.target.selectionStart; draw(); const n = el.querySelector("[data-q]"); n.focus(); n.setSelectionRange(p, p); } });
+    el.addEventListener("click", (e) => {
+      const k = e.target.closest("[data-kind]"); if (k) { kind = k.dataset.kind; draw(); return; }
+      if (e.target.closest("[data-odoo]")) { odoo = odoo === "all" ? "out" : odoo === "out" ? "in" : "all"; draw(); return; }
+      const s = e.target.closest("[data-sup]"); if (s) { e.preventDefault(); msg = `فُتح كشف ${SUP[+s.dataset.sup]}.`; draw(); return; }
+      const p = e.target.closest("[data-pick]"); if (p) { const x = search(q, { kind, odoo }).ents[+p.dataset.pick]; msg = `فُتح كشف ${SUP[x.s]} مع إبراز ${x.no || "الملاحظة"}.`; draw(); }
+    });
+    draw(); })();
+
+  // ج
+  (() => { const el = document.getElementById("sc"); let q = "سداد", kind = "all", recent = ["10002", "المورد ب", "اسمنت"], msg = "";
+    const draw = () => {
+      const r = search(q, { kind });
+      el.innerHTML = mast(`<button type="button" class="qbtn" aria-pressed="true">${icon}<span class="t">البحث مفتوح</span></button>`)
+        + `<div class="split"><div class="behind"><h3 style="color:var(--ink)">${msg ? esc(msg) : "كشف الحساب"}</h3><p>الكشف يُفتح هنا والبحث باقٍ بجانبه.</p><div class="fake-tbl"></div><div class="fake-tbl"></div><div class="fake-tbl"></div><div class="fake-tbl"></div></div>
+        <aside class="drawer" aria-label="البحث"><div class="in"><label class="q">${icon}<input data-q value="${esc(q)}" placeholder="ابحث…" aria-label="البحث"></label>
+        <div class="chips">${[["all", "الكل"], ["inv", "فواتير"], ["misc", "قيود"], ["note", "ملاحظات"]].map(([v, l]) => `<button type="button" class="chip" data-kind="${v}" aria-pressed="${kind === v}">${l}</button>`).join("")}</div>
+        <div class="recent" aria-label="آخر عمليات البحث">${recent.map((t) => `<button type="button" data-rec="${esc(t)}">${esc(t)}</button>`).join("")}</div></div>
+        <div class="list"><p class="count">${r.sups.length} مورد · ${r.ents.length} حركة</p>${r.sups.map((x) => supRow(x, q)).join("")}${r.ents.map((e, i) => resRow(e, q, i, false)).join("")}${q.trim() && !r.ents.length && !r.sups.length ? `<p class="empty">لا نتائج.</p>` : ""}</div></aside></div>`;
+    };
+    el.addEventListener("input", (e) => { if (e.target.dataset.q !== undefined) { q = e.target.value; const p = e.target.selectionStart; draw(); const n = el.querySelector("[data-q]"); n.focus(); n.setSelectionRange(p, p); } });
+    el.addEventListener("click", (e) => {
+      const k = e.target.closest("[data-kind]"); if (k) { kind = k.dataset.kind; draw(); return; }
+      const rc = e.target.closest("[data-rec]"); if (rc) { q = rc.dataset.rec; draw(); return; }
+      const s = e.target.closest("[data-sup]"); if (s) { msg = `كشف ${SUP[+s.dataset.sup]}`; draw(); return; }
+      const p = e.target.closest("[data-pick]"); if (p) { const x = search(q, { kind }).ents[+p.dataset.pick]; msg = `كشف ${SUP[x.s]} · ${x.no || "ملاحظة"} مبرزة`; if (q.trim() && !recent.includes(q.trim())) recent = [q.trim(), ...recent].slice(0, 5); draw(); }
+    });
+    draw(); })();
+
+  document.querySelectorAll(".seg[data-view]").forEach((g) => g.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.getElementById("s" + g.dataset.view).classList.toggle("phone", b.dataset.v === "phone");
+  }));
+})();
+</script>
