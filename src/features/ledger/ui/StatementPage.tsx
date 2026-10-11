@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { flushSync } from "react-dom";
 import { Link, useNavigate, useParams } from "react-router";
 import { PeriodFilter, type Period } from "../../../shared/fields/components/PeriodFilter";
 import { Segment } from "../../../shared/fields/components/Segment";
@@ -6,6 +7,7 @@ import { SupplierCombobox } from "../../../shared/fields/components/SupplierComb
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
+import { RIYAL_PATH } from "../../../shared/ui/Icon";
 import { useProfile } from "../../auth/session/SessionProvider";
 import {
   balanceState,
@@ -17,6 +19,9 @@ import {
 } from "../core/ledger";
 import { sortRows, type SortState } from "../core/sort";
 import { openingBalance, watchStatement } from "../data/ledgerRepo";
+import { buildStatementExport } from "../core/exportModel";
+import { StatementPrint } from "../export/StatementPrint";
+import { downloadStatementXlsx } from "../export/statementXlsx";
 import { Amount, HeadSar, Money } from "./Amount";
 import { MobileSort, SortTh } from "./Sorting";
 import { SupplierIndex, useIndexCollapse } from "./SupplierIndex";
@@ -86,6 +91,44 @@ export function StatementPage() {
           : null;
   const loading = !error && Boolean(supplier) && !st;
   const closingLabel = range ? "الرصيد الختامي للفترة" : "الرصيد الكلي";
+
+  // وقت الطباعة يُحدَّث لحظة فتح نافذة الطباعة (زرّنا أو Ctrl+P)
+  const [printNow, setPrintNow] = useState(() => new Date());
+  useEffect(() => {
+    const before = () => flushSync(() => setPrintNow(new Date()));
+    window.addEventListener("beforeprint", before);
+    return () => window.removeEventListener("beforeprint", before);
+  }, []);
+  const exportModel = useMemo(
+    () =>
+      st && supplier
+        ? buildStatementExport({ supplierName: supplier.name, statement: st, range, today, now: printNow })
+        : null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- حدود الفترة تكفي
+    [st, supplier?.name, range?.from, range?.to, today, printNow],
+  );
+  const [xlsxBusy, setXlsxBusy] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const exportXlsx = async () => {
+    if (!st || !supplier) return;
+    setXlsxBusy(true);
+    setExportError(null);
+    try {
+      const model = buildStatementExport({
+        supplierName: supplier.name,
+        statement: st,
+        range,
+        today,
+        now: new Date(),
+      });
+      await downloadStatementXlsx(model, RIYAL_PATH);
+    } catch (e) {
+      console.error("تعذّر إنشاء ملف Excel", e);
+      setExportError("تعذّر إنشاء ملف Excel. أعد المحاولة، وإن تكرر فأبلغ المالك.");
+    } finally {
+      setXlsxBusy(false);
+    }
+  };
 
   return (
     <div className={`${l.sheet} ${idx.collapsed ? l.collapsed : ""}`}>
@@ -157,7 +200,22 @@ export function StatementPage() {
               {scope === "period" ? <PeriodFilter value={period} onChange={setPeriod} today={today} /> : null}
             </div>
           ) : null}
+          {exportModel ? (
+            <div className={s.exports}>
+              <Button variant="ghost" busy={xlsxBusy} onClick={() => void exportXlsx()}>
+                تصدير Excel
+              </Button>
+              <Button variant="ghost" onClick={() => window.print()}>
+                طباعة / PDF
+              </Button>
+            </div>
+          ) : null}
         </div>
+        {exportError ? (
+          <div className={s.err}>
+            <Banner tone="err">{exportError}</Banner>
+          </div>
+        ) : null}
 
         <p className={l.status} role="status" aria-live="polite">
           {loading ? "جارٍ تحميل الكشف…" : ""}
@@ -335,9 +393,13 @@ export function StatementPage() {
         </section>
         <section aria-labelledby="sx-h">
           <h2 id="sx-h">التصدير والطباعة</h2>
-          <p>تصدير Excel وPDF وطباعة A4 تُضاف في الخطوة التالية من المرحلة 4، من الأقدم إلى الأحدث.</p>
+          <p>
+            الطباعة والتصدير بالنطاق المعروض، من الأقدم إلى الأحدث أياً كان ترتيب الشاشة. ملف PDF يُحفظ من
+            نافذة الطباعة باختيار «حفظ بتنسيق PDF». وسم «للمراجعة» داخلي لا يظهر فيهما.
+          </p>
         </section>
       </aside>
+      {exportModel ? <StatementPrint x={exportModel} /> : null}
     </div>
   );
 }

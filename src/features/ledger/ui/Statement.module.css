@@ -55,6 +55,13 @@
   gap: 10px 16px;
 }
 
+.exports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-inline-start: auto;
+}
+
 .err {
   display: flex;
   flex-direction: column;
@@ -189,6 +196,14 @@
 
   .pickSup {
     inline-size: 100%;
+  }
+
+  .exports {
+    margin-inline-start: 0;
+  }
+
+  .exports > * {
+    flex: 1;
   }
 
   .stmt tbody tr {

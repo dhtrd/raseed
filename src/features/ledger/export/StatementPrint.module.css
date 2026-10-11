@@ -1,0 +1,143 @@
+/* طباعة الكشف على A4 عمودي (proposals/2026-10-11-statement-export.html، الخيار أ).
+   الألوان من tokens.css؛ رقم الصفحة من @page في global.css. */
+
+.root {
+  display: none;
+}
+
+@media print {
+  .root {
+    display: block;
+    color: var(--ink);
+    font-family: var(--f-text);
+    font-size: 10pt;
+    line-height: 1.5;
+  }
+}
+
+.lh {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding-block-end: 8pt;
+  border-block-end: 3px double var(--ink);
+  margin-block-end: 10pt;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--f-brand);
+  font-weight: 600;
+  font-size: 16pt;
+  color: var(--mark-ink);
+}
+
+.mark {
+  inline-size: 26pt;
+  block-size: 26pt;
+}
+
+.who {
+  text-align: end;
+}
+
+.who h1 {
+  margin: 0;
+  font-size: 16pt;
+  line-height: 1.3;
+}
+
+.sub {
+  color: var(--ink-2);
+  font-size: 9pt;
+}
+
+.sum {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 0 10pt;
+  border: 1px solid var(--rule);
+}
+
+.sum div {
+  padding: 5pt 7pt;
+}
+
+.sum div + div {
+  border-inline-start: 1px solid var(--rule);
+}
+
+.sum dt {
+  color: var(--ink-2);
+  font-size: 8.5pt;
+}
+
+.sum dd {
+  margin: 0;
+  font-weight: 700;
+  font-size: 11.5pt;
+}
+
+.table {
+  inline-size: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 3pt 4pt;
+  border-block-end: 0.5pt solid var(--rule);
+  text-align: start;
+  vertical-align: top;
+}
+
+.table thead th {
+  font-weight: 700;
+  color: var(--ink-2);
+  white-space: nowrap;
+  border-block-end: 2.5pt double var(--ink);
+}
+
+.table tr {
+  break-inside: avoid;
+}
+
+.amt {
+  text-align: end;
+  white-space: nowrap;
+  border-inline-start: 0.5pt solid var(--margin);
+}
+
+.table th.amt {
+  text-align: end;
+}
+
+.desc {
+  overflow-wrap: anywhere;
+}
+
+.note td {
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.empty {
+  color: var(--ink-2);
+}
+
+.total th,
+.total td {
+  border-block-end: 0;
+  font-weight: 700;
+  padding-block-start: 7pt;
+}
+
+.total .amt :global(.num) {
+  display: inline-block;
+  border-block-start: 0.8pt solid var(--ink);
+  border-block-end: 2.5pt double var(--ink);
+  padding: 1pt 0;
+}

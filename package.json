@@ -27,6 +27,7 @@
     "migrate": "node tools/migrate/migrate.ts"
   },
   "dependencies": {
+    "exceljs": "4.4.0",
     "firebase": "^12.19.0",
     "react": "^19.3.0",
     "react-aria-components": "^1.22.1",
@@ -46,7 +47,6 @@
     "eslint": "^9.39.5",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "exceljs": "4.4.0",
     "firebase-admin": "^13.10.0",
     "firebase-tools": "^15.33.0",
     "globals": "^17.13.0",
