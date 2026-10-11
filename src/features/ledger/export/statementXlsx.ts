@@ -8,7 +8,7 @@ import type { Workbook } from "exceljs";
 import type { StatementExport } from "../core/exportModel";
 import { splitIso } from "../../../shared/fields/core/date";
 
-type ExcelModule = typeof import("exceljs");
+export type ExcelModule = typeof import("exceljs");
 
 const NUM = "#,##0.00;[Red]-#,##0.00";
 const HEAD = 4; // صف رؤوس الأعمدة
@@ -146,11 +146,14 @@ export function riyalPngBase64(path: string): string | null {
   }
 }
 
-/** ينشئ الملف وينزّله في المتصفح. */
-export async function downloadStatementXlsx(x: StatementExport, riyalPath: string): Promise<void> {
+/** يحمّل ExcelJS عند الطلب فقط (حزمة منفصلة). */
+export async function loadExcel(): Promise<ExcelModule> {
   const mod = await import("exceljs");
-  const ExcelJS = ((mod as { default?: ExcelModule }).default ?? mod) as ExcelModule;
-  const wb = buildStatementWorkbook(ExcelJS, x, riyalPngBase64(riyalPath));
+  return ((mod as { default?: ExcelModule }).default ?? mod) as ExcelModule;
+}
+
+/** ينزّل المصنَّف في المتصفح باسم الملف المعطى. */
+export async function saveWorkbook(wb: Workbook, fileBase: string): Promise<void> {
   const buf = await wb.xlsx.writeBuffer();
   const url = URL.createObjectURL(
     new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
@@ -158,11 +161,17 @@ export async function downloadStatementXlsx(x: StatementExport, riyalPath: strin
   try {
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${x.fileBase}.xlsx`;
+    a.download = `${fileBase}.xlsx`;
     document.body.append(a);
     a.click();
     a.remove();
   } finally {
     setTimeout(() => URL.revokeObjectURL(url), 10_000);
   }
+}
+
+/** ينشئ ملف الكشف وينزّله. */
+export async function downloadStatementXlsx(x: StatementExport, riyalPath: string): Promise<void> {
+  const ExcelJS = await loadExcel();
+  await saveWorkbook(buildStatementWorkbook(ExcelJS, x, riyalPngBase64(riyalPath)), x.fileBase);
 }

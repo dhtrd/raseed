@@ -24,7 +24,7 @@ CLAUDE.md ← DECISIONS.md ← PROGRESS.md ← هذا الملف ← SPEC.md (v1
 
 ## المرحلة 4 — الخطوة التالية مباشرة
 1. ~~تصدير الكشف~~ أُنجز (`src/features/ledger/export`): Excel الخيار أ وطباعة A4 الخيار أ، والنماذج في `proposals/2026-10-11-statement-export.html`.
-2. فهرس الفواتير وحالة Odoo (`invoices.html`) مع الإرجاع بسبب إلزامي.
+2. ~~فهرس الفواتير وحالة Odoo~~ أُنجز (`InvoicesPage` + `data/invoicesRepo.ts` + `export/invoicesXlsx.ts`). المؤجل: استثناء المالك في الفترة المقفلة بسبب مكتوب (`odoo.lockReason`) مع شاشة قفل الفترات.
 3. إضافة حركة والإدخال السريع (`add-entry.html` + لسان 4 في نماذج الحقول).
 4. مركز المراجعة (`review.html`)، ثم تحويل تنبيهات اللوحة إلى روابط إليه.
 5. شريط التنقل السفلي على الجوال حين تكتمل أقسامه الخمسة.

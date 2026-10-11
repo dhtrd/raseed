@@ -8,6 +8,7 @@ import { UsersPage } from "../features/users/ui/UsersPage";
 import { AssignPage } from "../features/users/ui/AssignPage";
 import { DashboardPage } from "../features/ledger/ui/DashboardPage";
 import { StatementPage } from "../features/ledger/ui/StatementPage";
+import { InvoicesPage } from "../features/ledger/ui/InvoicesPage";
 import { AppShell } from "./AppShell";
 import { ErrorScreen, LoadingScreen, RouteError } from "./Screens";
 
@@ -84,6 +85,7 @@ const router = createBrowserRouter(
               children: [
                 { index: true, element: <DashboardPage /> },
                 { path: "statement/:sid?", element: <StatementPage /> },
+                { path: "invoices/:sid?", element: <InvoicesPage /> },
                 {
                   path: "users/:uid?",
                   element: (

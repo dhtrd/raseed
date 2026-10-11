@@ -130,7 +130,9 @@ export default async function seed() {
       reversed: e.reversed === true,
       needsManualFix: e.fix === true,
       deleted: e.deleted === true,
-      ...(e.kind === "inv" ? { odoo: { entered: false } } : {}),
+      ...(e.kind === "inv"
+        ? { odoo: e.id === "e301" ? { entered: true, by: "migration" } : { entered: false } }
+        : {}),
       auditId: "seed",
       createdBy: "seed",
       createdAt: new Date(),
@@ -148,6 +150,8 @@ export default async function seed() {
       resolved,
       createdAt: new Date(),
     });
+  // فترة مقفلة حتى نهاية يونيو: الفاتورة e101 لا تتغير حالتها في Odoo
+  await db.doc("settings/lock").set({ lockedThrough: "2026-06-30", auditId: "seed" });
   await issue("e107", "s1", "future_date");
   await issue("e108", "s1", "untyped");
   await issue("e201", "s2", "duplicate_ref", true);
