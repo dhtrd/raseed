@@ -1,0 +1,256 @@
+<title>رصيد · تذكّر الحساب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* ثلاثة خيارات لـ«تذكّر الحساب على الجهاز» داخل شاشة الدخول المقسومة المعتمدة. الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --mark-acc: #b8752a; --mark-ink: #1e4634;
+  --brand-panel: #1e4634; --brand-on: #d7eae1; --brand-acc: #c9822b;
+  --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { direction: rtl; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.ltr { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); }
+.lead { color: var(--ink-2); max-width: 78ch; margin: 6px 0 16px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+.opt { margin-bottom: 38px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 82ch; }
+ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+li.pro { color: var(--ink); }
+.ctl { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; width: 980px; min-height: 520px; margin-inline: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; display: grid; grid-template-columns: 1fr 1.1fr; }
+.screen.phone { width: 360px; border-radius: 24px; grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+.side { background: var(--brand-panel); color: var(--brand-on); padding: 32px 30px; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
+.brand { display: flex; flex-direction: column; gap: 10px; }
+.brand svg { width: 92px; height: 92px; }
+.word { font-family: var(--f-brand); font-weight: 600; font-size: 28px; line-height: 1; }
+.tag { font-size: 15px; opacity: .85; max-width: 30ch; }
+.clock { font-size: 44px; font-weight: 600; line-height: 1.1; }
+.clock small { font-size: 18px; margin-inline-start: 6px; }
+.phone .side { flex-direction: row; align-items: center; padding: 12px 16px; }
+.phone .brand { flex-direction: row; align-items: center; }
+.phone .brand svg { width: 40px; height: 40px; }
+.phone .tag, .phone .clock { display: none; }
+.main { padding: 34px clamp(16px, 5cqi, 54px); display: flex; align-items: center; }
+.form { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 14px; }
+.title { font-size: 23px; }
+.sub { color: var(--ink-2); font-size: 15px; margin-top: -10px; }
+
+/* حقول بشكل النظام: خط سفلي، بلا إطار */
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 14.5px; font-weight: 700; }
+.input { height: 46px; padding: 0 10px; border: 0; border-bottom: 1.5px solid var(--ink-2); background: var(--wash-2); font: inherit; color: var(--ink); width: 100%; }
+.input:focus { outline: none; border-bottom: 2.5px solid var(--accent); background: var(--wash); }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; }
+.btn.pri { background: var(--accent); color: var(--on-accent); width: 100%; }
+.link { border: 0; background: none; padding: 0; min-height: 36px; color: var(--accent); font: inherit; font-size: 14.5px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.foot { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px 12px; }
+.note { font-size: 13px; color: var(--ink-2); }
+.check { display: flex; align-items: center; gap: 10px; font-size: 14.5px; cursor: pointer; }
+.box { width: 22px; height: 22px; border: 1.5px solid var(--ink-2); border-radius: 4px; display: grid; place-items: center; flex: none; background: var(--surface); }
+.check[aria-checked="true"] .box { background: var(--accent); border-color: var(--accent); }
+.check[aria-checked="true"] .box::after { content: ""; width: 10px; height: 6px; border: 2.5px solid #fff; border-top: 0; border-inline-end: 0; transform: rotate(-45deg) translate(1px, -1px); }
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--wash); color: var(--accent); font-family: var(--f-brand); font-size: 16px; border: 1.5px solid var(--accent); }
+.who { display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
+.who b { font-size: 15.5px; }
+.who span { font-size: 13.5px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.toast { font-size: 13.5px; color: var(--ink-2); background: var(--wash-2); border-inline-start: 3px solid var(--mark-acc); padding: 6px 10px; }
+
+/* أ: قائمة الحسابات */
+.accounts { list-style: none; margin: 0; padding: 0; border-top: 3px double var(--ink); }
+.accounts li { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--rule); }
+.acc { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 10px 6px; border: 0; background: none; font: inherit; color: inherit; text-align: start; cursor: pointer; min-height: 60px; }
+.acc:hover { background: var(--wash-2); }
+.x { width: 40px; height: 40px; border: 0; background: none; color: var(--ink-2); font-size: 20px; cursor: pointer; border-radius: 6px; }
+.x:hover { background: var(--wash-2); color: var(--neg); }
+.picked { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+
+/* ب: آخر حساب */
+.me { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--wash-2); border-inline-start: 4px solid var(--accent); }
+.me .who { flex: 1; }
+
+/* ج: شرائح */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 6px 0 12px; border: 1.5px solid var(--rule); border-radius: 999px; background: var(--surface); font: inherit; font-size: 14.5px; color: var(--ink); cursor: pointer; }
+.chip .avatar { width: 28px; height: 28px; font-size: 13px; }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--wash); }
+.chips-label { font-size: 13.5px; color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <h1>تذكّر الحساب على الجهاز — ثلاثة خيارات</h1>
+  <p class="lead">شاشة الدخول المقسومة المعتمدة نفسها. جرّب كل خيار: اختر حساباً، أو «حساب آخر»، أو أزل حساباً، وبدّل بين «أول مرة» و«حسابات محفوظة»، وبين الحاسوب والجوال.</p>
+  <div class="common">
+    <b>مشترك بين الخيارات الثلاثة (أمان):</b>
+    <ul>
+      <li>يُحفظ على الجهاز <b>البريد والاسم الظاهر فقط</b>. لا كلمة مرور ولا رمز دخول، وكلمة المرور تُكتب في كل دخول كما الآن.</li>
+      <li>الحفظ <b>باختيار المستخدم</b> بمربع «تذكّر حسابي على هذا الجهاز» (غير محدد افتراضياً، لأجل الأجهزة المشتركة)، ويُحفظ بعد نجاح الدخول فقط.</li>
+      <li>كل حساب يُزال من الجهاز بزر واضح بلا دخول، وخمسة حسابات على الأكثر. لا تغيير في انتهاء الجلسة بإغلاق المتصفح أو بالخمول.</li>
+    </ul>
+  </div>
+
+  <section class="opt" data-opt="a">
+    <div class="opt-head">
+      <div>
+        <h2>أ. قائمة الحسابات</h2>
+        <p class="why">الحسابات المحفوظة صفوف في الدفتر (الحرف الأول، الاسم، البريد). النقر على حساب يفتح كلمة المرور وحدها، و«حساب آخر» يعيد النموذج الكامل.</p>
+      </div>
+      <div class="ctl"></div>
+    </div>
+    <ul class="pc"><li class="pro">الأوضح لجهاز يستعمله أكثر من شخص</li><li class="pro">الإزالة ظاهرة بجانب كل حساب</li><li>خطوة إضافية (اختيار الحساب) لمن له حساب واحد</li></ul>
+    <div class="screen-wrap"><div class="screen"></div></div>
+  </section>
+
+  <section class="opt" data-opt="b">
+    <div class="opt-head">
+      <div>
+        <h2>ب. آخر حساب جاهز</h2>
+        <p class="why">يتذكر آخر حساب فقط: بطاقة «تدخل باسم…» والتركيز مباشرة على كلمة المرور. «تغيير الحساب» يعيد حقل البريد، ومنه تُنسى البطاقة.</p>
+      </div>
+      <div class="ctl"></div>
+    </div>
+    <ul class="pc"><li class="pro">الأسرع: كلمة المرور ثم Enter</li><li class="pro">أقل ما يُحفظ (حساب واحد)</li><li>جهاز مشترك: كل دخول يستبدل الحساب المحفوظ</li></ul>
+    <div class="screen-wrap"><div class="screen"></div></div>
+  </section>
+
+  <section class="opt" data-opt="c">
+    <div class="opt-head">
+      <div>
+        <h2>ج. شرائح فوق البريد</h2>
+        <p class="why">النموذج كما هو، وفوقه شرائح الحسابات المحفوظة. النقر على شريحة يملأ البريد وينقل التركيز إلى كلمة المرور. الإزالة بـ× في الشريحة.</p>
+      </div>
+      <div class="ctl"></div>
+    </div>
+    <ul class="pc"><li class="pro">أقل تغيير في الشاشة الحالية</li><li class="pro">يعمل لحساب واحد أو عدة</li><li>الشرائح تزدحم على الجوال مع أكثر من 3 حسابات</li></ul>
+    <div class="screen-wrap"><div class="screen"></div></div>
+  </section>
+</div>
+
+<script>
+const MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="14" width="44" height="8" rx="2" fill="#d7eae1"/><rect x="10" y="28" width="30" height="8" rx="2" fill="#d7eae1"/><rect x="10" y="44" width="44" height="7" rx="2" fill="#c9822b"/></svg>';
+const SEED = [
+  { name: "صاحب المنشأة", email: "owner@example.com" },
+  { name: "سالم", email: "salem@example.com" },
+];
+const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const ini = (n) => esc(n.trim().charAt(0));
+
+function makeOption(section) {
+  const opt = section.dataset.opt;
+  const screen = section.querySelector(".screen");
+  const st = { device: "desk", saved: SEED.map((a) => ({ ...a })), picked: null, other: false, remember: false, msg: "" };
+
+  const ctl = section.querySelector(".ctl");
+  ctl.innerHTML =
+    '<div class="seg" role="group" aria-label="الحالة"><button data-k="seed" aria-pressed="true">حسابات محفوظة</button><button data-k="first" aria-pressed="false">أول مرة</button></div>' +
+    '<div class="seg" role="group" aria-label="الجهاز"><button data-d="desk" aria-pressed="true">حاسوب</button><button data-d="phone" aria-pressed="false">جوال</button></div>';
+  ctl.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.k) {
+      st.saved = b.dataset.k === "seed" ? SEED.map((a) => ({ ...a })) : [];
+      st.picked = null; st.other = false; st.msg = "";
+      ctl.querySelectorAll("[data-k]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    }
+    if (b.dataset.d) {
+      st.device = b.dataset.d;
+      ctl.querySelectorAll("[data-d]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    }
+    render();
+  });
+
+  const remember = () =>
+    `<div class="check" role="checkbox" tabindex="0" aria-checked="${st.remember}" data-act="rem"><span class="box"></span>تذكّر حسابي على هذا الجهاز</div>`;
+  const pw = () => `<div class="field"><label>كلمة المرور</label><input class="input" type="password" data-pw placeholder="••••••••••••"></div>`;
+  const email = (v = "") => `<div class="field"><label>البريد الإلكتروني</label><input class="input ltr" type="email" data-email value="${esc(v)}" placeholder="name@example.com"></div>`;
+  const foot = `<div class="foot"><button class="link" type="button">نسيت كلمة المرور؟</button><span class="note">تنتهي الجلسة بإغلاق المتصفح أو بعد مدة بلا نشاط.</span></div>`;
+  const submit = `<button class="btn pri" type="button" data-act="login">دخول</button>`;
+  const who = (a) => `<span class="avatar">${ini(a.name)}</span><span class="who"><b>${esc(a.name)}</b><span class="ltr">${esc(a.email)}</span></span>`;
+  const msg = () => (st.msg ? `<p class="toast" role="status">${esc(st.msg)}</p>` : "");
+
+  function body() {
+    if (opt === "a") {
+      if (st.saved.length && !st.picked && !st.other)
+        return `<h2 class="title">اختر حسابك</h2><p class="sub">الحسابات التي تذكّرها هذا الجهاز.</p>${msg()}
+          <ul class="accounts">${st.saved.map((a, i) => `<li><button class="acc" data-pick="${i}">${who(a)}</button><button class="x" aria-label="إزالة ${esc(a.name)} من هذا الجهاز" title="إزالة من هذا الجهاز" data-rm="${i}">×</button></li>`).join("")}</ul>
+          <button class="btn" data-act="other">حساب آخر</button>`;
+      if (st.picked)
+        return `<h2 class="title">تسجيل الدخول</h2><div class="picked">${who(st.picked)}</div>${pw()}${submit}
+          <div class="foot"><button class="link" data-act="back">حساب آخر</button><button class="link" type="button">نسيت كلمة المرور؟</button></div>`;
+      return `<h2 class="title">تسجيل الدخول</h2><p class="sub">بحسابك الذي أنشأته لك الإدارة.</p>${msg()}${email()}${pw()}${remember()}${submit}
+        ${st.saved.length ? '<button class="link" data-act="back">الحسابات المحفوظة</button>' : ""}${foot}`;
+    }
+    if (opt === "b") {
+      const last = st.saved[0];
+      if (last && !st.other)
+        return `<h2 class="title">مرحباً مجدداً</h2>${msg()}
+          <div class="me">${who(last)}<button class="link" data-act="other">تغيير الحساب</button></div>${pw()}${submit}${foot}`;
+      return `<h2 class="title">تسجيل الدخول</h2><p class="sub">بحسابك الذي أنشأته لك الإدارة.</p>${msg()}${email()}${pw()}${remember()}${submit}
+        ${last ? `<div class="foot"><button class="link" data-act="back">رجوع إلى ${esc(last.name)}</button><button class="link" data-rm="0">نسيان ${esc(last.name)} على هذا الجهاز</button></div>` : foot}`;
+    }
+    const chips = st.saved.length
+      ? `<span class="chips-label">حسابات هذا الجهاز</span><div class="chips">${st.saved.map((a, i) => `<span class="chip" aria-pressed="${st.picked === a}"><button class="link" style="text-decoration:none;color:inherit;display:inline-flex;gap:8px;align-items:center" data-pick="${i}"><span class="avatar">${ini(a.name)}</span>${esc(a.name)}</button><button class="x" style="width:32px;height:32px" aria-label="إزالة ${esc(a.name)} من هذا الجهاز" data-rm="${i}">×</button></span>`).join("")}</div>`
+      : "";
+    return `<h2 class="title">تسجيل الدخول</h2><p class="sub">بحسابك الذي أنشأته لك الإدارة.</p>${msg()}${chips}${email(st.picked ? st.picked.email : "")}${pw()}${remember()}${submit}${foot}`;
+  }
+
+  function render() {
+    screen.className = "screen" + (st.device === "phone" ? " phone" : "");
+    screen.innerHTML = `<section class="side"><div class="brand">${MARK}<span class="word">رصيد</span><p class="tag">دفتر حسابات الموردين: الكشوف، والفواتير، وحالة Odoo في مكان واحد.</p></div><div class="clock">11:30<small>ص</small></div></section>
+      <section class="main"><div class="form">${body()}</div></section>`;
+    const p = screen.querySelector("[data-pw]");
+    if (p && (st.picked || (opt === "b" && st.saved.length && !st.other))) p.focus({ preventScroll: true });
+  }
+
+  screen.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-act],[data-pick],[data-rm]");
+    if (!t) return;
+    st.msg = "";
+    if (t.dataset.pick !== undefined) { st.picked = st.saved[+t.dataset.pick]; st.other = false; }
+    else if (t.dataset.rm !== undefined) {
+      const [gone] = st.saved.splice(+t.dataset.rm, 1);
+      if (st.picked === gone) st.picked = null;
+      st.other = false;
+      st.msg = `أُزيل ${gone.name} من هذا الجهاز.`;
+    } else if (t.dataset.act === "other") { st.other = true; st.picked = null; }
+    else if (t.dataset.act === "back") { st.other = false; st.picked = null; }
+    else if (t.dataset.act === "rem") st.remember = !st.remember;
+    else if (t.dataset.act === "login") {
+      const em = screen.querySelector("[data-email]");
+      const account = st.picked || (opt === "b" && !st.other ? st.saved[0] : null);
+      if (!account && em && st.remember && em.value.includes("@")) {
+        const a = { name: em.value.split("@")[0], email: em.value.trim() };
+        st.saved = opt === "b" ? [a] : [a, ...st.saved.filter((x) => x.email !== a.email)].slice(0, 5);
+        st.msg = "نموذج: حُفظ الحساب بعد نجاح الدخول. سيظهر في الدخول القادم.";
+      } else st.msg = "نموذج: يدخل النظام الآن (لا تحقق حقيقي هنا).";
+      st.other = false; st.picked = null;
+    }
+    render();
+  });
+  screen.addEventListener("keydown", (e) => {
+    if ((e.key === " " || e.key === "Enter") && e.target.matches("[data-act=rem]")) { e.preventDefault(); e.target.click(); }
+  });
+  render();
+}
+document.querySelectorAll(".opt").forEach(makeOption);
+</script>
