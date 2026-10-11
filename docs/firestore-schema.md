@@ -12,7 +12,7 @@
 | `settings/lock` | ثابت | `lockedThrough` (YYYY-MM-DD), `auditId` | كل مستخدم نشط | المالك فقط |
 | `settings/session` | ثابت | `idleMinutes` (عدد صحيح 5–120، الافتراضي 30 إن غاب) | كل مستخدم نشط | المالك فقط |
 | `settings/roleNames` | ثابت | `owner`, `admin`, `entry` (≤40) | كل مستخدم نشط | المالك فقط |
-| `migrationIssues` | معرّف الحركة المنقولة | `entryId`, `supplierId`, `supplierName`, `sheet`, `row`, `issues[]` {code, text}, `resolved`, `createdAt` | المالك والإدارة | سكربت النقل وحده (firebase-admin)؛ لا كتابة من التطبيق |
+| `migrationIssues` | معرّف الحركة المنقولة | `entryId`, `supplierId`, `supplierName`, `sheet`, `row`, `issues[]` {code, text}, `resolved`, `createdAt`؛ وحقول الحل `resolution` (ignored/fixed، أو reopened مع resolved=false)، `resolutionNote` (≤300)، `resolvedBy`، `resolvedAt`، `auditId` | المالك والإدارة | ينشئها سكربت النقل وحده؛ المالك والإدارة يغيّرون حقول الحل فقط بسجل تدقيق (`entity = migrationIssues`)، ولا إنشاء ولا حذف من التطبيق |
 | `settings/migration` | ثابت | `at`, `sha256`, `totals`, `auditId` | لا أحد من التطبيق | سكربت النقل (علامة اكتمال تمنع نقلاً ثانياً) |
 | `auditLog` | تلقائي | `actor`, `at`, `action`, `entity`, `entityId`, `before?`, `after?`, `reason?` | المالك والإدارة | إضافة فقط باسم الكاتب نفسه؛ لا تعديل ولا حذف |
 

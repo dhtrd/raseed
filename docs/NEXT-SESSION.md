@@ -25,12 +25,13 @@ CLAUDE.md ← DECISIONS.md ← PROGRESS.md ← هذا الملف ← SPEC.md (v1
 ## المرحلة 4 — الخطوة التالية مباشرة
 1. ~~تصدير الكشف~~ أُنجز (`src/features/ledger/export`): Excel الخيار أ وطباعة A4 الخيار أ، والنماذج في `proposals/2026-10-11-statement-export.html`.
 2. ~~فهرس الفواتير وحالة Odoo~~ أُنجز (`InvoicesPage` + `data/invoicesRepo.ts` + `export/invoicesXlsx.ts`). المؤجل: استثناء المالك في الفترة المقفلة بسبب مكتوب (`odoo.lockReason`) مع شاشة قفل الفترات.
-3. ~~إضافة حركة~~ و~~الإدخال السريع (حاسوب ولوحي)~~ أُنجزا (`AddEntryPage`، `QuickEntryPage`، `core/batch.ts`، `addEntriesChunked`). و~~بطاقة الجوال~~ (الخيار ج، `QuickEntryMobile.tsx`). **التالي:** مركز المراجعة (`review.html`). حد تقني: أقصى عملية ذرّية 7 حركات (DECISIONS 2026-10-11). الشريط السفلي للجوال بعد اكتمال الأقسام الخمسة.
-4. مركز المراجعة (`review.html`)، ثم تحويل تنبيهات اللوحة إلى روابط إليه.
+3. ~~إضافة حركة~~ و~~الإدخال السريع (حاسوب ولوحي)~~ أُنجزا (`AddEntryPage`، `QuickEntryPage`، `core/batch.ts`، `addEntriesChunked`). و~~بطاقة الجوال~~ (الخيار ج، `QuickEntryMobile.tsx`). و~~مركز المراجعة~~ (`ReviewPage`، `core/review.ts`، `data/reviewRepo.ts`). **التالي:** «نافذة تعديل الحركة» بعد الاختيار من `proposals/2026-10-11-edit-entry.html` (https://claude.ai/artifact/Mfm4sagPcN1AfY4LypSSzf)، ثم زر «تعديل» في المركز. حد تقني: أقصى عملية ذرّية 7 حركات (DECISIONS 2026-10-11). الشريط السفلي للجوال بعد اكتمال الأقسام الخمسة.
+4. ~~مركز المراجعة وتحويل تنبيهات اللوحة إلى روابط~~ أُنجز. التالي فيه: «تعديل» عبر النافذة المعتمدة.
 5. شريط التنقل السفلي على الجوال حين تكتمل أقسامه الخمسة.
 6. **نماذج ناقصة قبل بنائها** (2–3 خيارات واعتماد): فهرس القيود، قفل الفترات، التدقيق، الإشعارات، التحميل والفراغ، والبحث داخل الكشف.
 
 ## صفحات مرجعية (Artifacts)
+- نموذج نافذة تعديل الحركة (بانتظار الاختيار): https://claude.ai/artifact/Mfm4sagPcN1AfY4LypSSzf
 - نموذج بطاقة الإدخال السريع على الجوال (اختير ج): https://claude.ai/artifact/4wKpL3YreNN65WemWG7Dfd
 - نماذج تصدير الكشف (بانتظار الاختيار): https://claude.ai/artifact/HW1mbhy6a3d2aTSjMrz6WQ
 - نماذج المرحلة 2 المعتمدة: https://claude.ai/artifact/2GHbnzdf9UoxUVpkWZNPab

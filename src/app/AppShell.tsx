@@ -31,6 +31,7 @@ export function AppShell() {
   ];
   if (isManager(profile.role)) {
     tabs.push(
+      { to: "/review", label: "المراجعة", end: false },
       { to: "/users", label: "المستخدمون", end: false },
       { to: "/assign", label: "الإسناد", end: false },
     );

@@ -252,10 +252,22 @@ service cloud.firestore {
     }
 
     // ---------- أسباب «التعديل اليدوي» للبيانات المنقولة (المرحلة 3) ----------
-    // يكتبها سكربت النقل وحده (firebase-admin)؛ تُقرأ في مركز المراجعة للمالك والإدارة.
+    // ينشئها سكربت النقل وحده (firebase-admin)؛ تُقرأ في مركز المراجعة للمالك والإدارة.
+    // المالك والإدارة يغيّرون حقول الحل فقط، بسجل تدقيق في الدفعة نفسها (DECISIONS 2026-10-11).
     match /migrationIssues/{eid} {
+      function resolutionOk(d) {
+        return d.resolved is bool
+          && d.resolvedBy == request.auth.uid && d.resolvedAt == request.time
+          && (d.resolved ? d.resolution in ['ignored', 'fixed'] : d.resolution == 'reopened')
+          && d.resolutionNote is string && d.resolutionNote.size() <= 300;
+      }
       allow read: if isManager();
-      allow write: if false;
+      allow update: if isManager()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['resolved', 'resolution', 'resolutionNote', 'resolvedBy', 'resolvedAt', 'auditId'])
+        && resolutionOk(request.resource.data)
+        && audited('migrationIssues', eid);
+      allow create, delete: if false;
     }
 
     // ---------- سجل التدقيق: إضافة فقط، لا تعديل ولا حذف ----------
@@ -267,7 +279,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['actor', 'at', 'action', 'entity', 'entityId', 'before', 'after', 'reason'])
         && request.resource.data.actor == request.auth.uid
         && request.resource.data.at == request.time
-        && request.resource.data.entity in ['entries', 'users', 'suppliers', 'settings']
+        && request.resource.data.entity in ['entries', 'users', 'suppliers', 'settings', 'migrationIssues']
         && request.resource.data.entityId is string
         && request.resource.data.action is string && request.resource.data.action.size() <= 40;
       allow update, delete: if false;

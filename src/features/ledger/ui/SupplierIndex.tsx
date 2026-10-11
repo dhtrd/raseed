@@ -26,12 +26,19 @@ export function useIndexCollapse() {
   return { collapsed, toggle };
 }
 
-export function SupplierIndex(p: { collapsed: boolean; onToggle: () => void; children: ReactNode }) {
+export function SupplierIndex(p: {
+  collapsed: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+  /** عنوان الفهرس (الافتراضي «الموردون»)؛ مركز المراجعة يستعمله لأقسامه */
+  title?: string;
+}) {
   const bodyId = useId();
+  const title = p.title ?? "الموردون";
   return (
-    <aside className={s.index} aria-label="فهرس الموردين">
+    <aside className={s.index} aria-label={p.title ? p.title : "فهرس الموردين"}>
       <div className={s.indexHead}>
-        <h2 className={s.indexTitle}>الموردون</h2>
+        <h2 className={s.indexTitle}>{title}</h2>
         <button
           type="button"
           className={s.collapseBtn}

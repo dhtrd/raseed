@@ -153,14 +153,14 @@ export default async function seed() {
       places: [...((cur.get("places") as (typeof place)[] | undefined) ?? []), place],
     });
   }
-  const issue = (entryId: string, sup: string, code: string, resolved = false) =>
+  const issue = (entryId: string, sup: string, code: string, resolved = false, text = "وهمي", row = 1) =>
     db.doc(`migrationIssues/${entryId}`).set({
       entryId,
       supplierId: sup,
       supplierName: "وهمي",
       sheet: "وهمي",
-      row: 1,
-      issues: [{ code, text: "وهمي" }],
+      row,
+      issues: [{ code, text }],
       resolved,
       createdAt: new Date(),
     });
@@ -169,4 +169,14 @@ export default async function seed() {
   await issue("e107", "s1", "future_date");
   await issue("e108", "s1", "untyped");
   await issue("e201", "s2", "duplicate_ref", true);
+  // مركز المراجعة: تاريخ مقلوب بمرجّح، ومرجع بطول مخالف في قسم «أخرى»
+  await issue(
+    "e102",
+    "s1",
+    "known_swapped_day_month",
+    false,
+    "تاريخ مقلوب على الأرجح: 2026-07-05 والأرجح 2026-05-07",
+    12,
+  );
+  await issue("e103", "s1", "ref_length", false, "طول المرجع 4 (المتوقع 5)", 14);
 }

@@ -1,6 +1,6 @@
 import { collection, doc, serverTimestamp, type Firestore, type WriteBatch } from "firebase/firestore";
 
-export type AuditEntity = "entries" | "users" | "suppliers" | "settings";
+export type AuditEntity = "entries" | "users" | "suppliers" | "settings" | "migrationIssues";
 
 export interface AuditInput {
   actor: string;
