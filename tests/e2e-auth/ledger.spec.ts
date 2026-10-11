@@ -98,13 +98,13 @@ test("كشف المورد: الرصيد الجاري، الأحدث أولاً،
   const body = page.locator("main tbody tr");
   await expect(body).toHaveCount(7); // المحذوف ناعماً لا يظهر
   await expect(body.first()).toContainText("07/10/2026");
-  await expect(body.first().locator("td").last()).toHaveText("-1,050.75");
-  await expect(body.last().locator("td").last()).toHaveText("-1,000.00");
+  await expect(body.first().locator('td[data-l="الرصيد"]')).toHaveText("-1,050.75");
+  await expect(body.last().locator('td[data-l="الرصيد"]')).toHaveText("-1,000.00");
   await expect(page.locator("main").getByText("مرتجع", { exact: true })).toBeVisible();
   await expect(page.locator("main").getByText("بلا نوع", { exact: true })).toBeVisible();
   await expect(page.locator("main tbody").getByText("للمراجعة", { exact: true })).toHaveCount(2);
   await expect(page.locator("main").getByText("اتصال لتأكيد موعد التوريد")).toBeVisible();
-  await expect(page.locator("main tfoot td").last()).toHaveText("-1,050.75");
+  await expect(page.locator("main tfoot td").filter({ hasText: /\d/ }).last()).toHaveText("-1,050.75");
 
   // التاريخ تصاعدياً: الأقدم أولاً والرصيد نفسه لكل حركة
   await page
@@ -118,7 +118,7 @@ test("كشف المورد: الرصيد الجاري، الأحدث أولاً،
   await expect(page.getByText(/الرصيد الافتتاحي قبل/)).toContainText("0.00");
   await expect(body).toHaveCount(5);
   await expect(page.getByText("الرصيد الختامي للفترة").first()).toBeVisible();
-  await expect(page.locator("main tfoot td").last()).toHaveText("-1,050.75");
+  await expect(page.locator("main tfoot td").filter({ hasText: /\d/ }).last()).toHaveText("-1,050.75");
   await page.screenshot({ path: "test-results/statement-1440.png", fullPage: true });
 });
 
@@ -232,7 +232,7 @@ test("تصدير الكشف: ملف Excel بالأرقام والمعادلات�
   await page.setViewportSize({ width: 1440, height: 900 });
   await loginOk(page, OWNER.email, OWNER.password);
   await page.goto("/statement/s1");
-  await expect(page.locator("main tfoot td").last()).toHaveText("-1,050.75");
+  await expect(page.locator("main tfoot td").filter({ hasText: /\d/ }).last()).toHaveText("-1,050.75");
 
   const [download] = await Promise.all([
     page.waitForEvent("download"),
