@@ -191,7 +191,7 @@ body.reduce .stage *, body.reduce .stage *::before, body.reduce .stage *::after 
 
 <div class="wrap">
   <h1>الحركة في «رصيد» — اختر لكل موضع</h1>
-  <p class="lead">خمسة مواضع، في كل منها خمسة خيارات. جرّب الحركة، ثم اضغط «اختر هذا» على خيار واحد في كل موضع. اختياراتك تظهر في الشريط أسفل الشاشة، وانسخها بزر «نسخ الاختيارات» وأرسلها لي.</p>
+  <p class="lead">خمسة مواضع، في كل منها خمسة خيارات. جرّب الحركة، ثم اختر خياراً أو أكثر في كل موضع بزر «اختر هذا» (الضغط مرة ثانية يلغيه). اختياراتك تظهر في الشريط أسفل الشاشة، وانسخها بزر «نسخ الاختيارات» وأرسلها لي.</p>
   <div class="common">
     <b>مشترك بين كل الخيارات:</b>
     <ul>
@@ -262,7 +262,7 @@ body.reduce .stage *, body.reduce .stage *::before, body.reduce .stage *::after 
     ] },
   ];
 
-  const KEY = "raseed-motion-picks-v2";
+  const KEY = "raseed-motion-picks-v3";
   let picks = {};
   try { picks = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { picks = {}; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(picks)); } catch {} };
@@ -291,7 +291,9 @@ body.reduce .stage *, body.reduce .stage *::before, body.reduce .stage *::after 
     if (t.classList.contains("replay")) replay(opt.querySelector(".stage"));
     else if (t.classList.contains("pick")) {
       const k = sec.id.slice(5); const i = +opt.dataset.i;
-      picks[k] = picks[k] === i ? undefined : i; if (picks[k] === undefined) delete picks[k];
+      const cur = new Set(picks[k] || []);
+      if (cur.has(i)) cur.delete(i); else cur.add(i);
+      if (cur.size) picks[k] = [...cur].sort((x, y) => x - y); else delete picks[k];
       save(); render();
     } else if (t.hasAttribute("data-busy")) {
       const st = t.closest(".stage"); st.classList.add("busy"); t.disabled = true; t.textContent = "جارٍ الحفظ…";
@@ -301,24 +303,30 @@ body.reduce .stage *, body.reduce .stage *::before, body.reduce .stage *::after 
 
   const chips = document.getElementById("chips"), copy = document.getElementById("copy"), note = document.getElementById("note"), out = document.getElementById("out");
   function text() {
-    return AREAS.map((a) => picks[a.key] === undefined ? null : `${a.n}${L[picks[a.key]]} (${a.title}: ${a.opts[picks[a.key]][0]})`).filter(Boolean).join(" · ");
+    return AREAS.map((a) => {
+      const p = picks[a.key];
+      if (!p || !p.length) return null;
+      return `${a.n} ${a.title}: ${p.map((i) => `${L[i]}. ${a.opts[i][0]}`).join("، ")}`;
+    }).filter(Boolean).join(" | ");
   }
   function render() {
     document.querySelectorAll(".area").forEach((sec) => {
       const k = sec.id.slice(5);
       sec.querySelectorAll(".opt").forEach((o) => {
-        const on = picks[k] === +o.dataset.i;
+        const on = (picks[k] || []).includes(+o.dataset.i);
         o.classList.toggle("chosen", on);
         const b = o.querySelector(".pick"); b.setAttribute("aria-pressed", String(on)); b.textContent = on ? "مختار ✓" : "اختر هذا";
       });
     });
     chips.innerHTML = AREAS.map((a) => {
-      const p = picks[a.key];
-      return `<button class="chip ${p !== undefined ? "set" : ""}" type="button" data-go="${a.key}" aria-label="${a.title}: ${p !== undefined ? a.opts[p][0] : "لم يُختر"}"><b>${a.n}</b><span class="long">${a.title}${p !== undefined ? ` — ${L[p]}. ${a.opts[p][0]}` : " — لم يُختر"}</span><span class="short">${p !== undefined ? L[p] : "—"}</span></button>`;
+      const p = picks[a.key] || [];
+      const names = p.map((i) => a.opts[i][0]).join("، ");
+      return `<button class="chip ${p.length ? "set" : ""}" type="button" data-go="${a.key}" aria-label="${a.title}: ${p.length ? names : "لم يُختر"}"><b>${a.n}</b><span class="long">${a.title} — ${p.length ? p.map((i) => L[i]).join("، ") : "لم يُختر"}</span><span class="short">${p.length ? p.map((i) => L[i]).join("،") : "—"}</span></button>`;
     }).join("");
     const n = Object.keys(picks).length;
+    const total = Object.values(picks).reduce((t, p) => t + p.length, 0);
     copy.disabled = n === 0;
-    note.textContent = `${n} من 5`;
+    note.textContent = `${total} خيار في ${n} من 5 مواضع`;
   }
   chips.addEventListener("click", (e) => { const c = e.target.closest("[data-go]"); if (c) document.getElementById(`area-${c.dataset.go}`).scrollIntoView({ behavior: "smooth" }); });
   copy.addEventListener("click", async () => {
