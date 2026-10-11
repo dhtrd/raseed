@@ -1,0 +1,249 @@
+<title>رصيد · استثناء Odoo المقفل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاثة خيارات لتغيير حالة Odoo لفاتورة في الفترة المقفلة (للمالك فقط)، كل منها فهرس فواتير تفاعلي بين الحاسوب والجوال. الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --neg-wash: #f7e7e8; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --amber: #b8752a; --amber-wash: #fbf1e3; --ok: #2f6b45;
+  --scrim: rgb(27 42 68 / 45%); --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.lead { color: var(--ink-2); max-width: 78ch; margin: 6px 0 16px; }
+.eg { display: inline-block; font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 6px; margin-inline-start: 6px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+
+.opt { margin-bottom: 34px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 82ch; }
+.opt ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; position: relative; width: 1100px; min-height: 500px; margin-inline: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.screen.phone { width: 360px; min-height: 700px; border-radius: 24px; }
+.mast { display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: var(--surface); border-bottom: 3px double var(--ink); font-weight: 700; }
+.mast .brand { font-family: var(--f-brand); font-size: 20px; }
+.mast .who { margin-inline-start: auto; font-size: 13.5px; color: var(--ink-2); font-weight: 400; }
+.page { padding: 16px 20px 22px; display: grid; gap: 10px; }
+@container (width < 600px) { .page { padding: 12px 14px 18px; } }
+.page h3 { font-size: 22px; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.lockline { font-size: 14px; color: var(--ink-2); }
+.toast { padding: 8px 12px; background: var(--wash); border-inline-start: 4px solid var(--accent); font-size: 15px; display: grid; gap: 6px; }
+.toast.warn { background: var(--amber-wash); border-inline-start-color: var(--amber); }
+.toast .acts { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* الجدول */
+table { width: 100%; border-collapse: collapse; background: var(--surface); border-top: 3px double var(--ink); font-size: 15px; }
+th { text-align: start; font-size: 13.5px; color: var(--ink-2); padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+td, tbody th { padding: 9px 8px; border-bottom: 1px solid var(--rule); text-align: start; font-weight: 400; color: var(--ink); font-size: 15px; vertical-align: middle; }
+.amt { text-align: end; border-inline-start: 1px solid var(--margin); }
+tr.locked td, tr.locked th { background: var(--wash-2); }
+.lk { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--ink-2); }
+.lk svg { width: 14px; height: 14px; }
+.chk { width: 20px; height: 20px; accent-color: var(--accent); }
+.stamp { display: inline-block; padding: 0 8px; border: 1.5px solid currentcolor; border-radius: 3px; font-size: 13px; font-weight: 700; transform: rotate(-3deg); }
+.stamp.in { color: var(--ok); }
+.stamp.out { color: var(--neg); }
+.exc { display: inline-block; margin-inline-start: 6px; padding: 0 6px; border: 1px dashed var(--amber); border-radius: 3px; color: var(--amber); font-size: 12px; font-weight: 700; }
+.st { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 2px 14px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.btn.pri { background: var(--accent); color: var(--on-accent); }
+.btn.sm { min-height: 34px; padding: 0 10px; font-size: 14px; }
+.btn.amber { border-color: var(--amber); color: var(--amber); background: var(--amber-wash); }
+.btn.amber.pri { background: var(--amber); color: var(--on-accent); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn svg { width: 15px; height: 15px; }
+.link { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.hint { font-size: 13px; color: var(--ink-2); }
+
+@container (width < 600px) {
+  thead { display: none; }
+  table, tbody { display: block; }
+  tbody tr { display: grid; grid-template-columns: auto 1fr auto; gap: 2px 10px; padding: 10px 0; border-bottom: 1px solid var(--rule); align-items: center; }
+  tbody tr > * { display: block; border: 0; padding: 0; background: none !important; }
+  tr.locked { background: var(--wash-2); }
+  .hide-m { display: none; }
+  .amt { border: 0; }
+  .m-full { grid-column: 1 / -1; }
+}
+@container (width >= 600px) { .m-only { display: none; } }
+
+/* النافذة: وسطى على الحاسوب، لوحة سفلية على الجوال */
+.scrim { position: absolute; inset: 0; background: var(--scrim); display: grid; place-items: center; padding: 16px; z-index: 5; }
+.dlg { width: min(100%, 540px); background: var(--surface); border-top: 4px solid var(--amber); border-radius: 8px; box-shadow: var(--shadow); padding: 16px 18px; display: grid; gap: 12px; }
+.dlg h4 { margin: 0; font-size: 18px; }
+@container (width < 600px) { .scrim { place-items: end stretch; padding: 0; } .dlg { width: 100%; border-radius: 14px 14px 0 0; } }
+.sum { padding: 10px 12px; background: var(--amber-wash); border-inline-start: 4px solid var(--amber); font-size: 15px; display: grid; gap: 2px; }
+.fld { display: grid; gap: 2px; font-size: 13.5px; color: var(--ink-2); }
+.fld textarea { font: inherit; font-size: 15.5px; color: var(--ink); min-height: 64px; padding: 6px 10px; border: 0; border-bottom: 2px solid var(--amber); background: var(--wash-2); resize: vertical; }
+.fld textarea:focus { outline: none; background: var(--wash); }
+.err { color: var(--neg); font-weight: 700; font-size: 14px; }
+.foot { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 10px; }
+.qs b { color: var(--accent); }
+.qs .sub { color: var(--ink-2); font-size: 15px; }
+@media (prefers-reduced-motion: no-preference) { .dlg { animation: up .16s ease-out; } @keyframes up { from { transform: translateY(8px); opacity: .6; } } }
+</style>
+
+<div class="wrap">
+  <h1>تغيير حالة Odoo لفاتورة في الفترة المقفلة</h1>
+  <p class="lead">اليوم: الفواتير بتاريخ داخل الفترة المقفلة لا تتغير حالتها، وزر «دخلت ✓» معطّل لها. المطلوب استثناء <b>للمالك وحده</b> بسبب مكتوب إلزامي، دون فتح القفل، ولا يتغير في الفاتورة شيء غير حالة Odoo. الإدارة تبقى كما هي (ممنوعة). ثلاثة أشكال تفاعلية، كل منها بين الحاسوب والجوال. البيانات وهمية<span class="eg">مثال</span>.</p>
+  <div class="common">في الأشكال الثلاثة:
+    <ul>
+      <li>السبب الإلزامي يُحفظ مع الفاتورة وفي سجل التدقيق، والقواعد تفرضه من الخادم (موجودة ومختبرة).</li>
+      <li>الاتجاهان: «دخلت» وإرجاعها إلى «لم تدخل» (الإرجاع يطلب أيضاً سببه المعتاد من القائمة).</li>
+      <li>الفواتير خارج الفترة المقفلة لا يتغير شيء في طريقتها.</li>
+    </ul>
+  </div>
+
+  <section class="opt" aria-labelledby="ha">
+    <div class="opt-head"><h2 id="ha">أ. زر بقفل في صف الفاتورة المقفلة</h2><div class="seg" data-view="a"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">للمالك يبقى زر «دخلت ✓» ظاهراً في الفاتورة المقفلة بلون كهرماني وأيقونة قفل، ويفتح نافذة «استثناء الفترة المقفلة» بالسبب. وفي التحديد الجماعي يعرض شريط النتيجة رابط «تغيير المقفلة باستثناء» بسبب واحد لها كلها.</p>
+    <ul class="pc"><li class="pro">الأوضح: الاستثناء حيث الفاتورة نفسها.</li><li class="pro">يعمل للفاتورة الواحدة وللدفعة.</li><li>زر إضافي بلون مختلف في الفواتير القديمة.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <div class="opt-head"><h2 id="hb">ب. من شريط نتيجة التحديد فقط</h2><div class="seg" data-view="b"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">زر الصف يبقى معطّلاً للمقفلة كما الآن. حدّد الفواتير ثم «تحديد كـدخلت»؛ تتغير المفتوحة، ويقول الشريط إن المقفلة لم تتغير مع زر «تطبيق على المقفلة باستثناء (العدد)».</p>
+    <ul class="pc"><li class="pro">الاستثناء مقصود دائماً ولا يحدث بنقرة عابرة.</li><li class="pro">بلا تغيير في شكل الصفوف.</li><li>الفاتورة الواحدة تحتاج تحديداً ثم إجراءً ثم استثناءً.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <div class="opt-head"><h2 id="hc">ج. عبر الفتح المؤقت فقط (بلا استثناء)</h2><div class="seg" data-view="c"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">لا استثناء في الفواتير: الزر معطّل وتحته للمالك رابط «افتح القفل مؤقتاً» إلى شاشة قفل الفترات، كما في تعديل الحركة والحذف. بعد التغيير يعيد المالك القفل.</p>
+    <ul class="pc"><li class="pro">طريقة واحدة لكل ما في الفترة المقفلة.</li><li class="pro">تُحذف قاعدة الاستثناء فتصبح القواعد أشد.</li><li>أبطأ: فتح ثم تغيير ثم إعادة، وتنفتح الفترة كلها مؤقتاً.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الشكل:</b> أ أم ب أم ج؟</li>
+      <li><b>وسم «استثناء» على الفاتورة بعد التغيير:</b> يظهر بجانب ختم الحالة (وسبب الاستثناء في تفاصيلها)، أم يكفي سجل التدقيق؟
+        <div class="sub">أقترح: يظهر، كي يُعرف أن الفاتورة تغيرت بعد الإقفال.</div></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const LOCK = "30/06/2026";
+  const BASE = [
+    { no: "P10003", d: "04/10/2026", sup: "المورد (أ)", amt: "300.00", locked: false, on: false },
+    { no: "P10002", d: "02/10/2026", sup: "المورد (أ)", amt: "2,500.50", locked: false, on: false },
+    { no: "P10001", d: "20/06/2026", sup: "المورد (أ)", amt: "1,000.00", locked: true, on: false },
+    { no: "P09987", d: "12/05/2026", sup: "المورد (ب)", amt: "4,750.00", locked: true, on: false },
+  ];
+  const lock = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+  function build(id, mode) {
+    const el = document.getElementById(id);
+    const st = { rows: BASE.map((r) => ({ ...r, exc: "" })), sel: new Set(), toast: null, dlg: null, reason: "", err: "" };
+
+    const status = (r, i) => {
+      const stamp = `<span class="stamp ${r.on ? "in" : "out"}">${r.on ? "دخلت" : "لم تدخل"}</span>${r.exc ? `<span class="exc" title="${esc(r.exc)}">استثناء</span>` : ""}`;
+      let btn = "";
+      if (!r.on) {
+        if (!r.locked) btn = `<button type="button" class="btn sm" data-mark="${i}">دخلت ✓</button>`;
+        else if (mode === "a") btn = `<button type="button" class="btn sm amber" data-exc="${i}" aria-label="تحديد ${r.no} كـدخلت باستثناء الفترة المقفلة">${lock} دخلت ✓</button>`;
+        else btn = `<button type="button" class="btn sm" disabled title="في فترة مقفلة">دخلت ✓</button>`;
+      }
+      const hint = r.locked && !r.on && mode === "c" ? `<span class="hint">مقفلة · <button type="button" class="link" data-unlock>افتح القفل مؤقتاً</button></span>` : "";
+      return `<span class="st">${stamp}${btn}${hint}</span>`;
+    };
+
+    const table = () => st.rows.map((r, i) => `<tr class="${r.locked ? "locked" : ""}">
+        <td><input type="checkbox" class="chk" data-sel="${i}" ${st.sel.has(i) ? "checked" : ""} aria-label="تحديد ${r.no}"></td>
+        <th scope="row"><span class="num">${r.no}</span>${r.locked ? ` <span class="lk">${lock}مقفلة</span>` : ""}</th>
+        <td class="hide-m"><span class="num">${r.d}</span></td><td class="hide-m">${r.sup}</td>
+        <td class="amt"><span class="num">${r.amt}</span></td>
+        <td class="m-full">${status(r, i)}</td></tr>`).join("");
+
+    const dialog = () => {
+      if (!st.dlg) return "";
+      const list = st.dlg.map((i) => st.rows[i].no).join("، ");
+      return `<div class="scrim"><div class="dlg" role="dialog" aria-modal="true" aria-label="استثناء الفترة المقفلة"><h4>استثناء الفترة المقفلة</h4>
+        <div class="sum"><span>${st.dlg.length === 1 ? "الفاتورة" : `${st.dlg.length} فواتير`} <span class="num">${list}</span> بتاريخ داخل الفترة المقفلة حتى <span class="num">${LOCK}</span>.</span><span>تتغير حالة Odoo إلى «دخلت» فقط، ولا يُفتح القفل ولا يتغير شيء آخر.</span></div>
+        <label class="fld" for="${id}-why">سبب الاستثناء (إلزامي، يُحفظ مع الفاتورة وفي سجل التدقيق)<textarea id="${id}-why" data-why maxlength="300">${esc(st.reason)}</textarea></label>
+        ${st.err ? `<p class="err" role="alert">${st.err}</p>` : ""}
+        <div class="foot"><button type="button" class="btn amber pri" data-ok>تطبيق الاستثناء</button><button type="button" class="btn" data-close>إلغاء</button></div></div></div>`;
+    };
+
+    const draw = () => {
+      const n = st.sel.size;
+      const tools = `<div class="bar"><button type="button" class="btn pri" data-bulk ${n ? "" : "disabled"}>تحديد كـدخلت${n ? ` (${n})` : ""}</button><span class="lockline">${lock.replace('aria-hidden="true"', 'aria-hidden="true" style="width:14px;height:14px;vertical-align:-2px"')} مقفل حتى <span class="num">${LOCK}</span></span></div>`;
+      const t = st.toast ? `<div class="toast ${st.toast.warn ? "warn" : ""}" role="status"><p>${st.toast.text}</p>${st.toast.acts ?? ""}</div>` : "";
+      el.innerHTML = `<div class="mast"><span class="brand">رصيد</span><span>الفواتير</span><span class="who">المالك</span></div>
+        <div class="page"><h3>الفواتير</h3>${tools}${t}
+        <table><caption style="position:absolute;width:1px;height:1px;overflow:hidden">الفواتير</caption><thead><tr><th><span style="position:absolute;width:1px;height:1px;overflow:hidden">تحديد</span></th><th>الرقم المرجعي</th><th class="hide-m">التاريخ</th><th class="hide-m">المورد</th><th class="amt">المبلغ</th><th>حالة Odoo</th></tr></thead><tbody>${table()}</tbody></table>
+        <p class="hint">${mode === "a" ? "الزر الكهرماني بقفل للمالك فقط؛ الإدارة تراه معطّلاً." : mode === "b" ? "حدّد فاتورة مقفلة ثم «تحديد كـدخلت» لترى الاستثناء." : "المالك يفتح القفل مؤقتاً ثم يعود ويعيده من الشريط الكهرماني."}</p></div>${dialog()}`;
+      el.querySelector("[data-why]")?.focus();
+    };
+    const openExc = (idx) => { st.dlg = idx; st.reason = ""; st.err = ""; draw(); };
+
+    el.addEventListener("input", (e) => { if (e.target.matches("[data-why]")) st.reason = e.target.value; });
+    el.addEventListener("change", (e) => {
+      const c = e.target.closest("[data-sel]"); if (!c) return;
+      const i = +c.dataset.sel; c.checked ? st.sel.add(i) : st.sel.delete(i); draw();
+    });
+    el.addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      if (b.dataset.mark) { st.rows[+b.dataset.mark].on = true; st.toast = { text: `حُددت ${st.rows[+b.dataset.mark].no} كـ«دخلت».` }; draw(); }
+      else if (b.dataset.exc) openExc([+b.dataset.exc]);
+      else if ("bulk" in b.dataset) {
+        const idx = [...st.sel]; const open = idx.filter((i) => !st.rows[i].locked && !st.rows[i].on); const locked = idx.filter((i) => st.rows[i].locked && !st.rows[i].on);
+        open.forEach((i) => (st.rows[i].on = true)); st.sel.clear();
+        const lines = [open.length ? `حُددت ${open.length} فاتورة كـ«دخلت».` : "", locked.length ? `${locked.length} فاتورة في فترة مقفلة لم تتغير: ${locked.map((i) => st.rows[i].no).join("، ")}.` : ""].filter(Boolean).join(" ");
+        const acts = locked.length && mode !== "c"
+          ? `<div class="acts"><button type="button" class="btn sm amber" data-excs="${locked.join(",")}">${lock} ${mode === "a" ? "تغيير المقفلة باستثناء" : "تطبيق على المقفلة باستثناء"} (${locked.length})</button></div>`
+          : locked.length ? `<div class="acts"><button type="button" class="link" data-unlock>افتح القفل مؤقتاً من «قفل الفترات»</button></div>` : "";
+        st.toast = { text: lines || "لا شيء لتغييره.", warn: locked.length > 0, acts }; draw();
+      }
+      else if (b.dataset.excs) openExc(b.dataset.excs.split(",").map(Number));
+      else if ("unlock" in b.dataset) { st.toast = { text: "تُفتح شاشة «قفل الفترات» لفتح مؤقت من بداية الشهر، ثم يعود المالك إلى الفواتير.", warn: true }; draw(); }
+      else if ("close" in b.dataset) { st.dlg = null; draw(); }
+      else if ("ok" in b.dataset) {
+        const why = st.reason.trim();
+        if (!why) { st.err = "اكتب سبب الاستثناء: لا يُطبَّق بلا سبب."; draw(); return; }
+        st.dlg.forEach((i) => { st.rows[i].on = true; st.rows[i].exc = why; });
+        st.toast = { text: `حُددت ${st.dlg.length} فاتورة مقفلة كـ«دخلت» باستثناء مسجّل في التدقيق: ${esc(why)}.` };
+        st.dlg = null; draw();
+      }
+    });
+    el.addEventListener("keydown", (e) => { if (e.key === "Escape" && st.dlg) { st.dlg = null; draw(); } });
+    draw();
+  }
+  build("sa", "a"); build("sb", "b"); build("sc", "c");
+  document.querySelectorAll(".seg[data-view]").forEach((g) => g.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.getElementById("s" + g.dataset.view).classList.toggle("phone", b.dataset.v === "phone");
+  }));
+})();
+</script>

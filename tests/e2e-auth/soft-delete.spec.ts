@@ -36,6 +36,7 @@ test("المالك: الحذف من نافذة التعديل بسبب إلزا�
   await loginOk(page, OWNER.email, OWNER.password);
   await page.goto("/statement/s5");
   await expect(balance(page)).toContainText("99.99");
+  await expect(page.getByRole("button", { name: "إعادة تحميل الصفحة" })).toBeHidden();
 
   await page.locator("main").getByRole("button", { name: "تعديل الحركة MISC/2026/08/0701" }).click();
   await page
@@ -96,6 +97,8 @@ test("الجوال: الحذف لوحة سفلية، والمحذوف بزر ا�
   await page.setViewportSize({ width: 360, height: 780 });
   await loginOk(page, OWNER.email, OWNER.password);
   await page.goto("/statement/s1");
+  // زر إعادة التحميل في الرأس للجوال واللوحي فقط
+  await expect(page.getByRole("button", { name: "إعادة تحميل الصفحة" })).toBeVisible();
   await page.getByRole("checkbox", { name: /إظهار المحذوف/ }).click();
   const btn = page.getByRole("button", { name: "استرجاع الحركة P10009" });
   await expect(btn).toBeVisible();

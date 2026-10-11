@@ -111,6 +111,37 @@
   cursor: progress;
 }
 
+/* إعادة التحميل: للجوال واللوحي فقط (طلب المستخدم 2026-10-11) */
+.reload {
+  display: none;
+  place-items: center;
+  inline-size: var(--touch);
+  block-size: var(--touch);
+  padding: 0;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.reload svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.reload:hover,
+.reload:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (width <= 1279px) {
+  .reload {
+    display: inline-grid;
+  }
+}
+
 .shell {
   position: relative;
   z-index: 1;
