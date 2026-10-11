@@ -26,7 +26,7 @@ import { sortRows, type SortState } from "../core/sort";
 import { setOdooStatus, watchInvoices, watchLockedThrough, type OdooChange } from "../data/invoicesRepo";
 import { downloadNotEnteredXlsx } from "../export/invoicesXlsx";
 import { LockExceptionDialog, type LockException } from "./LockExceptionDialog";
-import { Amount, HeadSar } from "./Amount";
+import { Amount, HeadSar, Money } from "./Amount";
 import { MobileSort, SortTh } from "./Sorting";
 import { SupplierIndex, useIndexCollapse } from "./SupplierIndex";
 import { useKeyedWatch, useVisibleSuppliers } from "./useLedgerData";
@@ -294,14 +294,23 @@ export function InvoicesPage() {
             <div>
               <dt>إجمالي الفواتير</dt>
               <dd className="num">{counts.total.toLocaleString("en-US")}</dd>
+              <dd className={s.cAmtSum} aria-label="المبلغ الإجمالي">
+                <Money h={counts.totalAmount} />
+              </dd>
             </div>
             <div>
               <dt>دخلت</dt>
               <dd className="num">{counts.entered.toLocaleString("en-US")}</dd>
+              <dd className={s.cAmtSum} aria-label="مبلغ ما دخلت">
+                <Money h={counts.enteredAmount} />
+              </dd>
             </div>
             <div>
               <dt>لم تدخل Odoo</dt>
               <dd className={`num ${l.neg}`}>{counts.notEntered.toLocaleString("en-US")}</dd>
+              <dd className={s.cAmtSum} aria-label="مبلغ ما لم تدخل">
+                <Money h={counts.notEnteredAmount} />
+              </dd>
             </div>
           </dl>
         </div>

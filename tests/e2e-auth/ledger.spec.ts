@@ -269,7 +269,8 @@ test.describe("فهرس الفواتير وحالة Odoo", () => {
     page
       .locator("main dl div")
       .filter({ has: page.getByText(label, { exact: true }) })
-      .locator("dd");
+      .locator("dd")
+      .first();
 
   test("المالك: تحديد كـدخلت جماعي يستثني المقفل، والإرجاع بسبب، وكل تغيير في التدقيق", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });

@@ -26,6 +26,16 @@ test("المالك: نقرة واحدة تحوّل الفاتورة إلى «د�
   await loginOk(page, OWNER.email, OWNER.password);
   await page.goto("/invoices/s1");
   await page.getByRole("radio", { name: "كل الفترات" }).click();
+  // المبلغ تحت كل عدّاد: الإجمالي = دخلت + لم تدخل (المرتجع يُطرح)؛ حركات الاختبارات السابقة تغيّر المبالغ
+  const money = async (label: string) =>
+    Number(((await page.getByLabel(label).textContent()) ?? "").replace(/[^\d.-]/g, ""));
+  await expect(page.getByLabel("المبلغ الإجمالي")).toContainText(".");
+  const [total0, in0, out0] = [
+    await money("المبلغ الإجمالي"),
+    await money("مبلغ ما دخلت"),
+    await money("مبلغ ما لم تدخل"),
+  ];
+  expect(Math.round((in0 + out0) * 100)).toBe(Math.round(total0 * 100));
   // المقفلة (يونيو): للمالك زر الاستثناء بدل الزر العادي
   await expect(
     page.getByRole("button", { name: "تحديد P10001 كـدخلت باستثناء الفترة المقفلة" }),
@@ -33,6 +43,9 @@ test("المالك: نقرة واحدة تحوّل الفاتورة إلى «د�
   await page.getByRole("button", { name: "تحديد P10002 كـدخلت" }).click();
   await expect(page.getByText("حُددت P10002 كـ«دخلت» وسُجّل التغيير في التدقيق.")).toBeVisible();
   await expect(page.getByRole("button", { name: "تحديد P10002 كـدخلت" })).toHaveCount(0);
+  await expect
+    .poll(async () => Math.round((await money("مبلغ ما دخلت")) * 100))
+    .toBe(Math.round((in0 + 2500.5) * 100));
   const e = await adminDb().doc("entries/e103").get();
   expect(e.get("odoo.entered")).toBe(true);
   const audit = await adminDb()

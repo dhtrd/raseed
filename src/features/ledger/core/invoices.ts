@@ -42,16 +42,29 @@ export interface InvoiceCounts {
   notEntered: number;
   /** مجموع مبالغ «لم تدخل» (المرتجع يُطرح) */
   notEnteredAmount: number;
+  /** مجموع مبالغ «دخلت» والإجمالي (طلب المستخدم 2026-10-11)؛ دخلت + لم تدخل = الإجمالي */
+  enteredAmount: number;
+  totalAmount: number;
 }
 
 export function invoiceCounts(rows: Pick<LedgerEntry, "odooEntered" | "debit" | "credit">[]): InvoiceCounts {
   let entered = 0;
   let amount = 0;
+  let inAmount = 0;
   for (const r of rows) {
-    if (isEntered(r)) entered++;
-    else amount += invoiceAmount(r);
+    if (isEntered(r)) {
+      entered++;
+      inAmount += invoiceAmount(r);
+    } else amount += invoiceAmount(r);
   }
-  return { total: rows.length, entered, notEntered: rows.length - entered, notEnteredAmount: amount };
+  return {
+    total: rows.length,
+    entered,
+    notEntered: rows.length - entered,
+    notEnteredAmount: amount,
+    enteredAmount: inAmount,
+    totalAmount: inAmount + amount,
+  };
 }
 
 /**

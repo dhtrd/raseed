@@ -28,6 +28,14 @@
   line-height: 1.3;
 }
 
+/* المبلغ تحت العدد (طلب المستخدم 2026-10-11) */
+.counters dd.cAmtSum {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
 .filters {
   display: flex;
   flex-wrap: wrap;
@@ -203,6 +211,12 @@
 
   .counters dd {
     font-size: 22px;
+  }
+
+  .counters dd.cAmtSum {
+    font-size: 13px;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .filters {

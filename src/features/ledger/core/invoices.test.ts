@@ -20,7 +20,14 @@ describe("فهرس الفواتير", () => {
 
   it("دخلت + لم تدخل = الإجمالي في كل فلتر", () => {
     const c = invoiceCounts(rows);
-    expect(c).toEqual({ total: 4, entered: 1, notEntered: 3, notEnteredAmount: 5000 - 2000 + 700 });
+    expect(c).toEqual({
+      total: 4,
+      entered: 1,
+      notEntered: 3,
+      notEnteredAmount: 5000 - 2000 + 700,
+      enteredAmount: 10000,
+      totalAmount: 10000 + 5000 - 2000 + 700,
+    });
     expect(filterByOdoo(rows, "in")).toHaveLength(c.entered);
     expect(filterByOdoo(rows, "out")).toHaveLength(c.notEntered);
     expect(filterByOdoo(rows, "all")).toHaveLength(c.total);
