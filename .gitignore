@@ -33,3 +33,6 @@ playwright-report/
 playwright-report-auth/
 coverage/
 *.log
+
+# مخرجات البناء التزايدي لـ tsc -b
+*.tsbuildinfo
