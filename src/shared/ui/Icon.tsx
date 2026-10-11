@@ -95,6 +95,16 @@ const PATHS = {
       <path d="M13 13l4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </>
   ),
+  edit: (
+    <path
+      d="M3.5 16.5h3.2L15.6 7.6l-3.2-3.2L3.5 13.3v3.2zM11.2 5.6l3.2 3.2"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  ),
   reverse: (
     <path
       d="M5 8a6 6 0 1 1 1 7M5 3v5h5"

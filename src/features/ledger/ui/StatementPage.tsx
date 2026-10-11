@@ -7,8 +7,9 @@ import { SupplierCombobox } from "../../../shared/fields/components/SupplierComb
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
-import { RIYAL_PATH } from "../../../shared/ui/Icon";
+import { Icon, RIYAL_PATH } from "../../../shared/ui/Icon";
 import { useProfile } from "../../auth/session/SessionProvider";
+import { isManager } from "../../users/core/users";
 import {
   balanceState,
   buildStatement,
@@ -18,11 +19,13 @@ import {
   type StatementRow,
 } from "../core/ledger";
 import { sortRows, type SortState } from "../core/sort";
+import { watchLockedThrough } from "../data/invoicesRepo";
 import { openingBalance, watchStatement } from "../data/ledgerRepo";
 import { buildStatementExport } from "../core/exportModel";
 import { StatementPrint } from "../export/StatementPrint";
 import { downloadStatementXlsx } from "../export/statementXlsx";
 import { Amount, HeadSar, Money } from "./Amount";
+import { EditEntryDialog, type EditTarget } from "./EditEntryDialog";
 import { MobileSort, SortTh } from "./Sorting";
 import { SupplierIndex, useIndexCollapse } from "./SupplierIndex";
 import { useKeyedLoad, useKeyedWatch, useLedgerVersion, useVisibleSuppliers } from "./useLedgerData";
@@ -49,6 +52,16 @@ export function StatementPage() {
   const [sort, setSort] = useState<SortState<Col>>({ key: "date", dir: "desc" });
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [retry, setRetry] = useState(0);
+  // التعديل من الكشف (DECISIONS 2026-10-11، الخيار ب): للمالك والإدارة فقط، والقواعد تفرض ذلك
+  const canEdit = isManager(profile.role);
+  const [editing, setEditing] = useState<EditTarget | null>(null);
+  const [saved, setSaved] = useState<string | null>(null);
+  const lock = useKeyedWatch<string | null>(
+    canEdit ? "lock" : null,
+    watchLockedThrough,
+    "قراءة تاريخ الإقفال",
+  );
+  const cols = canEdit ? 10 : 9;
 
   const list = suppliers.status === "ready" ? suppliers.data : [];
   const supplier = sid ? list.find((x) => x.id === sid) : undefined;
@@ -219,6 +232,11 @@ export function StatementPage() {
             <Banner tone="err">{exportError}</Banner>
           </div>
         ) : null}
+        {saved ? (
+          <div className={s.err}>
+            <Banner tone="ok">{saved}</Banner>
+          </div>
+        ) : null}
 
         <p className={l.status} role="status" aria-live="polite">
           {loading ? "جارٍ تحميل الكشف…" : ""}
@@ -289,18 +307,41 @@ export function StatementPage() {
                       الرصيد
                       <HeadSar />
                     </SortTh>
+                    {canEdit ? (
+                      <th scope="col" className={s.cEdit}>
+                        <span className="sr-only">تعديل</span>
+                      </th>
+                    ) : null}
                   </tr>
                 </thead>
                 <tbody>
                   {rows.length === 0 ? (
                     <tr className={l.more}>
-                      <td colSpan={9}>{range ? "لا حركات في هذه الفترة." : "لا حركات لهذا المورد بعد."}</td>
+                      <td colSpan={cols}>
+                        {range ? "لا حركات في هذه الفترة." : "لا حركات لهذا المورد بعد."}
+                      </td>
                     </tr>
                   ) : null}
                   {rows.map((r) => (
                     <EntryRow
                       key={r.id}
                       r={r}
+                      cols={cols}
+                      onEdit={
+                        canEdit
+                          ? () => {
+                              setSaved(null);
+                              setEditing({
+                                entry: r,
+                                supplierName: supplier.name,
+                                issueId: null,
+                                sheetRow: null,
+                                reasons: [],
+                                suggestedDate: null,
+                              });
+                            }
+                          : undefined
+                      }
                       open={open.has(r.id)}
                       onToggle={() =>
                         setOpen((o) => {
@@ -326,6 +367,7 @@ export function StatementPage() {
                     <td className={`${l.amt} ${s.bal}`}>
                       <Amount h={st.closing} />
                     </td>
+                    {canEdit ? <td className={s.cEdit} /> : null}
                   </tr>
                 </tfoot>
               </table>
@@ -337,6 +379,18 @@ export function StatementPage() {
           </>
         ) : null}
       </main>
+
+      <EditEntryDialog
+        target={editing}
+        uid={profile.uid}
+        lockedThrough={lock.status === "ready" ? lock.data : null}
+        canUnlock={profile.role === "owner"}
+        onClose={() => setEditing(null)}
+        onSaved={(text) => {
+          setEditing(null);
+          setSaved(text);
+        }}
+      />
 
       <aside className={l.side} aria-label="ملخص الكشف">
         <section aria-labelledby="sm-h">
@@ -407,7 +461,14 @@ export function StatementPage() {
   );
 }
 
-function EntryRow(p: { r: StatementRow; open: boolean; onToggle: () => void }) {
+function EntryRow(p: {
+  r: StatementRow;
+  cols: number;
+  open: boolean;
+  onToggle: () => void;
+  /** للمالك والإدارة فقط */
+  onEdit?: () => void;
+}) {
   const { r } = p;
   const k = kindLabel(r);
   const desc = r.kind === "note" ? r.note : r.details;
@@ -420,7 +481,7 @@ function EntryRow(p: { r: StatementRow; open: boolean; onToggle: () => void }) {
   );
   return (
     <>
-      <tr className={r.kind === "note" ? s.noteRow : undefined}>
+      <tr className={`${r.kind === "note" ? s.noteRow : ""} ${p.onEdit ? s.withEdit : ""}`}>
         <th scope="row" className={s.cDate}>
           <span className={l.cellIn}>
             <button
@@ -464,10 +525,23 @@ function EntryRow(p: { r: StatementRow; open: boolean; onToggle: () => void }) {
         <td className={`${l.amt} ${s.bal}`} data-l="الرصيد">
           <Amount h={r.balance} />
         </td>
+        {p.onEdit ? (
+          <td className={s.cEdit}>
+            <button
+              type="button"
+              className={s.pen}
+              aria-label={`تعديل الحركة ${r.refNo || formatDate(r.date)}`}
+              title="تعديل الحركة"
+              onClick={p.onEdit}
+            >
+              <Icon name="edit" />
+            </button>
+          </td>
+        ) : null}
       </tr>
       {p.open ? (
         <tr className={l.rowDetail}>
-          <td colSpan={9}>
+          <td colSpan={p.cols}>
             <dl className={l.dlInline}>
               <div>
                 <dt>النوع</dt>

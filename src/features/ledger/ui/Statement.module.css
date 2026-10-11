@@ -297,6 +297,62 @@
   }
 }
 
+/* عمود «تعديل» (الخيار ب، proposals/2026-10-11-statement-edit.html) */
+.cEdit {
+  inline-size: 48px;
+  text-align: center;
+}
+
+.pen {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  padding: 0;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.pen svg {
+  inline-size: 18px;
+  block-size: 18px;
+}
+
+.pen:hover,
+.pen:focus-visible {
+  border-color: var(--accent);
+  background: var(--wash);
+}
+
+@media (width <= 600px) {
+  /* القلم في زاوية البطاقة، والبطاقة تفسح له مكاناً كي لا يغطي المبلغ */
+  .stmt tbody tr.withEdit {
+    position: relative;
+    padding-inline-end: 48px;
+  }
+
+  .stmt tbody .cEdit {
+    position: absolute;
+    inset-block-start: 12px;
+    inset-inline-end: 0;
+    inline-size: auto;
+  }
+
+  .stmt tfoot .cEdit,
+  .stmt thead .cEdit {
+    display: none;
+  }
+}
+
+@media print {
+  .cEdit {
+    display: none;
+  }
+}
+
 /* اللوحي: الفهرس يختار المورد، فلا حاجة لقائمة الاختيار */
 @media (width >= 601px) and (width <= 1279px) {
   .pickSup {
