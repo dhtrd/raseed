@@ -710,3 +710,24 @@
     padding-inline: 48px;
   }
 }
+
+/* «+ مورد جديد» أسفل الفهرس (الخيار ب، proposals/2026-10-11-suppliers.html) */
+.ixAdd {
+  display: flex;
+  align-items: center;
+  inline-size: 100%;
+  min-block-size: 44px;
+  margin-block-start: 8px;
+  padding: 0 10px;
+  border: 1.5px dashed var(--accent);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ixAdd:hover {
+  background: var(--wash);
+}

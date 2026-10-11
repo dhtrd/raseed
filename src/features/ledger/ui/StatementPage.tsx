@@ -10,6 +10,8 @@ import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
 import { Icon, RIYAL_PATH } from "../../../shared/ui/Icon";
 import { useProfile } from "../../auth/session/SessionProvider";
+import { SupplierDialog, type SupplierAction } from "../../suppliers/ui/SupplierDialog";
+import { SupplierMenu } from "../../suppliers/ui/SupplierMenu";
 import { isManager } from "../../users/core/users";
 import { balanceState, buildStatement, currentQuarter, kindLabel, type LedgerEntry } from "../core/ledger";
 import { withDeleted, type DeletedEntry, type DisplayRow } from "../core/deleteEntry";
@@ -67,6 +69,8 @@ export function StatementPage() {
   const [saved, setSaved] = useState<string | null>(null);
   const canDelete = profile.role === "owner";
   const [deleting, setDeleting] = useState<DeleteTarget | null>(null);
+  // إدارة الموردين (DECISIONS 2026-10-11، الخيار ب): المالك والإدارة
+  const [supAction, setSupAction] = useState<SupplierAction | null>(null);
   const lock = useKeyedWatch<string | null>(
     canEdit ? "lock" : null,
     watchLockedThrough,
@@ -180,19 +184,37 @@ export function StatementPage() {
                 className={l.ixItem}
                 aria-current={x.id === sid ? "page" : undefined}
               >
-                <span>{x.name}</span>
+                <span>
+                  {x.name}
+                  {x.archived ? <span className={l.tag}> مؤرشف</span> : null}
+                </span>
                 {x.id === sid && st ? <Amount h={st.closing} /> : null}
               </Link>
             </li>
           ))}
         </ul>
+        {canEdit && suppliers.status === "ready" ? (
+          <button type="button" className={l.ixAdd} onClick={() => setSupAction({ kind: "add" })}>
+            + مورد جديد
+          </button>
+        ) : null}
         {suppliers.status === "loading" ? <p className={l.ixNote}>جارٍ التحميل…</p> : null}
       </SupplierIndex>
 
       <main className={l.main} id="main">
         <div className={l.pageHead}>
           <div>
-            <h1 className={l.h1}>{supplier ? supplier.name : "كشف الحساب"}</h1>
+            <div className={s.titleRow}>
+              <h1 className={l.h1}>{supplier ? supplier.name : "كشف الحساب"}</h1>
+              {supplier?.archived ? <span className={l.tag}>مؤرشف</span> : null}
+              {supplier && canEdit ? (
+                <SupplierMenu
+                  supplier={supplier}
+                  onRename={() => setSupAction({ kind: "rename", supplier })}
+                  onArchive={() => setSupAction({ kind: "archive", supplier })}
+                />
+              ) : null}
+            </div>
             <p className={l.sub}>
               {!supplier
                 ? "اختر مورداً لعرض كشف حسابه."
@@ -223,6 +245,13 @@ export function StatementPage() {
                   if (id && id !== sid) navigate(`/statement/${id}`);
                 }}
               />
+            ) : null}
+            {canEdit && suppliers.status === "ready" ? (
+              <span className={s.addPick}>
+                <Button size="sm" variant="ghost" onClick={() => setSupAction({ kind: "add" })}>
+                  + مورد جديد
+                </Button>
+              </span>
             ) : null}
           </div>
           {supplier ? (
@@ -287,7 +316,7 @@ export function StatementPage() {
             </Button>
           </div>
         ) : null}
-        {sid && suppliers.status === "ready" && !supplier ? (
+        {sid && suppliers.status === "ready" && !("stale" in suppliers && suppliers.stale) && !supplier ? (
           <Banner tone="err">هذا المورد غير موجود أو غير مسند إليك. اختر مورداً من القائمة.</Banner>
         ) : null}
 
@@ -449,6 +478,18 @@ export function StatementPage() {
         onSaved={(text) => {
           setEditing(null);
           setSaved(text);
+        }}
+      />
+      <SupplierDialog
+        action={supAction}
+        uid={profile.uid}
+        all={list}
+        onClose={() => setSupAction(null)}
+        onDone={(text, id) => {
+          const added = supAction?.kind === "add";
+          setSupAction(null);
+          setSaved(text);
+          if (added) navigate(`/statement/${id}`);
         }}
       />
       <DeleteEntryDialog

@@ -422,3 +422,17 @@
     display: none;
   }
 }
+
+/* رأس الكشف: الاسم وحالة المورد وقائمة إجراءاته (الخيار ب، proposals/2026-10-11-suppliers.html) */
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+/* تحت اختيار المورد على الجوال والحاسوب؛ على اللوحي في الفهرس الجانبي (اختيار المورد مخفي هناك) */
+.addPick {
+  display: block;
+  margin-block-start: 6px;
+}
