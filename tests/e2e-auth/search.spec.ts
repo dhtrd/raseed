@@ -46,7 +46,9 @@ test("مورد بالاسم، ومبلغ بلا فواصل، والمحذوف ب
   await expect(del).toContainText("محذوف");
   await page.screenshot({ path: "test-results/search-1440.png" });
   await del.click();
-  await expect(page.getByText("الحركة المطلوبة محذوفة، فلا تظهر في الكشف.")).toBeVisible();
+  await expect(page.getByText(/الحركة المطلوبة محذوفة: تظهر مشطوبة/)).toBeVisible();
+  // تظهر مشطوبة بوسم «محذوف» لأن «إظهار المحذوف» يُفعَّل تلقائياً
+  await expect(page.locator("main tbody tr").filter({ hasText: "P10009" })).toContainText("محذوف");
 });
 
 test("مدخل البيانات: نتائج موردِيه فقط ولا محذوف", async ({ page }) => {

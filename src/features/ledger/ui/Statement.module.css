@@ -356,8 +356,62 @@
   }
 }
 
+/* المحذوفات (الخيار أ، proposals/2026-10-11-soft-delete.html): مشطوبة بخلفية حمراء خفيفة، بلا رصيد */
+.showDel {
+  display: flex;
+  align-items: center;
+  min-block-size: 44px;
+}
+
+.stmt tbody tr.gone > * {
+  background: var(--neg-wash);
+  color: var(--ink-2);
+}
+
+.stmt tbody tr.gone :is(.cDate .num, .cRef, .cRefno, .cDr, .cCr) {
+  text-decoration: line-through;
+  text-decoration-color: var(--neg);
+}
+
+.why {
+  display: block;
+  font-size: 13.5px;
+  color: var(--neg);
+  font-style: normal;
+}
+
+.restore {
+  min-block-size: 36px;
+  padding: 0 10px;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--accent);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.restore:hover,
+.restore:focus-visible {
+  background: var(--wash);
+}
+
+@media (width <= 600px) {
+  .stmt tbody tr.gone {
+    background: var(--neg-wash);
+  }
+
+  .stmt tbody tr.withRestore {
+    padding-inline-end: 96px;
+  }
+}
+
 @media print {
-  .cEdit {
+  .cEdit,
+  .showDel {
     display: none;
   }
 }

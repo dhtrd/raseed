@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 import { Link, useLocation, useNavigate, useParams } from "react-router";
 import { asPeriod, PeriodFilter, type Period } from "../../../shared/fields/components/PeriodFilter";
+import { Checkbox } from "../../../shared/fields/components/Checkbox";
 import { Segment } from "../../../shared/fields/components/Segment";
 import { SupplierCombobox } from "../../../shared/fields/components/SupplierCombobox";
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
@@ -10,21 +11,17 @@ import { Button } from "../../../shared/ui/Button";
 import { Icon, RIYAL_PATH } from "../../../shared/ui/Icon";
 import { useProfile } from "../../auth/session/SessionProvider";
 import { isManager } from "../../users/core/users";
-import {
-  balanceState,
-  buildStatement,
-  currentQuarter,
-  kindLabel,
-  type LedgerEntry,
-  type StatementRow,
-} from "../core/ledger";
+import { balanceState, buildStatement, currentQuarter, kindLabel, type LedgerEntry } from "../core/ledger";
+import { withDeleted, type DeletedEntry, type DisplayRow } from "../core/deleteEntry";
 import { sortRows, type SortState } from "../core/sort";
+import { watchDeleted } from "../data/deleteRepo";
 import { watchLockedThrough } from "../data/invoicesRepo";
 import { openingBalance, watchStatement } from "../data/ledgerRepo";
 import { buildStatementExport } from "../core/exportModel";
 import { StatementPrint } from "../export/StatementPrint";
 import { downloadStatementXlsx } from "../export/statementXlsx";
 import { Amount, HeadSar, Money } from "./Amount";
+import { DeleteEntryDialog, type DeleteTarget } from "./DeleteEntryDialog";
 import { EditEntryDialog, type EditTarget } from "./EditEntryDialog";
 import { MobileSort, SortTh } from "./Sorting";
 import { SupplierIndex, useIndexCollapse } from "./SupplierIndex";
@@ -55,9 +52,12 @@ export function StatementPage() {
   const [scope, setScope] = useState<Scope>(fromDashboard ? "period" : "all");
   const [period, setPeriod] = useState<Period>(() => fromDashboard ?? currentQuarter(today));
   const [sort, setSort] = useState<SortState<Col>>({ key: "date", dir: "desc" });
+  // المحذوفات (DECISIONS 2026-10-11، الخيار أ): يراها المالك والإدارة مشطوبة عند الطلب، والاسترجاع للمالك
+  const [showDeleted, setShowDeleted] = useState(highlightDeleted);
   if (navKey !== location.key) {
     setNavKey(location.key);
     if (highlightId) setScope("all");
+    if (highlightDeleted) setShowDeleted(true);
   }
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [retry, setRetry] = useState(0);
@@ -65,6 +65,8 @@ export function StatementPage() {
   const canEdit = isManager(profile.role);
   const [editing, setEditing] = useState<EditTarget | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
+  const canDelete = profile.role === "owner";
+  const [deleting, setDeleting] = useState<DeleteTarget | null>(null);
   const lock = useKeyedWatch<string | null>(
     canEdit ? "lock" : null,
     watchLockedThrough,
@@ -82,6 +84,12 @@ export function StatementPage() {
     (onData, onError) => watchStatement(supplier?.id ?? "", range, onData, onError),
     "قراءة حركات المورد",
   );
+  const deleted = useKeyedWatch<DeletedEntry[]>(
+    canEdit && watchKey ? `del|${watchKey}` : null,
+    (onData, onError) => watchDeleted(supplier?.id ?? "", range, onData, onError),
+    "قراءة الحركات المحذوفة",
+  );
+  const deletedList = useMemo(() => (deleted.status === "ready" ? deleted.data : []), [deleted]);
   // الحركات مباشرة؛ والرصيد الافتتاحي (للفترة فقط) يُعاد حسابه تلقائياً بعد أي تغيير لحركات المورد
   const live = useLedgerVersion(supplier && range ? [supplier.id] : null);
   const opening = useKeyedLoad(
@@ -100,11 +108,15 @@ export function StatementPage() {
   );
   const rows = useMemo(() => {
     if (!st) return [];
-    const pos = new Map(st.rows.map((r, i) => [r.id, i]));
-    return sortRows(st.rows, sort, (r, k) =>
+    const all: DisplayRow[] =
+      showDeleted && deletedList.length
+        ? withDeleted(st.opening, st.rows, deletedList)
+        : st.rows.map((r) => ({ ...r, deleted: false, deletion: null }));
+    const pos = new Map(all.map((r, i) => [r.id, i]));
+    return sortRows(all, sort, (r, k) =>
       k === "date" ? (pos.get(r.id) ?? 0) : k === "ref" ? r.mainRef : k === "balance" ? r.balance : r[k],
     );
-  }, [st, sort]);
+  }, [st, sort, showDeleted, deletedList]);
 
   const error =
     suppliers.status === "error"
@@ -113,7 +125,9 @@ export function StatementPage() {
         ? entries.message
         : opening.status === "error"
           ? opening.message
-          : null;
+          : deleted.status === "error"
+            ? deleted.message
+            : null;
   const loading = !error && Boolean(supplier) && !st;
   const closingLabel = range ? "الرصيد الختامي للفترة" : "الرصيد الكلي";
 
@@ -225,6 +239,13 @@ export function StatementPage() {
               {scope === "period" ? <PeriodFilter value={period} onChange={setPeriod} today={today} /> : null}
             </div>
           ) : null}
+          {supplier && canEdit ? (
+            <div className={s.showDel}>
+              <Checkbox checked={showDeleted} onChange={setShowDeleted}>
+                إظهار المحذوف (<span className="num">{deletedList.length}</span>)
+              </Checkbox>
+            </div>
+          ) : null}
           {exportModel ? (
             <div className={s.exports}>
               <Button variant="ghost" busy={xlsxBusy} onClick={() => void exportXlsx()}>
@@ -243,7 +264,10 @@ export function StatementPage() {
         ) : null}
         {highlightId && highlightDeleted ? (
           <div className={s.err}>
-            <Banner tone="info">الحركة المطلوبة محذوفة، فلا تظهر في الكشف.</Banner>
+            <Banner tone="info">
+              الحركة المطلوبة محذوفة: تظهر مشطوبة مع «إظهار المحذوف»، ولا تدخل في الرصيد
+              {canDelete ? "، ويمكن استرجاعها من زر «استرجاع» في صفها" : ""}.
+            </Banner>
           </div>
         ) : null}
         {saved ? (
@@ -342,6 +366,19 @@ export function StatementPage() {
                       r={r}
                       cols={cols}
                       highlighted={r.id === highlightId}
+                      onRestore={
+                        canDelete && r.deleted
+                          ? () => {
+                              setSaved(null);
+                              setDeleting({
+                                mode: "restore",
+                                entry: r,
+                                supplierName: supplier.name,
+                                deletion: r.deletion,
+                              });
+                            }
+                          : undefined
+                      }
                       onEdit={
                         canEdit
                           ? () => {
@@ -400,9 +437,27 @@ export function StatementPage() {
         uid={profile.uid}
         lockedThrough={lock.status === "ready" ? lock.data : null}
         canUnlock={profile.role === "owner"}
+        onDelete={
+          canDelete
+            ? (t) => {
+                setEditing(null);
+                setDeleting({ mode: "delete", entry: t.entry, supplierName: t.supplierName, deletion: null });
+              }
+            : undefined
+        }
         onClose={() => setEditing(null)}
         onSaved={(text) => {
           setEditing(null);
+          setSaved(text);
+        }}
+      />
+      <DeleteEntryDialog
+        target={deleting}
+        uid={profile.uid}
+        lockedThrough={lock.status === "ready" ? lock.data : null}
+        onClose={() => setDeleting(null)}
+        onDone={(text) => {
+          setDeleting(null);
           setSaved(text);
         }}
       />
@@ -477,7 +532,7 @@ export function StatementPage() {
 }
 
 function EntryRow(p: {
-  r: StatementRow;
+  r: DisplayRow;
   cols: number;
   /** الحركة المطلوبة من البحث العام */
   highlighted: boolean;
@@ -485,15 +540,19 @@ function EntryRow(p: {
   onToggle: () => void;
   /** للمالك والإدارة فقط */
   onEdit?: () => void;
+  /** للمالك وحده، على الحركة المحذوفة */
+  onRestore?: () => void;
 }) {
   const { r } = p;
+  const gone = r.deleted;
   const k = kindLabel(r);
   const desc = r.kind === "note" ? r.note : r.details;
   const tags = (
     <>
       <span className={`${s.typeTag} ${s[r.kind]}`}>{k.label}</span>
       {k.tag ? <span className={s.flag}>{k.tag}</span> : null}
-      {r.needsManualFix ? <span className={`${s.flag} ${s.review}`}>للمراجعة</span> : null}
+      {r.needsManualFix && !gone ? <span className={`${s.flag} ${s.review}`}>للمراجعة</span> : null}
+      {gone ? <span className={`${s.flag} ${s.review}`}>محذوف</span> : null}
     </>
   );
   return (
@@ -501,7 +560,7 @@ function EntryRow(p: {
       <tr
         className={`${r.kind === "note" ? s.noteRow : ""} ${p.onEdit ? s.withEdit : ""} ${
           p.highlighted ? s.hl : ""
-        }`}
+        } ${gone ? s.gone : ""} ${gone && p.onRestore ? s.withRestore : ""}`}
         data-entry={r.id}
         ref={(el) => {
           if (el && p.highlighted) el.scrollIntoView({ block: "center" });
@@ -540,17 +599,33 @@ function EntryRow(p: {
             </>
           ) : null}
         </td>
-        <td className={`${s.cDesc} ${l.hideTl}`}>{desc}</td>
+        <td className={`${s.cDesc} ${l.hideTl}`}>
+          {desc}
+          {r.deletion ? <span className={s.why}>حُذفت: {r.deletion.reason}</span> : null}
+        </td>
         <td className={`${l.amt} ${s.cDr}`} data-l={r.debit ? "مدين" : undefined}>
           {r.debit ? <Amount h={r.debit} /> : null}
         </td>
         <td className={`${l.amt} ${s.cCr}`} data-l={r.credit ? "دائن" : undefined}>
           {r.credit ? <Amount h={r.credit} /> : null}
         </td>
-        <td className={`${l.amt} ${s.bal}`} data-l="الرصيد">
-          <Amount h={r.balance} />
+        <td className={`${l.amt} ${s.bal}`} data-l={gone ? undefined : "الرصيد"}>
+          {gone ? <span aria-label="لا يدخل في الرصيد">—</span> : <Amount h={r.balance} />}
         </td>
-        {p.onEdit ? (
+        {p.onEdit && gone ? (
+          <td className={s.cEdit}>
+            {p.onRestore ? (
+              <button
+                type="button"
+                className={s.restore}
+                aria-label={`استرجاع الحركة ${r.refNo || formatDate(r.date)}`}
+                onClick={p.onRestore}
+              >
+                استرجاع
+              </button>
+            ) : null}
+          </td>
+        ) : p.onEdit ? (
           <td className={s.cEdit}>
             <button
               type="button"

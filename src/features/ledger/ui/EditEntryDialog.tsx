@@ -53,6 +53,8 @@ export function EditEntryDialog(p: {
   lockedThrough: IsoDate | null;
   /** المالك: يُرشد إلى فتح القفل مؤقتاً (DECISIONS 2026-10-11، الخيار ب) */
   canUnlock: boolean;
+  /** المالك وحده: ينقل إلى نافذة الحذف الناعم (DECISIONS 2026-10-11، الخيار أ) */
+  onDelete?: (target: EditTarget) => void;
   onClose: () => void;
   onSaved: (text: string) => void;
 }) {
@@ -65,6 +67,7 @@ export function EditEntryDialog(p: {
           uid={p.uid}
           lockedThrough={p.lockedThrough}
           canUnlock={p.canUnlock}
+          onDelete={p.onDelete}
           onClose={p.onClose}
           onSaved={p.onSaved}
         />
@@ -78,6 +81,7 @@ function EditBody(p: {
   uid: string;
   lockedThrough: IsoDate | null;
   canUnlock: boolean;
+  onDelete?: (target: EditTarget) => void;
   onClose: () => void;
   onSaved: (text: string) => void;
 }) {
@@ -393,6 +397,20 @@ function EditBody(p: {
           إلغاء
         </Button>
       </div>
+
+      {p.onDelete ? (
+        <div className={s.dangerZone}>
+          <span>للمالك فقط: تُحذف ناعماً ويمكن استرجاعها.</span>
+          <Button
+            variant="danger"
+            size="sm"
+            disabled={busy || lockedNow}
+            onClick={() => p.onDelete?.(p.target)}
+          >
+            حذف الحركة
+          </Button>
+        </div>
+      ) : null}
     </form>
   );
 }
