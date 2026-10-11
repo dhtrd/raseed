@@ -1,0 +1,310 @@
+<title>رصيد · نماذج تصدير الكشف</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ورقة الدفتر بلسانين (الطباعة A4 · ملف Excel)؛ كل لسان مقطّع خيارات أ/ب/ج ومعاينة بالحجم المصغّر، ثم أسئلة مفتوحة.
+   الألوان والخطوط من CHOSEN.md (الاتجاه 1 «الدفتر»)، بالوضع النهاري دائماً كما في النظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --neg-wash: #f8e8e9; --tab: #e2e8ee;
+  --mark-ink: #1e4634; --mark-acc: #b8752a;
+  --xl-grid: #d9dde3; --xl-head: #eef0f3; --xl-green: #1e6b45;
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.neg { color: var(--neg); }
+.head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.head svg { width: 38px; height: 38px; flex: none; }
+.head .w { font-family: var(--f-brand); font-weight: 600; font-size: 24px; }
+.lead { color: var(--ink-2); max-width: 70ch; margin-bottom: 18px; }
+.eg { display: inline-block; font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 6px; margin-inline-start: 6px; vertical-align: middle; }
+
+.tabs { display: flex; gap: 3px; }
+.tabs button { min-height: 46px; padding: 6px 20px 8px; border: 1px solid var(--rule); border-bottom: 0; border-radius: 10px 10px 0 0; background: var(--tab); color: var(--ink-2); font: inherit; font-weight: 500; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); font-weight: 700; box-shadow: inset 0 3px 0 var(--accent); position: relative; z-index: 2; margin-bottom: -1px; }
+.sheet { background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); padding: 22px clamp(14px, 3vw, 30px) 28px; }
+
+.seg { display: inline-flex; flex-wrap: wrap; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; margin-bottom: 14px; }
+.seg button { min-height: 44px; padding: 4px 16px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.opt { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+.why h3 { font-size: 18px; margin-bottom: 6px; }
+.why ul { margin: 0; padding-inline-start: 18px; color: var(--ink-2); font-size: 15px; }
+.why li + li { margin-top: 4px; }
+.why .pro { color: var(--ink); }
+.why .tag { display: inline-block; font-size: 13px; font-weight: 700; border: 1.5px solid var(--accent); color: var(--accent); border-radius: 4px; padding: 0 8px; margin-bottom: 8px; }
+@media (max-width: 860px) { .opt { grid-template-columns: 1fr; } }
+
+/* ---------- ورقة A4 مصغّرة ---------- */
+.stage { overflow-x: auto; background: var(--wash-2); border: 1px solid var(--rule); padding: 18px; }
+.a4 { --w: 595px; width: var(--w); aspect-ratio: 210 / 297; margin-inline: auto; background: #fff; color: #111; box-shadow: 0 2px 10px rgb(27 42 68 / 18%); padding: 28px 30px; font-size: 9.5px; line-height: 1.5; display: flex; flex-direction: column; }
+.a4.land { --w: 760px; aspect-ratio: 297 / 210; }
+.a4 table { width: 100%; border-collapse: collapse; }
+.a4 th, .a4 td { padding: 3px 4px; border-bottom: 0.6px solid #c9d3de; text-align: start; vertical-align: top; }
+.a4 thead th { border-bottom: 2px double #1b2a44; font-weight: 700; color: #46546d; white-space: nowrap; }
+.a4 .amt { text-align: left; border-inline-start: 0.6px solid #e2b6b9; white-space: nowrap; }
+.a4 tfoot td, .a4 tfoot th { border-bottom: 0; font-weight: 700; padding-top: 6px; }
+.a4 tfoot .amt .num { border-top: 0.8px solid #111; border-bottom: 2.5px double #111; padding: 1px 0; }
+.a4 .lh { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding-bottom: 8px; border-bottom: 2px double #1b2a44; margin-bottom: 10px; }
+.a4 .lh svg { width: 26px; height: 26px; }
+.a4 .brand { display: flex; align-items: center; gap: 6px; font-family: var(--f-brand); font-weight: 600; font-size: 15px; color: #1e4634; }
+.a4 h4 { margin: 0; font-size: 15px; }
+.a4 .sub { color: #46546d; }
+.a4 .sum { display: grid; grid-template-columns: repeat(4, 1fr); border: 0.8px solid #c9d3de; margin-bottom: 10px; }
+.a4 .sum div { padding: 5px 7px; }
+.a4 .sum div + div { border-inline-start: 0.8px solid #c9d3de; }
+.a4 .sum dt { color: #46546d; font-size: 8.5px; }
+.a4 .sum dd { margin: 0; font-weight: 700; font-size: 11px; }
+.a4 .foot { margin-top: auto; padding-top: 8px; border-top: 0.6px solid #c9d3de; display: flex; justify-content: space-between; color: #46546d; font-size: 8px; }
+.a4 .t { font-weight: 700; border-radius: 2px; padding: 0 3px; font-size: 8.5px; }
+.a4 .t.inv { background: #f8e8e9; color: #a3242b; }
+.a4 .t.misc { background: #e3eaf4; color: #2b4c7e; }
+.a4 .t.note { border: 0.6px solid #c9d3de; color: #46546d; }
+.a4 .flag { font-size: 8px; border: 0.6px dashed #a3242b; color: #a3242b; padding: 0 2px; border-radius: 2px; margin-inline-start: 2px; }
+.a4 .open td { background: #f5f8fb; font-weight: 700; }
+.a4 .note-row td { color: #46546d; font-style: italic; }
+.a4 .sign { display: flex; justify-content: space-between; gap: 30px; margin-top: 14px; color: #46546d; }
+.a4 .sign span { flex: 1; border-top: 0.6px solid #46546d; padding-top: 3px; text-align: center; }
+.a4 .cmp { font-size: 8.5px; }
+.a4 .cmp td, .a4 .cmp th { padding: 2px 3px; }
+.a4 .strip { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.a4 .bal { font-weight: 700; font-size: 13px; }
+
+/* ---------- معاينة Excel ---------- */
+.xl { min-width: 640px; background: #fff; border: 1px solid var(--xl-grid); font-family: Calibri, "Segoe UI", var(--f-text); font-size: 13px; color: #111; }
+.xl .bar { display: flex; align-items: center; gap: 8px; background: var(--xl-green); color: #fff; padding: 4px 10px; font-size: 12.5px; }
+.xl .fx { display: flex; gap: 8px; border-bottom: 1px solid var(--xl-grid); padding: 3px 8px; font-size: 12px; color: #444; direction: ltr; }
+.xl table { border-collapse: collapse; width: 100%; direction: rtl; }
+.xl td, .xl th { border: 1px solid var(--xl-grid); padding: 2px 6px; height: 22px; white-space: nowrap; }
+.xl .ch th, .xl .rh { background: var(--xl-head); color: #555; font-weight: 400; font-size: 11.5px; text-align: center; width: 30px; }
+.xl .ch th { width: auto; }
+.xl .h td { background: #1b2a44; color: #fff; font-weight: 700; }
+.xl .t1 { font-size: 16px; font-weight: 700; }
+.xl .n { text-align: left; font-family: Calibri, var(--f-num); font-variant-numeric: tabular-nums; direction: ltr; }
+.xl .neg { color: #c00000; }
+.xl .tot td { font-weight: 700; border-top: 2px solid #111; border-bottom: 3px double #111; }
+.xl .frz { border-bottom: 2px solid #9aa4b2; }
+.xl .sar { display: inline-block; width: 10px; height: 11px; vertical-align: -1px; margin-inline-start: 3px; }
+.xl .fl::after { content: "▾"; font-size: 9px; color: #666; margin-inline-start: 4px; border: 1px solid #bbb; padding: 0 2px; background: #fff; }
+.xl .sheets { display: flex; gap: 2px; border-top: 1px solid var(--xl-grid); background: var(--xl-head); padding: 3px 8px; font-size: 12px; }
+.xl .sheets span { padding: 2px 12px; background: #fff; border: 1px solid var(--xl-grid); }
+.xl .sheets span.on { font-weight: 700; color: var(--xl-green); border-bottom: 2px solid var(--xl-green); }
+.xl .fm { color: #2b4c7e; }
+.note { margin-top: 10px; font-size: 14px; color: var(--ink-2); }
+
+/* ---------- الأسئلة ---------- */
+.qs { margin-top: 26px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 8px; }
+.qs b { color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <div class="head">
+    <svg viewBox="0 0 120 120" aria-hidden="true"><rect x="30" y="36" width="76" height="16" rx="8" fill="#1e4634"/><rect x="14" y="68" width="76" height="16" rx="8" fill="#b8752a"/></svg>
+    <span class="w">رصيد</span>
+  </div>
+  <h1>نماذج تصدير كشف المورد</h1>
+  <p class="lead">اختر شكل الطباعة على ورق A4 (ويُحفظ PDF من نافذة الطباعة نفسها)، وشكل ملف Excel. الترتيب في الطباعة والتصدير من الأقدم إلى الأحدث كما في SPEC. البيانات هنا وهمية<span class="eg">مثال</span></p>
+
+  <div class="tabs" role="tablist" aria-label="نوع التصدير">
+    <button role="tab" id="tab-print" aria-selected="true" aria-controls="p-print">الطباعة A4 وPDF</button>
+    <button role="tab" id="tab-xl" aria-selected="false" aria-controls="p-xl">ملف Excel</button>
+  </div>
+
+  <section class="sheet" id="p-print" role="tabpanel" aria-labelledby="tab-print">
+    <div class="seg" role="group" aria-label="خيار الطباعة">
+      <button type="button" data-opt="pa" aria-pressed="true">أ. كشف رسمي عمودي</button>
+      <button type="button" data-opt="pb" aria-pressed="false">ب. مختصر كثيف</button>
+      <button type="button" data-opt="pc" aria-pressed="false">ج. أفقي كامل</button>
+    </div>
+
+    <div class="opt" data-pane="pa">
+      <div class="stage"><div class="a4" id="a4-a"></div></div>
+      <div class="why">
+        <span class="tag">أ. كشف رسمي عمودي</span>
+        <h3>لإرساله للمورد أو حفظه</h3>
+        <ul>
+          <li class="pro">رأس بالشعار واسم المورد والفترة، وأربعة أرقام: الافتتاحي والمدين والدائن والختامي.</li>
+          <li class="pro">سبعة أعمدة: التاريخ، النوع، الرقم المرجعي، البيان، مدين، دائن، الرصيد. المرجع والسند داخل البيان.</li>
+          <li class="pro">خانتا توقيع (أعدّه / اعتمده) في آخر صفحة، وترقيم «صفحة 1 من 3» ووقت الطباعة واسم من طبع.</li>
+          <li>نحو 30 حركة في الصفحة.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="opt" data-pane="pb" hidden>
+      <div class="stage"><div class="a4" id="a4-b"></div></div>
+      <div class="why">
+        <span class="tag">ب. مختصر كثيف</span>
+        <h3>لأكبر عدد من الحركات في أقل ورق</h3>
+        <ul>
+          <li class="pro">سطر رأس واحد بالمورد والفترة والرصيد الختامي، بلا مربع ملخص.</li>
+          <li class="pro">ستة أعمدة بخط أصغر: التاريخ، الرقم المرجعي، البيان، مدين، دائن، الرصيد.</li>
+          <li class="pro">نحو 50 حركة في الصفحة.</li>
+          <li>بلا وسوم ألوان ولا توقيع؛ مناسب للمراجعة الداخلية أكثر من الإرسال.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="opt" data-pane="pc" hidden>
+      <div class="stage"><div class="a4 land" id="a4-c"></div></div>
+      <div class="why">
+        <span class="tag">ج. أفقي كامل</span>
+        <h3>مطابق لجدول الشاشة بكل أعمدته</h3>
+        <ul>
+          <li class="pro">الأعمدة التسعة كما في الشاشة: التاريخ، النوع، المرجع، الرقم المرجعي، السند، البيان، مدين، دائن، الرصيد.</li>
+          <li class="pro">مربع الملخص في الرأس كالخيار أ.</li>
+          <li>ورق أفقي: نحو 22 حركة في الصفحة، فعدد الصفحات أكثر.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="p-xl" role="tabpanel" aria-labelledby="tab-xl" hidden>
+    <div class="seg" role="group" aria-label="خيار Excel">
+      <button type="button" data-opt="xa" aria-pressed="true">أ. ورقة واحدة برأس</button>
+      <button type="button" data-opt="xb" aria-pressed="false">ب. جدول قابل للفلترة + ورقة ملخص</button>
+    </div>
+
+    <div class="opt" data-pane="xa">
+      <div class="stage" id="xl-a"></div>
+      <div class="why">
+        <span class="tag">أ. ورقة واحدة برأس</span>
+        <h3>يشبه الطباعة داخل Excel</h3>
+        <ul>
+          <li class="pro">صفوف رأس: اسم المورد والفترة ووقت التصدير، ثم سطر «الرصيد الافتتاحي».</li>
+          <li class="pro">رمز الريال صورة في رؤوس أعمدة المبالغ (المعتمد)، والخلايا أرقام بتنسيق <span class="num">#,##0.00</span> قابلة للجمع.</li>
+          <li class="pro">الرصيد الجاري معادلة (<span class="num fm">=G7+E8-F8</span>) والإجمالي معادلة <span class="num">SUM</span>، فيصح الحساب إن عدّلت الملف.</li>
+          <li>صفوف الرأس فوق الجدول تعيق الفلترة والفرز في Excel.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="opt" data-pane="xb" hidden>
+      <div class="stage" id="xl-b"></div>
+      <div class="why">
+        <span class="tag">ب. جدول قابل للفلترة + ملخص</span>
+        <h3>للتحليل والفرز داخل Excel</h3>
+        <ul>
+          <li class="pro">ورقة «الحركات» تبدأ من الصف الأول جدولاً منسقاً (Excel Table) بأسهم فلترة وصف أول مثبّت.</li>
+          <li class="pro">ورقة «الملخص»: المورد والفترة والافتتاحي والمدين والدائن والختامي وعدد الحركات.</li>
+          <li class="pro">الرصيد الجاري قيمة ثابتة محسوبة من النظام (لأن الفرز داخل Excel يكسر المعادلات المتتابعة).</li>
+          <li>شكله أقل «رسمية» إن أُرسل للمورد.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">في الخيارين: الملاحظات صفوف بلا مبلغ، والحركات «للمراجعة» مميزة بلون خلية فاتح، واسم الملف: <span class="num">كشف-المورد (أ)-2026-10-11.xlsx</span>.</p>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الطباعة:</b> أ أم ب أم ج؟</li>
+      <li><b>Excel:</b> أ أم ب؟</li>
+      <li><b>الملاحظات</b> (بند بلا مبلغ) تظهر في الطباعة والتصدير؟ في SPEC مفترضة «نعم».</li>
+      <li><b>وسم «للمراجعة»</b> يظهر في الملف المُرسل للمورد، أم يُخفى ويبقى داخلياً؟</li>
+      <li><b>خانتا التوقيع</b> (أعدّه / اعتمده) مطلوبتان؟ وهل يظهر اسم من طبع؟</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  // بيانات وهمية: مورد (أ)، كل الحركات، بالهللات، من الأقدم للأحدث
+  const rows = [
+    ["2026-06-20", "inv", "10001", "P10001", "305", "فاتورة مشتريات - مستودع", 0, 100000],
+    ["2026-07-05", "misc", "0501", "MISC/2026/07/0501", "", "سداد الفاتورة 10001", 100000, 0],
+    ["2026-08-11", "inv", "10044", "P10044", "318", "فاتورة مشتريات - مستودع", 0, 712239],
+    ["2026-08-30", "misc", "0533", "MISC/2026/08/0533", "", "سداد جزئي", 500000, 0],
+    ["2026-10-02", "inv", "10102", "P10102", "341", "فاتورة مشتريات - فرع العمرة", 0, 250050],
+    ["2026-10-03", "note", "", "", "", "اتصال لتأكيد موعد التوريد", 0, 0],
+    ["2026-10-04", "inv", "10103", "P10103", "", "مرتجع بضاعة", 30000, 0, "مرتجع"],
+    ["2026-10-06", "misc", "0602", "MISC/2026/10/0602", "", "سداد قيمة فاتورة 10044", 212239, 0, null, true],
+    ["2026-10-08", "inv", "10131", "P10131", "352", "فاتورة مشتريات - مستودع", 0, 47612],
+  ];
+  const fmt = (h) => (h / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const d = (iso) => iso.split("-").reverse().join("/");
+  const kindAr = { inv: "فاتورة", misc: "قيد", note: "ملاحظة" };
+  let bal = 0, dr = 0, cr = 0;
+  const data = rows.map((r) => { bal += r[6] - r[7]; dr += r[6]; cr += r[7]; return { date: r[0], kind: r[1], ref: r[2], refNo: r[3], v: r[4], desc: r[5], dr: r[6], cr: r[7], tag: r[8], fix: r[9], bal }; });
+  const n = (h, blank) => (blank && !h ? "" : `<span class="num${h < 0 ? " neg" : ""}">${fmt(h)}</span>`);
+  const mark = `<svg viewBox="0 0 120 120" aria-hidden="true"><rect x="30" y="36" width="76" height="16" rx="8" fill="#1e4634"/><rect x="14" y="68" width="76" height="16" rx="8" fill="#b8752a"/></svg>`;
+  const sar = `<svg class="sar" viewBox="40 0 1145 1270" aria-hidden="true"><path fill="currentColor" d="M750,1119C730,1163,716,1211,711,1262L1136,1172C1156,1127,1169,1079,1174,1028ZM1136,901C1156,857,1169,809,1174,758L843,828V693L1136,631C1156,587,1169,538,1174,488L843,558V72C793,100,748,138,711,183V586L579,614V6C528,34,483,72,447,117V642L151,705C131,750,117,798,112,849L447,777V948L88,1024C68,1068,55,1117,50,1167L425,1088C456,1081,482,1063,499,1038L568,936C575,926,579,913,579,899V749L711,721V992Z"/></svg>`;
+  const typeCell = (r) => `<span class="t ${r.kind}">${kindAr[r.kind]}</span>${r.tag ? `<span class="flag" style="border-style:solid;border-color:#2b4c7e;color:#2b4c7e">${r.tag}</span>` : ""}${r.fix ? `<span class="flag">للمراجعة</span>` : ""}`;
+  const header = (sub) => `<div class="lh"><div><div class="brand">${mark}رصيد</div><div class="sub">كشف حساب مورد</div></div><div style="text-align:left"><h4>المورد (أ)</h4><div class="sub">${sub}</div></div></div>`;
+  const summary = `<dl class="sum"><div><dt>الرصيد الافتتاحي</dt><dd>${n(0)}</dd></div><div><dt>مجموع المدين</dt><dd>${n(dr)}</dd></div><div><dt>مجموع الدائن</dt><dd>${n(cr)}</dd></div><div><dt>الرصيد الختامي</dt><dd>${n(bal)}</dd></div></dl>`;
+  const foot = `<div class="foot"><span>طُبع 11/10/2026 الساعة 11:40 ص · بواسطة: صاحب المنشأة</span><span>صفحة 1 من 1</span></div>`;
+
+  // أ. رسمي عمودي (7 أعمدة)
+  document.getElementById("a4-a").innerHTML = header("كل الحركات حتى 11/10/2026") + summary +
+    `<table><thead><tr><th>التاريخ</th><th>النوع</th><th>الرقم المرجعي</th><th>البيان</th><th class="amt">مدين</th><th class="amt">دائن</th><th class="amt">الرصيد</th></tr></thead><tbody>` +
+    data.map((r) => `<tr class="${r.kind === "note" ? "note-row" : ""}"><td class="num">${d(r.date)}</td><td>${typeCell(r)}</td><td class="num">${r.refNo}</td><td>${r.desc}${r.v ? ` · سند <span class="num">${r.v}</span>` : ""}</td><td class="amt">${n(r.dr, 1)}</td><td class="amt">${n(r.cr, 1)}</td><td class="amt">${n(r.bal)}</td></tr>`).join("") +
+    `</tbody><tfoot><tr><th colspan="4">الرصيد الختامي</th><td class="amt">${n(dr)}</td><td class="amt">${n(cr)}</td><td class="amt">${n(bal)}</td></tr></tfoot></table>` +
+    `<div class="sign"><span>أعدّه</span><span>اعتمده</span></div>` + foot;
+
+  // ب. مختصر كثيف (6 أعمدة، بلا وسوم)
+  document.getElementById("a4-b").innerHTML =
+    `<div class="strip"><div><b style="font-size:12px">المورد (أ)</b> · <span class="sub" style="color:#46546d">كشف حساب · كل الحركات حتى 11/10/2026</span></div><div class="bal">الختامي ${n(bal)}</div></div>` +
+    `<table class="cmp"><thead><tr><th>التاريخ</th><th>الرقم المرجعي</th><th>البيان</th><th class="amt">مدين</th><th class="amt">دائن</th><th class="amt">الرصيد</th></tr></thead><tbody>` +
+    data.map((r) => `<tr class="${r.kind === "note" ? "note-row" : ""}"><td class="num">${d(r.date)}</td><td class="num">${r.refNo}</td><td>${r.desc}</td><td class="amt">${n(r.dr, 1)}</td><td class="amt">${n(r.cr, 1)}</td><td class="amt">${n(r.bal)}</td></tr>`).join("") +
+    `</tbody><tfoot><tr><th colspan="3">الإجمالي</th><td class="amt">${n(dr)}</td><td class="amt">${n(cr)}</td><td class="amt">${n(bal)}</td></tr></tfoot></table>` +
+    `<div class="foot"><span>رصيد · طُبع 11/10/2026 11:40 ص</span><span>صفحة 1 من 1</span></div>`;
+
+  // ج. أفقي كامل (9 أعمدة)
+  document.getElementById("a4-c").innerHTML = header("كل الحركات حتى 11/10/2026") + summary +
+    `<table><thead><tr><th>التاريخ</th><th>النوع</th><th>المرجع</th><th>الرقم المرجعي</th><th>السند</th><th>البيان</th><th class="amt">مدين</th><th class="amt">دائن</th><th class="amt">الرصيد</th></tr></thead><tbody>` +
+    data.map((r) => `<tr class="${r.kind === "note" ? "note-row" : ""}"><td class="num">${d(r.date)}</td><td>${typeCell(r)}</td><td class="num">${r.ref}</td><td class="num">${r.refNo}</td><td class="num">${r.v}</td><td>${r.desc}</td><td class="amt">${n(r.dr, 1)}</td><td class="amt">${n(r.cr, 1)}</td><td class="amt">${n(r.bal)}</td></tr>`).join("") +
+    `</tbody><tfoot><tr><th colspan="6">الرصيد الختامي</th><td class="amt">${n(dr)}</td><td class="amt">${n(cr)}</td><td class="amt">${n(bal)}</td></tr></tfoot></table>` + foot;
+
+  // Excel أ: ورقة واحدة برأس ومعادلات
+  const cols = ["A", "B", "C", "D", "E", "F", "G"];
+  const xn = (h, blank) => (blank && !h ? "" : `<span class="${h < 0 ? "neg" : ""}">${fmt(h)}</span>`);
+  let xa = `<div class="xl"><div class="bar">كشف-المورد (أ)-2026-10-11.xlsx</div><div class="fx"><b>fx</b><span class="fm">=G7+E8-F8</span></div><table><tr class="ch"><th></th>${cols.map((c) => `<th>${c}</th>`).join("")}</tr>`;
+  xa += `<tr><td class="rh">1</td><td colspan="7" class="t1">كشف حساب: المورد (أ)</td></tr>`;
+  xa += `<tr><td class="rh">2</td><td colspan="7">الفترة: كل الحركات حتى 11/10/2026 · صُدّر 11/10/2026 11:40 ص</td></tr>`;
+  xa += `<tr><td class="rh">3</td><td colspan="7"></td></tr>`;
+  xa += `<tr class="h"><td class="rh" style="background:var(--xl-head);color:#555">4</td><td>التاريخ</td><td>النوع</td><td>الرقم المرجعي</td><td>البيان</td><td>مدين${sar}</td><td>دائن${sar}</td><td>الرصيد${sar}</td></tr>`;
+  xa += `<tr><td class="rh">5</td><td colspan="6"><b>الرصيد الافتتاحي</b></td><td class="n">0.00</td></tr>`;
+  data.forEach((r, i) => { xa += `<tr${r.fix ? ' style="background:#fdf1e3"' : ""}><td class="rh">${i + 6}</td><td class="n">${d(r.date)}</td><td>${kindAr[r.kind]}${r.tag ? " · " + r.tag : ""}</td><td class="n">${r.refNo}</td><td>${r.desc}</td><td class="n">${xn(r.dr, 1)}</td><td class="n">${xn(r.cr, 1)}</td><td class="n">${xn(r.bal)}</td></tr>`; });
+  const last = data.length + 5;
+  xa += `<tr class="tot"><td class="rh">${last + 1}</td><td colspan="4">الرصيد الختامي</td><td class="n" title="=SUM(E6:E${last})">${fmt(dr)}</td><td class="n" title="=SUM(F6:F${last})">${fmt(cr)}</td><td class="n neg">${fmt(bal)}</td></tr>`;
+  xa += `</table><div class="sheets"><span class="on">الكشف</span></div></div>`;
+  document.getElementById("xl-a").innerHTML = xa;
+
+  // Excel ب: جدول قابل للفلترة + ملخص
+  let xb = `<div class="xl"><div class="bar">كشف-المورد (أ)-2026-10-11.xlsx</div><div class="fx"><b>fx</b><span>التاريخ</span></div><table><tr class="ch"><th></th>${["A","B","C","D","E","F","G","H","I"].map((c) => `<th>${c}</th>`).join("")}</tr>`;
+  xb += `<tr class="h frz"><td class="rh" style="background:var(--xl-head);color:#555">1</td>${["التاريخ","النوع","المرجع","الرقم المرجعي","السند","البيان",`مدين${sar}`,`دائن${sar}`,`الرصيد${sar}`].map((h) => `<td class="fl">${h}</td>`).join("")}</tr>`;
+  data.forEach((r, i) => { xb += `<tr${r.fix ? ' style="background:#fdf1e3"' : i % 2 ? ' style="background:#f5f8fb"' : ""}><td class="rh">${i + 2}</td><td class="n">${d(r.date)}</td><td>${kindAr[r.kind]}${r.tag ? " · " + r.tag : ""}</td><td class="n">${r.ref}</td><td class="n">${r.refNo}</td><td class="n">${r.v}</td><td>${r.desc}</td><td class="n">${xn(r.dr, 1)}</td><td class="n">${xn(r.cr, 1)}</td><td class="n">${xn(r.bal)}</td></tr>`; });
+  xb += `</table><div class="sheets"><span class="on">الحركات</span><span>الملخص</span></div></div>`;
+  xb += `<div class="xl" style="margin-top:14px;min-width:0;max-width:420px"><div class="bar">ورقة «الملخص»</div><table>` +
+    [["المورد", "المورد (أ)"], ["الفترة", "كل الحركات حتى 11/10/2026"], ["الرصيد الافتتاحي", fmt(0)], ["مجموع المدين", fmt(dr)], ["مجموع الدائن", fmt(cr)], ["الرصيد الختامي", `<span class="neg">${fmt(bal)}</span>`], ["عدد الحركات", "8 (وملاحظة واحدة)"], ["صُدّر", "11/10/2026 11:40 ص"]]
+      .map(([k, v], i) => `<tr><td class="rh">${i + 1}</td><td><b>${k}</b></td><td class="n">${v}</td></tr>`).join("") + `</table></div>`;
+  document.getElementById("xl-b").innerHTML = xb;
+
+  // التبديل بين الألسنة والخيارات
+  const tabs = document.querySelectorAll('[role="tab"]');
+  tabs.forEach((t) => t.addEventListener("click", () => {
+    tabs.forEach((x) => { const on = x === t; x.setAttribute("aria-selected", String(on)); document.getElementById(x.getAttribute("aria-controls")).hidden = !on; });
+  }));
+  document.querySelectorAll(".seg").forEach((seg) => {
+    const btns = seg.querySelectorAll("button");
+    btns.forEach((b) => b.addEventListener("click", () => {
+      btns.forEach((x) => { const on = x === b; x.setAttribute("aria-pressed", String(on)); seg.parentElement.querySelector(`[data-pane="${x.dataset.opt}"]`).hidden = !on; });
+    }));
+  });
+})();
+</script>
