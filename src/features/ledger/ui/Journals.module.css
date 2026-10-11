@@ -1,0 +1,227 @@
+/* فهرس القيود (الخيار أ، proposals/2026-10-11-journals.html): بنمط فهرس الفواتير */
+
+.counters {
+  display: flex;
+  margin: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+}
+
+.counters div {
+  padding: 6px 16px;
+  min-inline-size: 7em;
+}
+
+.counters div + div {
+  border-inline-start: 1px solid var(--rule);
+}
+
+.counters dt {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.counters dd {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 20px;
+  margin-block-end: 14px;
+}
+
+.pickSup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  inline-size: min(100%, 320px);
+}
+
+.clear {
+  align-self: flex-start;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.banner {
+  margin-block-end: 12px;
+}
+
+.cDesc {
+  min-inline-size: 12em;
+  font-size: 15.5px;
+}
+
+.flag {
+  display: inline-block;
+  margin-inline-start: 6px;
+  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-xs);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.review {
+  border: 1.5px dashed var(--neg);
+  color: var(--neg);
+}
+
+.mInline {
+  display: none;
+}
+
+.net {
+  font-weight: 700;
+}
+
+.cEdit {
+  inline-size: 48px;
+  text-align: center;
+}
+
+.pen {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  padding: 0;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.pen svg {
+  inline-size: 18px;
+  block-size: 18px;
+}
+
+.pen:hover,
+.pen:focus-visible {
+  border-color: var(--accent);
+  background: var(--wash);
+}
+
+.repBtn {
+  margin-block-start: 14px;
+}
+
+/* ≤ 600 جوال: كل قيد بطاقة، والقلم في زاويتها */
+@media (width <= 600px) {
+  .counters {
+    inline-size: 100%;
+  }
+
+  .counters div {
+    flex: 1;
+    min-inline-size: 0;
+    padding: 6px 8px;
+  }
+
+  .counters dd {
+    font-size: 13.5px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pickSup {
+    inline-size: 100%;
+  }
+
+  .jr tbody tr.row {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "ref ref" "date amt" "sup amt" "desc desc";
+    gap: 2px 12px;
+    padding: 14px 0;
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .jr tbody tr.withEdit {
+    padding-inline-end: 48px;
+  }
+
+  .cRef {
+    grid-area: ref;
+    font-size: 17px;
+  }
+
+  .cDate {
+    grid-area: date;
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+
+  .cSup {
+    grid-area: sup;
+    font-size: 15px;
+  }
+
+  .cV {
+    display: none !important;
+  }
+
+  .jr .cDesc {
+    grid-area: desc;
+    min-inline-size: 0;
+    font-size: 14.5px;
+    color: var(--ink-2);
+  }
+
+  .cDesc:empty {
+    display: none !important;
+  }
+
+  .cAmt {
+    grid-area: amt;
+    align-self: end;
+    font-size: 19px;
+    font-weight: 700;
+  }
+
+  .jr tbody .cEdit {
+    position: absolute;
+    inset-block-start: 12px;
+    inset-inline-end: 0;
+    inline-size: auto;
+  }
+
+  .jr thead .cEdit,
+  .jr tfoot .cEdit {
+    display: none;
+  }
+
+  .jr tfoot tr {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "lbl net";
+    padding: 16px 0 6px;
+    border-block-start: 2px solid var(--ink);
+  }
+
+  .jr tfoot td:not(.net) {
+    display: none;
+  }
+
+  .jr tfoot .net {
+    grid-area: net;
+    font-size: 20px;
+  }
+}

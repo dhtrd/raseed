@@ -33,6 +33,8 @@ export function AppShell() {
     { to: "/", label: "الأرصدة", end: true, core: true },
     { to: "/statement", label: "كشف الحساب", end: false, core: true },
     { to: "/invoices", label: "الفواتير", end: false, core: true },
+    // فهرس القيود (DECISIONS 2026-10-11): بجانب الفواتير، وعلى الجوال في الألسنة العلوية
+    { to: "/journals", label: "القيود", end: false, core: false },
     { to: "/add", label: "إضافة حركة", end: false, core: true },
   ];
   const bottom: BottomItem[] = [

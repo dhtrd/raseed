@@ -18,7 +18,7 @@ test("المالك على الجوال: خمس خانات، والألسنة ا�
   await expect(nav(page).getByRole("link")).toHaveText(["الأرصدة", "الكشف", "الفواتير", "إضافة", "المراجعة"]);
   await expect(nav(page).getByRole("link", { name: "الأرصدة" })).toHaveAttribute("aria-current", "page");
   const top = page.getByRole("navigation", { name: "أقسام الدفتر" });
-  await expect(top.getByRole("link")).toHaveText(["قفل الفترات", "المستخدمون", "الإسناد"]);
+  await expect(top.getByRole("link")).toHaveText(["القيود", "قفل الفترات", "المستخدمون", "الإسناد"]);
   await nav(page).getByRole("link", { name: "الفواتير" }).click();
   await expect(page).toHaveURL(/\/invoices$/);
   await expect(nav(page).getByRole("link", { name: "الفواتير" })).toHaveAttribute("aria-current", "page");
@@ -27,16 +27,18 @@ test("المالك على الجوال: خمس خانات، والألسنة ا�
   await page.screenshot({ path: "test-results/bottom-nav-360.png" });
 });
 
-test("مدخل البيانات على الجوال: أربع خانات بلا «المراجعة» ولا ألسنة علوية", async ({ page }) => {
+test("مدخل البيانات على الجوال: أربع خانات بلا «المراجعة»، و«القيود» وحدها في الأعلى", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 780 });
   await loginOk(page, ENTRY.email, ENTRY.password);
   await expect(nav(page).getByRole("link")).toHaveText(["الأرصدة", "الكشف", "الفواتير", "إضافة"]);
-  await expect(page.getByRole("navigation", { name: "أقسام الدفتر" })).toBeHidden();
+  await expect(page.getByRole("navigation", { name: "أقسام الدفتر" }).getByRole("link")).toHaveText([
+    "القيود",
+  ]);
 });
 
 test("الحاسوب: لا تنقل سفلي، والألسنة كاملة", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await loginOk(page, OWNER.email, OWNER.password);
   await expect(nav(page)).toBeHidden();
-  await expect(page.getByRole("navigation", { name: "أقسام الدفتر" }).getByRole("link")).toHaveCount(8);
+  await expect(page.getByRole("navigation", { name: "أقسام الدفتر" }).getByRole("link")).toHaveCount(9);
 });

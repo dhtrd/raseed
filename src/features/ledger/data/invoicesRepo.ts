@@ -35,6 +35,26 @@ export function watchInvoices(
   onData: (rows: LedgerEntry[]) => void,
   onError: (e: Error) => void,
 ): Unsubscribe {
+  return watchKind("inv", supplierIds, period, onData, onError);
+}
+
+/** قيود غير محذوفة بمستمع مباشر (فهرس القيود، DECISIONS 2026-10-11)، بالفهارس نفسها. */
+export function watchJournals(
+  supplierIds: string[] | null,
+  period: Period | null,
+  onData: (rows: LedgerEntry[]) => void,
+  onError: (e: Error) => void,
+): Unsubscribe {
+  return watchKind("misc", supplierIds, period, onData, onError);
+}
+
+function watchKind(
+  kind: "inv" | "misc",
+  supplierIds: string[] | null,
+  period: Period | null,
+  onData: (rows: LedgerEntry[]) => void,
+  onError: (e: Error) => void,
+): Unsubscribe {
   const { db } = firebase();
   const range: QueryConstraint[] = period
     ? [where("date", ">=", period.from), where("date", "<=", period.to)]
@@ -43,7 +63,7 @@ export function watchInvoices(
     query(
       collection(db, "entries"),
       ...extra,
-      where("kind", "==", "inv"),
+      where("kind", "==", kind),
       where("deleted", "==", false),
       ...range,
       orderBy("date"),

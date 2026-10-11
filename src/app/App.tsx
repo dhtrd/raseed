@@ -9,6 +9,7 @@ import { AssignPage } from "../features/users/ui/AssignPage";
 import { DashboardPage } from "../features/ledger/ui/DashboardPage";
 import { StatementPage } from "../features/ledger/ui/StatementPage";
 import { InvoicesPage } from "../features/ledger/ui/InvoicesPage";
+import { JournalsPage } from "../features/ledger/ui/JournalsPage";
 import { AddEntryPage } from "../features/ledger/ui/AddEntryPage";
 import { QuickEntryPage } from "../features/ledger/ui/QuickEntryPage";
 import { ReviewPage } from "../features/ledger/ui/ReviewPage";
@@ -96,6 +97,7 @@ const router = createBrowserRouter(
                 { index: true, element: <DashboardPage /> },
                 { path: "statement/:sid?", element: <StatementPage /> },
                 { path: "invoices/:sid?", element: <InvoicesPage /> },
+                { path: "journals/:sid?", element: <JournalsPage /> },
                 { path: "add/:sid?", element: <AddEntryPage /> },
                 { path: "quick/:sid?", element: <QuickEntryPage /> },
                 {
