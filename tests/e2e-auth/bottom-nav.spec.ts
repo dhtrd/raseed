@@ -18,7 +18,13 @@ test("المالك على الجوال: خمس خانات، والألسنة ا�
   await expect(nav(page).getByRole("link")).toHaveText(["الأرصدة", "الكشف", "الفواتير", "إضافة", "المراجعة"]);
   await expect(nav(page).getByRole("link", { name: "الأرصدة" })).toHaveAttribute("aria-current", "page");
   const top = page.getByRole("navigation", { name: "أقسام الدفتر" });
-  await expect(top.getByRole("link")).toHaveText(["القيود", "قفل الفترات", "المستخدمون", "الإسناد"]);
+  await expect(top.getByRole("link")).toHaveText([
+    "القيود",
+    "قفل الفترات",
+    "التدقيق",
+    "المستخدمون",
+    "الإسناد",
+  ]);
   await nav(page).getByRole("link", { name: "الفواتير" }).click();
   await expect(page).toHaveURL(/\/invoices$/);
   await expect(nav(page).getByRole("link", { name: "الفواتير" })).toHaveAttribute("aria-current", "page");
@@ -40,5 +46,16 @@ test("الحاسوب: لا تنقل سفلي، والألسنة كاملة", asy
   await page.setViewportSize({ width: 1440, height: 900 });
   await loginOk(page, OWNER.email, OWNER.password);
   await expect(nav(page)).toBeHidden();
-  await expect(page.getByRole("navigation", { name: "أقسام الدفتر" }).getByRole("link")).toHaveCount(9);
+  await expect(page.getByRole("navigation", { name: "أقسام الدفتر" }).getByRole("link")).toHaveCount(10);
 });
+
+for (const w of [1280, 1366, 1440, 1920]) {
+  test(`الحاسوب ${w}px: ألسنة المالك العشرة كلها ظاهرة بلا قص`, async ({ page }) => {
+    await page.setViewportSize({ width: w, height: 900 });
+    await loginOk(page, OWNER.email, OWNER.password);
+    const tabs = page.getByRole("navigation", { name: "أقسام الدفتر" });
+    await expect(tabs.getByRole("link")).toHaveCount(10);
+    const hidden = await tabs.evaluate((el) => el.scrollWidth - el.clientWidth);
+    expect(hidden).toBeLessThanOrEqual(1);
+  });
+}

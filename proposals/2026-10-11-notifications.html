@@ -1,0 +1,178 @@
+<title>رصيد · الإشعارات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاثة خيارات لعرض الإشعارات (نجاح، خطأ، تنبيه نظام) على شاشة نموذجية بين الحاسوب والجوال. الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --neg-wash: #f8e8e9; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --tab: #e2e8ee; --mark-acc: #b8752a; --ok: #2f6b45; --ok-wash: #e6f1ea;
+  --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.lead { color: var(--ink-2); max-width: 78ch; margin: 6px 0 16px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+.opt { margin-bottom: 34px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 82ch; }
+.opt ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; position: relative; width: 1000px; height: 520px; margin-inline: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.screen.phone { width: 360px; height: 680px; border-radius: 24px; }
+.mast { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--tab); border-bottom: 1px solid var(--rule); font-weight: 700; }
+.mast .brand { font-family: var(--f-brand); font-size: 20px; }
+.bell { margin-inline-start: auto; position: relative; width: 42px; height: 42px; display: grid; place-items: center; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--surface); cursor: pointer; color: var(--ink); }
+.bell svg { width: 20px; height: 20px; }
+.badge { position: absolute; top: -6px; inset-inline-start: -6px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--neg); color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center; font-family: var(--f-num); }
+.page { padding: 16px 20px; display: grid; gap: 12px; align-content: start; }
+.page h3 { font-size: 22px; }
+.demo { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 2px 16px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.btn.pri { background: var(--accent); color: var(--on-accent); }
+.btn.neg { border-color: var(--neg); color: var(--neg); }
+.fake { display: grid; gap: 8px; }
+.fake span { height: 14px; border-radius: 3px; background: var(--wash-2); }
+.bnav { display: none; }
+@container (width < 600px) { .bnav { display: block; position: absolute; inset-inline: 0; bottom: 0; height: 60px; border-top: 3px double var(--rule); background: var(--surface); } }
+
+/* أ: شريط داخل الصفحة */
+.banner { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-inline-start: 4px solid var(--accent); background: var(--wash); font-size: 15px; }
+.banner.ok { border-color: var(--ok); background: var(--ok-wash); }
+.banner.err { border-color: var(--neg); background: var(--neg-wash); }
+.banner .x { margin-inline-start: auto; background: none; border: 0; font-size: 20px; line-height: 1; cursor: pointer; color: var(--ink-2); }
+
+/* ب: إشعار عائم */
+.toasts { position: absolute; inset-inline-start: 16px; bottom: 16px; display: grid; gap: 8px; width: min(380px, calc(100% - 32px)); z-index: 5; }
+@container (width < 600px) { .toasts { inset-inline: 12px; width: auto; bottom: 72px; } }
+.toast { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 10px; align-items: start; padding: 10px 12px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 5px solid var(--accent); border-radius: 6px; box-shadow: var(--shadow); font-size: 15px; animation: in .18s ease-out; }
+.toast.ok { border-inline-start-color: var(--ok); }
+.toast.err { border-inline-start-color: var(--neg); }
+.toast .ic { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; color: #fff; background: var(--accent); }
+.toast.ok .ic { background: var(--ok); }
+.toast.err .ic { background: var(--neg); }
+.toast .act { grid-column: 2; display: flex; gap: 12px; }
+.toast .act button, .toast .x { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; color: var(--accent); cursor: pointer; }
+.toast .x { color: var(--ink-2); font-size: 20px; line-height: 1; }
+.toast .bar { grid-column: 1 / -1; height: 3px; background: var(--wash-2); border-radius: 2px; overflow: hidden; }
+.toast .bar i { display: block; height: 100%; background: var(--ok); animation: drain 5s linear forwards; }
+@keyframes in { from { transform: translateY(8px); opacity: 0; } }
+@keyframes drain { to { width: 0; } from { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .toast, .toast .bar i { animation: none; } }
+
+/* ج: مركز الإشعارات */
+.panel { position: absolute; top: 60px; inset-inline-end: 12px; width: 360px; max-width: calc(100% - 24px); background: var(--surface); border: 1px solid var(--rule); border-top: 3px solid var(--accent); border-radius: 6px; box-shadow: var(--shadow); z-index: 6; }
+@container (width < 600px) { .panel { inset-inline: 0; top: 0; width: auto; max-width: none; height: 100%; border-radius: 0; } }
+.panel header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.panel ul { list-style: none; margin: 0; padding: 0; }
+.panel li { padding: 10px 14px; border-bottom: 1px solid var(--rule); display: grid; gap: 2px; font-size: 15px; }
+.panel li.sys { border-inline-start: 4px solid var(--neg); }
+.panel li.warn { border-inline-start: 4px solid var(--mark-acc); }
+.panel li small { color: var(--ink-2); font-size: 13px; }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 10px; }
+.qs b { color: var(--accent); }
+.qs .sub { color: var(--ink-2); font-size: 15px; }
+</style>
+
+<div class="wrap">
+  <h1>الإشعارات: رسائل النجاح والخطأ وتنبيهات النظام</h1>
+  <p class="lead">حسب ورقة الاتفاق: لا عنصر بالشكل الافتراضي، ومنها الإشعارات. اليوم تظهر رسائل الحفظ والخطأ شرائط داخل كل شاشة بأشكال متقاربة. ثلاثة أشكال لتوحيدها، جرّب الأزرار في كل شاشة، بين الحاسوب والجوال.</p>
+  <div class="common">في الأشكال الثلاثة:
+    <ul>
+      <li>ثلاثة أنواع: نجاح (أخضر)، خطأ (أحمر، لا يختفي وحده)، معلومة (كحلي). والخطأ يقول ما حدث وكيف يُصلح.</li>
+      <li>تُقرأ لقارئ الشاشة (منطقة حالة)، وتحترم تقليل الحركة.</li>
+      <li>رسائل الحقول والتحذير الصارم للتكرار تبقى داخل النماذج كما هي.</li>
+    </ul>
+  </div>
+
+  <section class="opt" aria-labelledby="ha">
+    <div class="opt-head"><h2 id="ha">أ. شريط داخل الصفحة (توحيد الحالي)</h2><div class="seg" data-view="a"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">يبقى المكان كما اليوم أعلى المحتوى، بشكل واحد وزر إغلاق، والنجاح يختفي بعد 8 ثوانٍ.</p>
+    <ul class="pc"><li class="pro">أقل تغيير؛ مألوف.</li><li class="pro">لا يغطي شيئاً.</li><li>يدفع المحتوى للأسفل، وقد لا يُرى إن كانت الصفحة مُمرَّرة.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <div class="opt-head"><h2 id="hb">ب. إشعار عائم أسفل الشاشة</h2><div class="seg" data-view="b"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">بطاقة صغيرة أسفل الشاشة (فوق التنقل السفلي على الجوال) بخط زمني يتناقص، وإجراء سريع مثل «فتح الكشف» أو «تراجع» حيث يمكن.</p>
+    <ul class="pc"><li class="pro">يُرى أينما كان التمرير.</li><li class="pro">لا يحرّك المحتوى.</li><li>قد يغطي جزءاً أسفل الجدول لثوانٍ.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <div class="opt-head"><h2 id="hc">ج. إشعار عائم + مركز إشعارات بجرس</h2><div class="seg" data-view="c"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">كـ(ب) للحظي، وجرس في الرأس يجمع تنبيهات النظام الدائمة: فشل النسخ الاحتياطي، والفتح المؤقت للقفل، وملاحظات المراجعة الجديدة، بعدّاد أحمر.</p>
+    <ul class="pc"><li class="pro">مكان واحد لما يحتاج انتباه المالك.</li><li class="pro">تنبيه فشل النسخ الاحتياطي (في ورقة الاتفاق) له مكان.</li><li>عنصر إضافي في الرأس.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الشكل:</b> أ أم ب أم ج؟</li>
+      <li><b>مدة بقاء رسالة النجاح:</b> 5 ثوانٍ أم 8 أم حتى تُغلق؟ <span class="sub">(الخطأ يبقى دائماً حتى يُغلق)</span></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const MSG = {
+    ok: { t: "حُفظت الفاتورة P10011 للمورد (أ) وسُجّلت في التدقيق.", act: "فتح الكشف" },
+    err: { t: "تعذّر الحفظ: لا اتصال بالخادم. تحقق من الإنترنت ثم أعد المحاولة.", act: "إعادة المحاولة" },
+    info: { t: "تم تحديد 12 فاتورة كـ«دخلت»؛ 2 في فترة مقفلة لم تتغير.", act: "" },
+  };
+  const bell = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"/></svg>`;
+  function build(id, mode) {
+    const el = document.getElementById(id);
+    const st = { items: [], panel: false, seq: 0, sys: 3 };
+    const add = (k) => {
+      const n = { id: ++st.seq, k };
+      st.items = mode === "a" ? [n] : [...st.items.slice(-2), n];
+      if (k !== "err") setTimeout(() => { st.items = st.items.filter((x) => x.id !== n.id); draw(); }, mode === "a" ? 8000 : 5000);
+      draw();
+    };
+    const draw = () => {
+      const icon = { ok: "✓", err: "!", info: "i" };
+      const banners = mode === "a" ? st.items.map((n) => `<div class="banner ${n.k}" role="${n.k === "err" ? "alert" : "status"}"><span>${MSG[n.k].t}</span><button type="button" class="x" data-x="${n.id}" aria-label="إغلاق">×</button></div>`).join("") : "";
+      const toasts = mode !== "a" ? `<div class="toasts" role="region" aria-label="الإشعارات">${st.items.map((n) => `<div class="toast ${n.k}" role="${n.k === "err" ? "alert" : "status"}"><span class="ic" aria-hidden="true">${icon[n.k]}</span><span>${MSG[n.k].t}</span><button type="button" class="x" data-x="${n.id}" aria-label="إغلاق">×</button>${MSG[n.k].act ? `<span class="act"><button type="button" data-x="${n.id}">${MSG[n.k].act}</button></span>` : ""}${n.k !== "err" ? '<span class="bar"><i></i></span>' : ""}</div>`).join("")}</div>` : "";
+      const panel = mode === "c" && st.panel ? `<div class="panel" role="dialog" aria-label="مركز الإشعارات"><header><b>الإشعارات</b><button type="button" class="btn" data-close style="min-height:34px">إغلاق</button></header><ul><li class="sys"><b>فشل النسخ الاحتياطي اليومي</b><span>لم تُرفع نسخة 11:30 إلى Dropbox. سنعيد المحاولة غداً؛ راجع إعدادات النسخ.</span><small class="num">11/10/2026 11:31 ص</small></li><li class="warn"><b>الفترة مفتوحة مؤقتاً من 01/06/2026</b><span>أعد القفل من «قفل الفترات» بعد التصحيح.</span><small class="num">11/10/2026 09:02 ص</small></li><li><b>3 ملاحظات جديدة في مركز المراجعة</b><span>من إدخال اليوم (تاريخ مستقبلي).</span><small class="num">10/10/2026 04:15 م</small></li></ul></div>` : "";
+      el.innerHTML = `<div class="mast"><span class="brand">رصيد</span>${mode === "c" ? `<button type="button" class="bell" data-bell aria-label="الإشعارات (${st.sys} جديدة)">${bell}${st.sys ? `<span class="badge">${st.sys}</span>` : ""}</button>` : ""}</div><div class="page"><h3>إضافة حركة</h3>${banners}<div class="demo"><button type="button" class="btn pri" data-k="ok">حفظ (نجاح)</button><button type="button" class="btn neg" data-k="err">حفظ (خطأ)</button><button type="button" class="btn" data-k="info">معلومة</button></div><div class="fake" aria-hidden="true"><span style="width:80%"></span><span style="width:60%"></span><span style="width:90%"></span><span style="width:70%"></span><span style="width:85%"></span><span style="width:50%"></span></div></div><div class="bnav" aria-hidden="true"></div>${toasts}${panel}`;
+    };
+    el.addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      if (b.dataset.k) add(b.dataset.k);
+      else if (b.dataset.x) { st.items = st.items.filter((x) => String(x.id) !== b.dataset.x); draw(); }
+      else if ("bell" in b.dataset) { st.panel = !st.panel; st.sys = 0; draw(); }
+      else if ("close" in b.dataset) { st.panel = false; draw(); }
+    });
+    draw();
+  }
+  build("sa", "a"); build("sb", "b"); build("sc", "c");
+  document.querySelectorAll(".seg[data-view]").forEach((g) => g.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.getElementById("s" + g.dataset.view).classList.toggle("phone", b.dataset.v === "phone");
+  }));
+})();
+</script>

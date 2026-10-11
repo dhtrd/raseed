@@ -48,6 +48,8 @@ export function AppShell() {
     tabs.push(
       { to: "/review", label: "المراجعة", end: false, core: true },
       ...(profile.role === "owner" ? [{ to: "/lock", label: "قفل الفترات", end: false, core: false }] : []),
+      // سجل التدقيق للمالك والإدارة (DECISIONS 2026-10-11)
+      { to: "/audit", label: "التدقيق", end: false, core: false },
       { to: "/users", label: "المستخدمون", end: false, core: false },
       { to: "/assign", label: "الإسناد", end: false, core: false },
     );
