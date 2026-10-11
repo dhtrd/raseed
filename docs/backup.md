@@ -24,9 +24,11 @@
 1. افتح في المتصفح (ضع App key مكان `APP_KEY`):
    `https://www.dropbox.com/oauth2/authorize?client_id=APP_KEY&response_type=code&token_access_type=offline`
 2. وافق، وانسخ الرمز الذي يظهر (صالح دقائق).
-3. في الطرفية على جهازك:
+3. في الطرفية على جهازك (اكتب القيم الثلاث عند `read -s` فلا تُحفظ في سجل الأوامر):
    ```
-   curl https://api.dropboxapi.com/oauth2/token -d code=الرمز -d grant_type=authorization_code -u APP_KEY:APP_SECRET
+   read -s CODE; read -s KEY; read -s SECRET
+   curl https://api.dropboxapi.com/oauth2/token -d grant_type=authorization_code \
+     -d code="$CODE" -d client_id="$KEY" -d client_secret="$SECRET"
    ```
 4. من الناتج انسخ قيمة `refresh_token` فقط. لا تلصقه في أي محادثة أو ملف.
 
