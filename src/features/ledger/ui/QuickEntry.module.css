@@ -1,0 +1,487 @@
+/* الإدخال السريع (لسان 4 المعتمد في proposals/2026-10-10-fields-excel-components.html) */
+
+.sheet {
+  display: block !important;
+}
+
+.main {
+  max-inline-size: 1640px;
+}
+
+.muted {
+  color: var(--ink-2);
+  margin: 0;
+}
+
+.mobileNote {
+  display: none;
+}
+
+.qsup {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  padding: 10px 12px;
+  background: var(--wash-2);
+  border-inline-start: 4px double var(--margin);
+  margin-block-end: 12px;
+}
+
+.pick {
+  inline-size: min(100%, 340px);
+}
+
+.qlast {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.qlast b {
+  color: var(--ink);
+}
+
+.modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  align-items: flex-start;
+  margin-block-end: 12px;
+}
+
+.howto {
+  margin: 0;
+  padding-inline-start: 22px;
+  font-size: 15px;
+  max-inline-size: 70ch;
+}
+
+.howto li + li {
+  margin-block-start: 4px;
+}
+
+.tool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: flex-end;
+  padding: 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  margin-block-end: 12px;
+}
+
+.col {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.fl {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.fillField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  inline-size: 160px;
+}
+
+.fillField .cell {
+  background: var(--wash-2);
+  border-block-end: 1.5px solid var(--rule);
+}
+
+.pz {
+  inline-size: 100%;
+  min-block-size: 76px;
+  padding: 10px;
+  font-family: var(--f-num);
+  font-size: 14.5px;
+  direction: ltr;
+  text-align: start;
+  color: var(--ink);
+  background: var(--wash-2);
+  border: 1.5px dashed var(--rule);
+  border-radius: var(--r-sm);
+  resize: vertical;
+}
+
+.pz:focus {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-color: var(--accent);
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.h2 {
+  margin: 6px 0 0;
+  font-size: 17px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.outcome {
+  margin-block-end: 12px;
+}
+
+.msgErr {
+  display: block;
+  color: var(--neg);
+  font-size: 14.5px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.msgWarn {
+  display: block;
+  color: var(--ink-2);
+  font-size: 14.5px;
+}
+
+.msgInfo {
+  margin: 0;
+  color: var(--accent);
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+/* ---------- الجدول ---------- */
+.gridWrap {
+  overflow-x: auto;
+  border-block-start: 3px double var(--ink);
+}
+
+.qg,
+.pv {
+  border-collapse: collapse;
+  inline-size: 100%;
+  min-inline-size: 1080px;
+  font-size: 15px;
+}
+
+.pv {
+  min-inline-size: 760px;
+}
+
+.qg th,
+.pv th {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  text-align: start;
+  padding: 6px;
+  border-block-end: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+.qg td,
+.pv td {
+  padding: 3px 4px;
+  border-block-end: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+.pv td {
+  padding: 7px 6px;
+}
+
+.amt {
+  border-inline-start: 1px solid var(--margin);
+  text-align: end !important;
+}
+
+.cs {
+  inline-size: 52px;
+}
+
+.rn {
+  color: var(--ink-2);
+  font-size: 13.5px;
+  padding-block-start: 12px !important;
+  text-align: center;
+  inline-size: 28px;
+}
+
+.picked td {
+  background: var(--wash);
+}
+
+.cell {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 38px;
+  padding: 6px;
+  font: inherit;
+  font-size: 15.5px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-block-end: 1.5px solid transparent;
+  border-start-start-radius: 3px;
+  border-start-end-radius: 3px;
+}
+
+/* داخل خانة رقمية LTR: «end» = يمين، كما في نموذج اللسان 4 */
+.cell:global(.num) {
+  font-family: var(--f-num);
+  direction: ltr;
+  text-align: end;
+}
+
+.amt .cell {
+  text-align: start;
+}
+
+.cell:hover {
+  background: var(--wash-2);
+}
+
+.cell:focus {
+  background: var(--wash-2);
+  border-block-end-color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.cell:disabled {
+  opacity: 0.5;
+}
+
+.badCell {
+  border-block-end: 2px solid var(--neg);
+}
+
+.wDate {
+  inline-size: 128px;
+}
+
+.wRef {
+  inline-size: 110px;
+}
+
+.wV {
+  inline-size: 88px;
+}
+
+.wAmt {
+  inline-size: 124px;
+}
+
+.wDesc {
+  min-inline-size: 180px;
+}
+
+.dn {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-2);
+  padding-inline: 6px;
+  line-height: 1.3;
+}
+
+.tc {
+  white-space: nowrap;
+  padding-block-start: 6px !important;
+}
+
+.tbtn,
+.rbtn {
+  min-block-size: 32px;
+  padding: 0 10px;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--accent);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rbtn {
+  margin-inline-start: 4px;
+  padding: 0 8px;
+  border-color: var(--rule);
+  color: var(--ink-2);
+}
+
+.rbtn[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.tbtn:disabled,
+.rbtn:disabled,
+.rm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tagret {
+  display: inline-block;
+  margin-inline-start: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 0 6px;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-xs);
+  color: var(--accent);
+}
+
+.refc {
+  padding-block-start: 12px !important;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.dupc {
+  color: var(--neg);
+}
+
+.lockc {
+  display: block;
+  padding-block-start: 8px;
+  text-align: center;
+  color: var(--rule);
+}
+
+.st {
+  white-space: nowrap;
+  padding-block-start: 10px !important;
+}
+
+.qs {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.bad {
+  color: var(--neg);
+}
+
+.good {
+  color: var(--accent);
+}
+
+.dupS {
+  color: var(--mark-acc);
+}
+
+.rm {
+  margin-inline-start: 8px;
+  inline-size: 28px;
+  block-size: 28px;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rm:hover {
+  color: var(--neg);
+  border-color: var(--neg);
+}
+
+.mrow td {
+  padding: 2px 6px 10px !important;
+  background: var(--wash-2);
+}
+
+.dupbox {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  margin-block-start: 6px;
+  padding: 8px 10px;
+  border: 2px solid var(--neg);
+  border-inline-start-width: 6px;
+  background: var(--neg-wash);
+  border-radius: var(--r-sm);
+  font-size: 15px;
+}
+
+.dupbox b {
+  color: var(--neg);
+}
+
+.reason {
+  flex: 1;
+  min-inline-size: 220px;
+  background: var(--surface);
+  border-block-end: 1.5px solid var(--rule);
+}
+
+.qfoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-block-start: 14px;
+  padding-block-start: 14px;
+  border-block-start: 1px solid var(--rule);
+}
+
+.status {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.note {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--ink-2);
+  max-inline-size: 80ch;
+}
+
+.kbd {
+  display: inline-block;
+  direction: ltr;
+  unicode-bidi: isolate;
+  margin-inline-start: 6px;
+  font-family: var(--f-num);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 0 5px;
+  border: 1px solid currentcolor;
+  border-block-end-width: 2px;
+  border-radius: var(--r-sm);
+  opacity: 0.85;
+}
+
+/* الجوال: بطاقة الإدخال السريع بانتظار اعتماد نموذجها (DECISIONS 2026-10-11) */
+@media (width <= 600px) {
+  .desk {
+    display: none;
+  }
+
+  .mobileNote {
+    display: block;
+    padding: 14px 16px;
+    background: var(--wash-2);
+    border-inline-start: 4px solid var(--accent);
+    color: var(--ink);
+  }
+}

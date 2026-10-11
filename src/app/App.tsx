@@ -10,6 +10,7 @@ import { DashboardPage } from "../features/ledger/ui/DashboardPage";
 import { StatementPage } from "../features/ledger/ui/StatementPage";
 import { InvoicesPage } from "../features/ledger/ui/InvoicesPage";
 import { AddEntryPage } from "../features/ledger/ui/AddEntryPage";
+import { QuickEntryPage } from "../features/ledger/ui/QuickEntryPage";
 import { AppShell } from "./AppShell";
 import { ErrorScreen, LoadingScreen, RouteError } from "./Screens";
 
@@ -88,6 +89,7 @@ const router = createBrowserRouter(
                 { path: "statement/:sid?", element: <StatementPage /> },
                 { path: "invoices/:sid?", element: <InvoicesPage /> },
                 { path: "add/:sid?", element: <AddEntryPage /> },
+                { path: "quick/:sid?", element: <QuickEntryPage /> },
                 {
                   path: "users/:uid?",
                   element: (
