@@ -25,12 +25,13 @@ CLAUDE.md ← DECISIONS.md ← PROGRESS.md ← هذا الملف ← SPEC.md (v1
 ## المرحلة 4 — الخطوة التالية مباشرة
 1. ~~تصدير الكشف~~ أُنجز (`src/features/ledger/export`): Excel الخيار أ وطباعة A4 الخيار أ، والنماذج في `proposals/2026-10-11-statement-export.html`.
 2. ~~فهرس الفواتير وحالة Odoo~~ أُنجز (`InvoicesPage` + `data/invoicesRepo.ts` + `export/invoicesXlsx.ts`). المؤجل: استثناء المالك في الفترة المقفلة بسبب مكتوب (`odoo.lockReason`) مع شاشة قفل الفترات.
-3. ~~إضافة حركة~~ أُنجزت (`AddEntryPage` + `data/entriesRepo.ts` + `core/entryForm.ts`). **التالي مباشرة:** الإدخال السريع (لسان 4 في `proposals/2026-10-10-fields-excel-components.html`: دفعة لمورد واحد، الطرق الثلاث، الحفظ كله أو لا شيء، Ctrl+S)، ونموذج بطاقة الإدخال السريع على الجوال (2–3 خيارات) قبل بنائها. الشريط السفلي للجوال بعد اكتمال الأقسام الخمسة (قرار المستخدم).
+3. ~~إضافة حركة~~ و~~الإدخال السريع (حاسوب ولوحي)~~ أُنجزا (`AddEntryPage`، `QuickEntryPage`، `core/batch.ts`، `addEntriesChunked`). **التالي:** بطاقة الإدخال السريع على الجوال بعد اختيار المستخدم من `proposals/2026-10-11-quick-entry-mobile.html` (https://claude.ai/artifact/4wKpL3YreNN65WemWG7Dfd)، ثم مركز المراجعة (`review.html`). حد تقني: أقصى عملية ذرّية 7 حركات (DECISIONS 2026-10-11). الشريط السفلي للجوال بعد اكتمال الأقسام الخمسة.
 4. مركز المراجعة (`review.html`)، ثم تحويل تنبيهات اللوحة إلى روابط إليه.
 5. شريط التنقل السفلي على الجوال حين تكتمل أقسامه الخمسة.
 6. **نماذج ناقصة قبل بنائها** (2–3 خيارات واعتماد): فهرس القيود، قفل الفترات، التدقيق، الإشعارات، التحميل والفراغ، بطاقة الإدخال السريع على الجوال، والبحث داخل الكشف.
 
 ## صفحات مرجعية (Artifacts)
+- نموذج بطاقة الإدخال السريع على الجوال (بانتظار الاختيار): https://claude.ai/artifact/4wKpL3YreNN65WemWG7Dfd
 - نماذج تصدير الكشف (بانتظار الاختيار): https://claude.ai/artifact/HW1mbhy6a3d2aTSjMrz6WQ
 - نماذج المرحلة 2 المعتمدة: https://claude.ai/artifact/2GHbnzdf9UoxUVpkWZNPab
 - دليل مفتاح المالك: https://claude.ai/artifact/18DkupUkhDZmrF8nuhrCCP

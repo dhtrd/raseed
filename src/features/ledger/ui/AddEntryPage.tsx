@@ -267,6 +267,9 @@ export function AddEntryPage() {
             <h1 className={l.h1}>إضافة حركة</h1>
             <p className={l.sub}>فاتورة أو قيد أو ملاحظة في دفتر المورد</p>
           </div>
+          <Link className={`${l.linkBtn} ${s.quickLink}`} to={sid ? `/quick/${sid}` : "/quick"}>
+            الإدخال السريع (دفعة)
+          </Link>
         </div>
 
         {saved ? (

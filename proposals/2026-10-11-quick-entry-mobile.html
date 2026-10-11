@@ -1,0 +1,242 @@
+<title>رصيد · بطاقة الإدخال السريع للجوال</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاث شاشات جوال 360px جنباً إلى جنب (أ/ب/ج)، كل منها تفاعلي، ثم الأسئلة. الألوان والخطوط من CHOSEN.md، نهاري دائماً. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --neg-wash: #f8e8e9; --tab: #e2e8ee; --amber: #b8752a;
+  --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1240px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.lead { color: var(--ink-2); max-width: 72ch; margin: 6px 0 20px; }
+.eg { display: inline-block; font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 6px; margin-inline-start: 6px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 26px; align-items: start; }
+.opt h2 { font-size: 19px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 10px; min-height: 5.1em; }
+.opt ul { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); }
+.opt li.pro { color: var(--ink); }
+
+/* إطار الجوال */
+.phone { width: 360px; max-width: 100%; height: 720px; margin-inline: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 26px; box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; position: relative; }
+.top { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 8px; border-bottom: 3px double var(--rule); }
+.top b { font-size: 17px; }
+.top .sup { font-size: 13.5px; color: var(--ink-2); }
+.scroll { flex: 1; overflow-y: auto; padding: 12px 14px 90px; }
+.bar { position: absolute; inset-inline: 0; bottom: 0; background: var(--surface); border-top: 2px solid var(--accent); box-shadow: var(--shadow); padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+.bar .cnt { flex: 1; font-size: 14px; }
+.bar .cnt b { font-family: var(--f-num); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; padding: 4px 16px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 15.5px; cursor: pointer; }
+.btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn.ghost { border-color: var(--rule); color: var(--ink); }
+.btn.wide { width: 100%; }
+.btn.sm { min-height: 44px; font-size: 14.5px; }
+
+.fl { font-size: 13.5px; font-weight: 700; color: var(--ink-2); display: block; margin-bottom: 2px; }
+.in { width: 100%; min-height: 46px; padding: 8px 10px; background: var(--wash-2); color: var(--ink); border: 0; border-bottom: 1.5px solid var(--rule); border-radius: 4px 4px 0 0; font: inherit; font-size: 16.5px; }
+.in.n { font-family: var(--f-num); direction: ltr; text-align: right; }
+.in:focus { outline: none; border-bottom-color: var(--accent); background: var(--wash); }
+.in.bad { border-bottom: 2px solid var(--neg); }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.seg { display: flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { flex: 1; min-height: 44px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.refno { font-family: var(--f-num); font-weight: 700; font-size: 15px; color: var(--ink-2); }
+.st { font-size: 13px; font-weight: 700; }
+.st.ok { color: var(--accent); } .st.bad { color: var(--neg); } .st.dup { color: var(--amber); }
+.err { color: var(--neg); font-size: 13.5px; font-weight: 700; }
+.amt { font-family: var(--f-num); font-weight: 700; font-size: 18px; direction: ltr; }
+.sug { font-size: 12px; color: var(--ink-2); }
+
+/* أ. بطاقة لكل صف */
+.card { border: 1px solid var(--rule); border-inline-start: 4px solid var(--rule); border-radius: 6px; padding: 10px 12px 12px; margin-bottom: 12px; display: grid; gap: 8px; }
+.card.cur { border-inline-start-color: var(--accent); background: var(--wash-2); }
+.card .hd { display: flex; justify-content: space-between; align-items: center; }
+.card .hd .n { font-family: var(--f-num); color: var(--ink-2); font-size: 13px; }
+
+/* ب. نموذج ثابت + قائمة */
+.form { border: 1px solid var(--rule); border-top: 3px double var(--ink); padding: 10px 12px 12px; display: grid; gap: 8px; background: var(--surface); }
+.list { margin-top: 14px; }
+.list h3 { font-size: 15px; color: var(--ink-2); margin-bottom: 4px; }
+.line { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 2px; border-bottom: 1px solid var(--rule); cursor: pointer; }
+.line:hover { background: var(--wash-2); }
+.line .d { font-size: 13.5px; color: var(--ink-2); }
+.line.editing { background: var(--wash); box-shadow: inset -4px 0 0 var(--accent); }
+
+/* ج. خطوة لكل صف */
+.prog { display: flex; gap: 4px; margin-bottom: 12px; }
+.prog i { flex: 1; height: 5px; border-radius: 3px; background: var(--tab); }
+.prog i.on { background: var(--accent); }
+.prog i.bad { background: var(--neg); }
+.step { display: grid; gap: 12px; }
+.step .big { font-size: 22px; min-height: 56px; }
+.nav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+.review .line { cursor: default; }
+
+.qs { margin-top: 28px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 8px; }
+.qs b { color: var(--accent); }
+.common { margin-top: 18px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <h1>بطاقة الإدخال السريع على الجوال</h1>
+  <p class="lead">على الحاسوب واللوحي يعمل الإدخال السريع جدولاً. على الجوال يحتاج شكلاً آخر. هذه ثلاثة خيارات تفاعلية بعرض جوال 360px: اكتب في الحقول وجرّب الإضافة. المورد والأرقام وهمية<span class="eg">مثال</span>. القواعد واحدة في الخيارات الثلاثة: المرجع التالي مقترح، التحقق نفسه، الحفظ بعد فحص كل الصفوف على أجزاء.</p>
+
+  <div class="opts">
+    <section class="opt" aria-labelledby="ha">
+      <h2 id="ha">أ. بطاقة لكل صف</h2>
+      <p class="why">الجدول نفسه، لكن كل صف بطاقة كاملة الحقول تحت التي قبلها. ما تراه هو الدفعة كلها.</p>
+      <ul><li class="pro">كل الصفوف ظاهرة وقابلة للتعديل في مكانها.</li><li class="pro">أقرب إلى سلوك الحاسوب.</li><li>طويلة مع 20 صفاً؛ تمرير كثير.</li></ul>
+      <div class="phone" id="pa"></div>
+    </section>
+
+    <section class="opt" aria-labelledby="hb">
+      <h2 id="hb">ب. نموذج ثابت + قائمة الدفعة</h2>
+      <p class="why">نموذج صغير أعلى الشاشة لصف واحد، و«إضافة إلى الدفعة» تنقله سطراً مختصراً في القائمة تحته. النقر على سطر يعيده للنموذج للتعديل.</p>
+      <ul><li class="pro">الأسرع بإبهام واحد: الحقول نفسها في المكان نفسه.</li><li class="pro">القائمة مختصرة تُقرأ بلمحة.</li><li>التعديل سطراً سطراً لا في مكانه.</li></ul>
+      <div class="phone" id="pb"></div>
+    </section>
+
+    <section class="opt" aria-labelledby="hc">
+      <h2 id="hc">ج. خطوة لكل صف</h2>
+      <p class="why">صف واحد بملء الشاشة بحقول كبيرة، و«التالي» يفتح الصف التالي. شريط تقدّم أعلى الشاشة، ومراجعة الدفعة كلها قبل الحفظ.</p>
+      <ul><li class="pro">حقول كبيرة وأخطاء أقل على شاشة صغيرة.</li><li class="pro">مراجعة واضحة قبل الحفظ.</li><li>أبطأ للتصحيح المتفرق بين الصفوف.</li></ul>
+      <div class="phone" id="pc"></div>
+    </section>
+  </div>
+
+  <p class="common"><b>في الخيارات الثلاثة:</b> اللصق من الإكسل زر «لصق» يفتح مربعاً ومعاينة كما في الحاسوب. التعبئة التسلسلية لا تظهر لأن المرجع المقترح يتسلسل وحده. شريط الحفظ ثابت أسفل الشاشة، والتحذير الصارم للتكرار داخل البطاقة نفسها بتأكيد وسبب.</p>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الشكل:</b> أ أم ب أم ج؟</li>
+      <li><b>التعبئة التسلسلية</b> على الجوال: تبقى مخفية كما هنا، أم تريدها؟</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  // بيانات وهمية ومنطق مبسّط للعرض فقط
+  const SAVED = { "12290": "المورد (د)" };
+  let last = "12291";
+  const inc = (s) => String(+s + 1).padStart(s.length, "0");
+  const fmt = (v) => { const n = +String(v).replace(/,/g, ""); return n ? n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ""; };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const status = (r) => {
+    if (r.ref && r.ref.length !== 5) return '<span class="st bad">✗ المرجع 5 أرقام</span>';
+    if (SAVED[r.ref]) return '<span class="st dup">⚠ مكرر</span>';
+    if (!r.amt) return '<span class="st bad">✗ المبلغ</span>';
+    return '<span class="st ok">✓ جاهز</span>';
+  };
+  const top = (t) => `<div class="top"><div><b>${t}</b><div class="sup">المورد (أ) · آخر فاتورة <span class="num">12291</span></div></div><button class="btn ghost sm" type="button">لصق</button></div>`;
+  const seed = () => [
+    { date: "10/10/2026", ref: "12292", amt: "4,750.00", desc: "فاتورة مشتريات" },
+    { date: "10/10/2026", ref: "12293", amt: "1,825.50", desc: "" },
+  ];
+
+  // أ. بطاقة لكل صف
+  (function () {
+    const el = document.getElementById("pa"); let rows = seed(); let cur = rows.length;
+    rows.push({ date: "10/10/2026", ref: "12294", amt: "", desc: "" });
+    const card = (r, i) => `<div class="card${i === cur ? " cur" : ""}" data-i="${i}">
+      <div class="hd"><span class="n">#${i + 1} · فاتورة</span>${status(r)}</div>
+      <div class="g2"><label><span class="fl">التاريخ</span><input class="in n" data-f="date" value="${esc(r.date)}" inputmode="decimal"></label>
+      <label><span class="fl">المرجع</span><input class="in n${r.ref.length !== 5 ? " bad" : ""}" data-f="ref" value="${esc(r.ref)}" inputmode="numeric"></label></div>
+      <span class="refno">P${esc(r.ref)}</span>
+      <label><span class="fl">دائن ﷼</span><input class="in n" data-f="amt" value="${esc(r.amt)}" inputmode="decimal" placeholder="0.00"></label>
+      <label><span class="fl">التفاصيل</span><input class="in" data-f="desc" value="${esc(r.desc)}"></label></div>`;
+    const draw = () => {
+      const ok = rows.filter((r) => r.amt).length;
+      el.innerHTML = top("الإدخال السريع") + `<div class="scroll">${rows.map(card).join("")}<button class="btn ghost wide" type="button" data-add>+ صف جديد</button></div>
+        <div class="bar"><span class="cnt"><b>${rows.length}</b> صف · <b>${ok}</b> جاهز</span><button class="btn primary" type="button">حفظ الدفعة</button></div>`;
+    };
+    el.addEventListener("input", (e) => { const c = e.target.closest(".card"); if (!c) return; rows[+c.dataset.i][e.target.dataset.f] = e.target.value; });
+    el.addEventListener("focusout", (e) => { const c = e.target.closest(".card"); if (!c) return; const r = rows[+c.dataset.i]; if (e.target.dataset.f === "amt") r.amt = fmt(r.amt); draw(); });
+    el.addEventListener("click", (e) => { if (e.target.closest("[data-add]")) { const p = rows[rows.length - 1]; rows.push({ date: p.date, ref: inc(p.ref), amt: "", desc: "" }); cur = rows.length - 1; draw(); el.querySelector(`.card[data-i="${cur}"] [data-f="amt"]`).focus(); } });
+    draw();
+  })();
+
+  // ب. نموذج ثابت + قائمة
+  (function () {
+    const el = document.getElementById("pb"); let rows = seed(); let edit = -1;
+    let f = { date: "10/10/2026", ref: "12294", amt: "", desc: "" };
+    const draw = () => {
+      el.innerHTML = top("الإدخال السريع") + `<div class="scroll">
+        <div class="form"><div class="seg" role="group" aria-label="النوع"><button aria-pressed="true" type="button">فاتورة</button><button aria-pressed="false" type="button">قيد</button></div>
+          <div class="g2"><label><span class="fl">التاريخ</span><input class="in n" data-f="date" value="${esc(f.date)}" inputmode="decimal"></label>
+          <label><span class="fl">المرجع <span class="sug">${edit < 0 ? "مقترح" : ""}</span></span><input class="in n" data-f="ref" value="${esc(f.ref)}" inputmode="numeric"></label></div>
+          <label><span class="fl">دائن ﷼</span><input class="in n" data-f="amt" value="${esc(f.amt)}" inputmode="decimal" placeholder="0.00"></label>
+          <label><span class="fl">التفاصيل</span><input class="in" data-f="desc" value="${esc(f.desc)}"></label>
+          ${SAVED[f.ref] ? '<p class="err">⚠ الرقم P' + esc(f.ref) + " مسجّل لـ " + SAVED[f.ref] + ": أكّد وسجّل السبب.</p>" : ""}
+          <button class="btn primary wide" type="button" data-add>${edit < 0 ? "إضافة إلى الدفعة ↓" : "حفظ التعديل في السطر " + (edit + 1)}</button></div>
+        <div class="list"><h3>الدفعة (<span class="num">${rows.length}</span>)</h3>${rows.map((r, i) => `<div class="line${i === edit ? " editing" : ""}" data-i="${i}"><div><span class="num">P${esc(r.ref)}</span> <span class="d">· ${esc(r.date)}</span><div class="d">${esc(r.desc || "—")}</div></div><div style="text-align:left"><div class="amt">${esc(r.amt)}</div>${status(r)}</div></div>`).join("")}</div></div>
+        <div class="bar"><span class="cnt"><b>${rows.length}</b> صف · المجموع <b>${fmt(rows.reduce((a, r) => a + +String(r.amt).replace(/,/g, ""), 0))}</b></span><button class="btn primary" type="button">حفظ الدفعة</button></div>`;
+    };
+    el.addEventListener("input", (e) => { if (e.target.dataset.f) f[e.target.dataset.f] = e.target.value; });
+    el.addEventListener("focusout", (e) => { if (e.target.dataset.f === "amt") { f.amt = fmt(f.amt); draw(); } else if (e.target.dataset.f === "ref") draw(); });
+    el.addEventListener("click", (e) => {
+      if (e.target.closest("[data-add]")) {
+        if (!f.amt) { el.querySelector('[data-f="amt"]').classList.add("bad"); el.querySelector('[data-f="amt"]').focus(); return; }
+        if (edit >= 0) rows[edit] = f; else rows.push(f);
+        const p = rows[rows.length - 1]; f = { date: p.date, ref: inc(p.ref), amt: "", desc: "" }; edit = -1; draw();
+        el.querySelector('[data-f="amt"]').focus(); return;
+      }
+      const ln = e.target.closest(".line"); if (ln) { edit = +ln.dataset.i; f = { ...rows[edit] }; draw(); }
+    });
+    draw();
+  })();
+
+  // ج. خطوة لكل صف
+  (function () {
+    const el = document.getElementById("pc"); let rows = seed(); rows.push({ date: "10/10/2026", ref: "12294", amt: "", desc: "" }); let i = 2; let review = false;
+    const draw = () => {
+      const bars = rows.map((r, k) => `<i class="${k === i && !review ? "on" : r.amt ? "on" : ""}"></i>`).join("");
+      if (review) {
+        el.innerHTML = top("مراجعة الدفعة") + `<div class="scroll review"><div class="prog">${bars}</div>${rows.map((r, k) => `<div class="line" data-i="${k}"><div><span class="num">P${esc(r.ref)}</span> <span class="d">· ${esc(r.date)}</span><div class="d">${esc(r.desc || "—")}</div></div><div style="text-align:left"><div class="amt">${esc(r.amt)}</div>${status(r)}</div></div>`).join("")}
+          <button class="btn ghost wide" type="button" data-back style="margin-top:12px">رجوع للتعديل</button></div>
+          <div class="bar"><span class="cnt"><b>${rows.length}</b> صف</span><button class="btn primary" type="button">حفظ الدفعة</button></div>`;
+        return;
+      }
+      const r = rows[i];
+      el.innerHTML = top(`الصف ${i + 1} من ${rows.length}`) + `<div class="scroll"><div class="prog">${bars}</div><div class="step">
+        <div class="seg" role="group" aria-label="النوع"><button aria-pressed="true" type="button">فاتورة</button><button aria-pressed="false" type="button">قيد</button></div>
+        <label><span class="fl">التاريخ</span><input class="in n big" data-f="date" value="${esc(r.date)}" inputmode="decimal"></label>
+        <label><span class="fl">المرجع (مقترح)</span><input class="in n big" data-f="ref" value="${esc(r.ref)}" inputmode="numeric"></label>
+        <span class="refno">الرقم المرجعي P${esc(r.ref)}</span>
+        <label><span class="fl">دائن ﷼</span><input class="in n big" data-f="amt" value="${esc(r.amt)}" inputmode="decimal" placeholder="0.00"></label>
+        <label><span class="fl">التفاصيل</span><input class="in" data-f="desc" value="${esc(r.desc)}"></label>
+        <div class="nav"><button class="btn ghost" type="button" data-prev ${i ? "" : "disabled"}>السابق</button><button class="btn primary" type="button" data-next>التالي</button></div>
+      </div></div>
+      <div class="bar"><span class="cnt"><b>${rows.filter((x) => x.amt).length}</b> جاهز من <b>${rows.length}</b></span><button class="btn" type="button" data-review>مراجعة وحفظ</button></div>`;
+    };
+    el.addEventListener("input", (e) => { if (e.target.dataset.f && !review) rows[i][e.target.dataset.f] = e.target.value; });
+    el.addEventListener("focusout", (e) => { if (e.target.dataset.f === "amt") { rows[i].amt = fmt(rows[i].amt); } });
+    el.addEventListener("click", (e) => {
+      if (e.target.closest("[data-next]")) { if (i === rows.length - 1) rows.push({ date: rows[i].date, ref: inc(rows[i].ref), amt: "", desc: "" }); i++; draw(); el.querySelector('[data-f="amt"]').focus(); }
+      else if (e.target.closest("[data-prev]")) { i = Math.max(0, i - 1); draw(); }
+      else if (e.target.closest("[data-review]")) { review = true; draw(); }
+      else if (e.target.closest("[data-back]")) { review = false; draw(); }
+    });
+    draw();
+  })();
+})();
+</script>

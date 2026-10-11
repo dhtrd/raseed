@@ -61,7 +61,16 @@ export async function supplierContext(supplierId: string): Promise<SupplierConte
         : 0;
     const top = s.docs
       .map((d) => ({ date: String(d.get("date")), at: millis(d.get("createdAt")), ref: String(d.get("mainRef") ?? "") }))
-      .sort((a, b) => (a.date === b.date ? b.at - a.at : a.date < b.date ? 1 : -1))[0];
+      // حركات الدفعة الواحدة تتشارك وقت الإنشاء، فالأكبر رقماً هو الأخير في تسلسلها
+      .sort((a, b) =>
+        a.date !== b.date
+          ? a.date < b.date
+            ? 1
+            : -1
+          : a.at !== b.at
+            ? b.at - a.at
+            : b.ref.localeCompare(a.ref, "en", { numeric: true }),
+      )[0];
     return top?.ref || null;
   };
   const [recent, inv, misc] = await Promise.all([
@@ -105,11 +114,23 @@ export type NewEntry =
 /** خطأ مقصود يُعرض للمستخدم كما هو. */
 export class EntrySaveError extends Error {}
 
-export async function addEntry(uid: string, e: NewEntry): Promise<string> {
+type Tx = Parameters<Parameters<typeof runTransaction>[1]>[0];
+
+/**
+ * يكتب حركات داخل معاملة واحدة: كل القراءات (فهارس الأرقام) أولاً كما تشترط Firestore، ثم الكتابة.
+ * يُرجع معرّفات الحركات بالترتيب.
+ */
+async function writeEntries(tx: Tx, uid: string, list: NewEntry[]): Promise<string[]> {
   const { db } = firebase();
-  const entryRef = doc(collection(db, "entries"));
-  const auditRef = doc(collection(db, "auditLog"));
-  await runTransaction(db, async (tx) => {
+  const plans = list.map((e) => ({
+    e,
+    entryRef: doc(collection(db, "entries")),
+    auditRef: doc(collection(db, "auditLog")),
+    refDoc: e.kind === "note" ? null : doc(db, "refs", refIndexKey(e.refNo)),
+  }));
+  const exists = await Promise.all(plans.map(async (p) => (p.refDoc ? (await tx.get(p.refDoc)).exists() : false)));
+  plans.forEach(({ e, entryRef, auditRef, refDoc }, i) => {
+    const refExists = exists[i] === true;
     const common = {
       supplierId: e.supplierId,
       kind: e.kind,
@@ -122,13 +143,9 @@ export async function addEntry(uid: string, e: NewEntry): Promise<string> {
       updatedAt: serverTimestamp(),
     };
     let data: Record<string, unknown>;
-    let refDoc: ReturnType<typeof doc> | null = null;
-    let refExists = false;
     if (e.kind === "note") {
       data = { ...common, debit: 0, credit: 0, note: e.note };
     } else {
-      refDoc = doc(db, "refs", refIndexKey(e.refNo));
-      refExists = (await tx.get(refDoc)).exists();
       if (refExists && !e.dupReason)
         throw new EntrySaveError(
           `الرقم المرجعي ${e.refNo} سُجّل لتوّه لحركة أخرى. راجع التحذير وأكّد مع ذكر السبب، أو عدّل المرجع.`,
@@ -176,5 +193,52 @@ export async function addEntry(uid: string, e: NewEntry): Promise<string> {
       else tx.set(refDoc, { ids: [entryRef.id], places: [place] });
     }
   });
-  return entryRef.id;
+  return plans.map((p) => p.entryRef.id);
+}
+
+export async function addEntry(uid: string, e: NewEntry): Promise<string> {
+  const { db } = firebase();
+  const ids = await runTransaction(db, (tx) => writeEntries(tx, uid, [e]));
+  return ids[0] ?? "";
+}
+
+/**
+ * حجم الجزء الذرّي في الإدخال السريع. القواعد تحتمل 7 حركات في العملية الواحدة (تجربة المحاكي،
+ * DECISIONS 2026-10-11)، و5 تترك هامشاً لمسار التكرار المؤكَّد ولمدخل البيانات.
+ */
+export const BATCH_CHUNK = 5;
+
+export interface ChunkedResult {
+  /** عدد الحركات المحفوظة من أول الدفعة بالترتيب */
+  saved: number;
+  error: { message: string; code: string } | null;
+}
+
+/**
+ * يحفظ الدفعة على أجزاء ذرّية بالترتيب (قرار المستخدم 2026-10-11). يتوقف عند أول جزء يتعثر،
+ * فيُعرف بالضبط ما حُفظ وما لم يُحفظ، ولا تُكرر حركة عند إعادة المحاولة.
+ */
+export async function addEntriesChunked(
+  uid: string,
+  list: NewEntry[],
+  onProgress?: (saved: number) => void,
+): Promise<ChunkedResult> {
+  const { db } = firebase();
+  let saved = 0;
+  for (let i = 0; i < list.length; i += BATCH_CHUNK) {
+    const chunk = list.slice(i, i + BATCH_CHUNK);
+    try {
+      await runTransaction(db, (tx) => writeEntries(tx, uid, chunk));
+      saved += chunk.length;
+      onProgress?.(saved);
+    } catch (e) {
+      console.error(`تعذّر حفظ الجزء الذي يبدأ بالصف ${i + 1}`, e);
+      const code = (e as { code?: string }).code ?? "";
+      return {
+        saved,
+        error: { message: e instanceof EntrySaveError ? e.message : "", code },
+      };
+    }
+  }
+  return { saved, error: null };
 }

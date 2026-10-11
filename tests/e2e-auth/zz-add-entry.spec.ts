@@ -1,6 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { getApps, initializeApp } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
+import { adminDb, removeCreatedEntries } from "./cleanup";
 import { ENTRY, OWNER } from "./seed";
 
 /**
@@ -8,11 +7,6 @@ import { ENTRY, OWNER } from "./seed";
  * ويحذف ما أنشأه في النهاية كي لا يتغير شيء لغيره.
  */
 test.describe.configure({ mode: "serial" });
-
-function adminDb() {
-  if (!getApps().length) initializeApp({ projectId: "demo-raseed" });
-  return getFirestore();
-}
 
 async function loginOk(page: Page, id: string, pw: string) {
   await page.goto("/login");
@@ -32,25 +26,7 @@ async function pickType(page: Page, key: "2" | "3", label: string) {
   await expect(form(page).getByRole("radio", { name: new RegExp(label) })).toBeChecked();
 }
 
-test.afterAll(async () => {
-  const db = adminDb();
-  const made = await db.collection("entries").where("createdBy", "!=", "seed").get();
-  for (const d of made.docs) {
-    const refNo = d.get("refNo") as string | undefined;
-    if (refNo) {
-      const ref = db.doc(`refs/${refNo.replace(/\//g, "|")}`);
-      const snap = await ref.get();
-      const ids = ((snap.get("ids") as string[] | undefined) ?? []).filter((x) => x !== d.id);
-      if (!ids.length) await ref.delete();
-      else
-        await ref.update({
-          ids,
-          places: ((snap.get("places") as { entryId: string }[]) ?? []).filter((p) => p.entryId !== d.id),
-        });
-    }
-    await d.ref.delete();
-  }
-});
+test.afterAll(removeCreatedEntries);
 
 test("فاتورة بلوحة المفاتيح: المرجع التالي مقترح، وCtrl+S يحفظ وينتقل للكشف", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
