@@ -1,0 +1,286 @@
+/* مركز المراجعة (rased-mockups/direction-1/review.html + قسم «أخرى») */
+
+.chips {
+  display: none;
+}
+
+.dOnly {
+  display: none;
+}
+
+.outcome {
+  margin-block-end: 12px;
+}
+
+.undo {
+  margin-inline-start: 10px;
+  min-block-size: 36px;
+  padding: 0 12px;
+  border: 1.5px solid currentcolor;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.empty {
+  margin: 14px 0;
+  color: var(--ink-2);
+}
+
+/* ---------- القسم ---------- */
+.rv {
+  margin-block-start: 26px;
+  scroll-margin-block-start: 16px;
+}
+
+.rvHead h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-size: 20px;
+}
+
+.rvN {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--neg);
+  line-height: 1;
+}
+
+.rvHead p {
+  margin: 4px 0 10px;
+  max-inline-size: 78ch;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+.rvt td,
+.rvt th {
+  vertical-align: top;
+}
+
+.sup {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sheet {
+  display: block;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.cur {
+  color: var(--neg);
+  text-decoration-thickness: 2px;
+}
+
+.sug {
+  text-decoration: none;
+  font-weight: 700;
+  color: var(--accent);
+  border-block-end: 2px solid var(--accent);
+}
+
+.none {
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.side {
+  color: var(--ink-2);
+  font-size: 12.5px;
+}
+
+.why {
+  min-inline-size: 200px;
+  max-inline-size: 360px;
+}
+
+.reason {
+  display: block;
+  color: var(--neg);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.reason + .reason {
+  margin-block-start: 4px;
+}
+
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.open {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 40px;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 14.5px;
+  white-space: nowrap;
+}
+
+/* ---------- الملخص الجانبي ---------- */
+.tally {
+  margin: 8px 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.tally li + li {
+  border-block-start: 1px solid var(--rule);
+}
+
+.tallyBtn {
+  display: grid;
+  grid-template-columns: 3.2em minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  inline-size: 100%;
+  min-block-size: 52px;
+  padding: 6px 4px;
+  border: 0;
+  border-inline-start: 4px solid transparent;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.tallyBtn :global(.num) {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--neg);
+  text-align: end;
+  line-height: 1.1;
+}
+
+.tallyBtn:hover {
+  background: var(--wash);
+}
+
+.tallyBtn[aria-pressed="true"] {
+  border-inline-start-color: var(--accent);
+  background: var(--surface);
+  font-weight: 700;
+}
+
+/* ---------- نافذة التجاهل ---------- */
+.noteField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-block-start: 12px;
+}
+
+.fl {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.in {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: var(--field-h);
+  padding: 8px 10px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--wash-2);
+  border: 0;
+  border-block-end: 1.5px solid var(--rule);
+  border-start-start-radius: var(--r-sm);
+  border-start-end-radius: var(--r-sm);
+}
+
+.in:focus {
+  outline: 3px solid var(--accent);
+  outline-offset: 1px;
+  border-block-end-color: var(--accent);
+}
+
+/* ≤ 600 جوال: شريط الأقسام، والجدول بطاقات */
+@media (width <= 600px) {
+  .chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin: 12px -16px 4px;
+    padding: 2px 16px 6px;
+    list-style: none;
+    scrollbar-width: none;
+  }
+
+  .chips li {
+    flex: none;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-block-size: 44px;
+    padding: 4px 14px;
+    border: 1.5px solid var(--accent);
+    border-radius: 22px;
+    background: var(--surface);
+    color: var(--accent);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .chip[aria-pressed="true"] {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .rvt tr {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 14px;
+    padding: 12px 0;
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .rvt .sup,
+  .why,
+  .act {
+    grid-column: 1 / -1;
+  }
+
+  .why {
+    max-inline-size: none;
+  }
+}
+
+/* 601–1024 لوحي عمودي: الإجراءات عمودياً والسبب أضيق كي يتسع الجدول بلا تمرير */
+@media (width >= 601px) and (width <= 1024px) {
+  .why {
+    min-inline-size: 120px;
+  }
+
+  .acts {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (width >= 1280px) {
+  .dOnly {
+    display: block;
+  }
+}

@@ -24,6 +24,7 @@ import { firebase } from "../../../shared/firebase/client";
 import type { Period } from "../../../shared/fields/components/PeriodFilter";
 import type { UserProfile } from "../../users/core/users";
 import { isManager } from "../../users/core/users";
+import { sectionOf } from "../core/review";
 import { parseEntry, type LedgerEntry, type SupplierBalance } from "../core/ledger";
 
 export interface SupplierRef {
@@ -99,18 +100,21 @@ export interface ReviewCounts {
   dates: number;
   duplicates: number;
   untyped: number;
+  other: number;
 }
 
 /** عدّادات مركز المراجعة للمالك والإدارة (من أسباب التعديل اليدوي غير المحلولة). */
 export async function reviewCounts(): Promise<ReviewCounts> {
   const { db } = firebase();
   const snap = await getDocs(query(collection(db, "migrationIssues"), where("resolved", "==", false)));
-  const c: ReviewCounts = { total: snap.size, dates: 0, duplicates: 0, untyped: 0 };
+  const c: ReviewCounts = { total: snap.size, dates: 0, duplicates: 0, untyped: 0, other: 0 };
+  // التصنيف نفسه في مركز المراجعة (core/review.ts)
+  const key = { dates: "dates", dups: "duplicates", untyped: "untyped", other: "other" } as const;
   for (const d of snap.docs) {
     const codes = ((d.get("issues") as { code?: string }[] | undefined) ?? []).map((i) => i.code ?? "");
-    if (codes.some((x) => x === "known_swapped_day_month" || x === "future_date")) c.dates++;
-    if (codes.some((x) => x === "duplicate_ref" || x === "known_duplicate_of_row_291")) c.duplicates++;
-    if (codes.includes("untyped")) c.untyped++;
+    const secs = new Set(codes.map(sectionOf));
+    if (!codes.length) secs.add("other");
+    for (const x of secs) c[key[x]]++;
   }
   return c;
 }

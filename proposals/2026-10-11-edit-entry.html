@@ -1,0 +1,270 @@
+<title>رصيد · نافذة تعديل الحركة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاث شاشات حاسوب مكدّسة (أ نافذة وسطى، ب لوحة جانبية، ج صفحة كاملة) على السجل نفسه، ثم الأسئلة. الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --neg-wash: #f8e8e9; --tab: #e2e8ee; --amber: #b8752a;
+  --scrim: rgb(20 27 38 / 42%); --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.lead { color: var(--ink-2); max-width: 74ch; margin: 6px 0 16px; }
+.eg { display: inline-block; font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 6px; margin-inline-start: 6px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.pick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); margin-bottom: 22px; }
+.pick .lbl { font-weight: 700; color: var(--ink-2); font-size: 15px; }
+
+.opt { margin-bottom: 34px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 80ch; }
+.opt ul { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+.screen-wrap { overflow-x: auto; border-radius: 10px; }
+.screen { position: relative; width: 1100px; min-height: 600px; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.mast { display: flex; align-items: center; gap: 18px; padding: 10px 18px; background: var(--surface); border-bottom: 3px double var(--ink); font-weight: 700; }
+.mast .brand { font-family: var(--f-brand); font-size: 20px; }
+.mast .tabs { display: flex; gap: 6px; font-size: 14.5px; color: var(--ink-2); }
+.mast .tabs span { padding: 2px 10px; border-radius: 8px 8px 0 0; background: var(--tab); }
+.mast .tabs span.on { background: var(--paper); color: var(--ink); }
+
+/* قائمة المراجعة خلف النوافذ */
+.rvlist { padding: 16px 22px; }
+.rvlist h3 { font-size: 18px; margin-bottom: 6px; }
+.rvt { width: 100%; border-collapse: collapse; background: var(--surface); border-top: 3px double var(--ink); font-size: 15px; }
+.rvt th { text-align: start; font-size: 13.5px; color: var(--ink-2); padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+.rvt td { padding: 8px; border-bottom: 1px solid var(--rule); }
+.rvt tr.on td { background: var(--wash); }
+.rvt .why2 { color: var(--neg); font-weight: 700; font-size: 14px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 4px 16px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; }
+.btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn.ghost { border-color: var(--rule); color: var(--ink); }
+.btn.sm { min-height: 36px; font-size: 14px; padding: 2px 12px; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+/* النموذج المشترك */
+.issue { padding: 8px 12px; background: var(--neg-wash); border: 1.5px solid var(--neg); border-inline-start-width: 6px; border-radius: 4px; font-size: 15px; }
+.issue b { color: var(--neg); }
+.issue .sugg { margin-inline-start: 8px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+.grid .full { grid-column: 1 / -1; }
+.fl { font-size: 13.5px; font-weight: 700; color: var(--ink-2); display: block; margin-bottom: 2px; }
+.in { width: 100%; min-height: 44px; padding: 7px 10px; background: var(--wash-2); color: var(--ink); border: 0; border-bottom: 1.5px solid var(--rule); border-radius: 4px 4px 0 0; font: inherit; font-size: 16px; }
+.in.n { font-family: var(--f-num); direction: ltr; text-align: right; }
+.in:focus { outline: none; border-bottom-color: var(--accent); background: var(--wash); }
+.in.bad { border-bottom: 2px solid var(--neg); }
+.in.chg { box-shadow: inset 0 -3px 0 var(--amber); }
+.err { color: var(--neg); font-size: 13.5px; font-weight: 700; }
+.hint { color: var(--ink-2); font-size: 13px; }
+.seg { display: flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { flex: 1; min-height: 42px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.seg.need { border-color: var(--neg); box-shadow: 0 0 0 2px var(--neg-wash); }
+.chk { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15px; }
+.chk i { width: 22px; height: 22px; border: 2px solid var(--accent); border-radius: 4px; display: inline-grid; place-items: center; font-style: normal; color: var(--on-accent); font-size: 14px; }
+.chk[aria-checked="true"] i { background: var(--accent); }
+.chk[aria-checked="true"] i::after { content: "✓"; }
+.diff { margin: 0; padding: 8px 12px; background: var(--wash-2); border: 1px dashed var(--rule); border-radius: 4px; font-size: 14.5px; list-style: none; }
+.diff li { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.diff s { color: var(--ink-2); }
+.diff ins { text-decoration: none; font-weight: 700; color: var(--accent); }
+.diff.empty { color: var(--ink-2); }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.done { color: var(--accent); font-weight: 700; }
+
+/* أ. نافذة وسطى */
+.scrim { position: absolute; inset: 52px 0 0; background: var(--scrim); display: grid; place-items: center; padding: 20px; }
+.dlg { width: 620px; max-height: 100%; overflow: auto; background: var(--surface); border-radius: 10px; box-shadow: var(--shadow); padding: 18px 20px; display: grid; gap: 12px; border-top: 4px solid var(--accent); }
+.dlg h3 { font-size: 19px; }
+.dlg .sub { color: var(--ink-2); font-size: 14.5px; }
+
+/* ب. لوحة جانبية */
+.split { display: grid; grid-template-columns: 1fr 470px; min-height: 548px; }
+.drawer { background: var(--surface); border-inline-start: 1px solid var(--rule); box-shadow: -6px 0 18px rgb(27 42 68 / 10%); padding: 14px 18px; display: grid; gap: 12px; align-content: start; }
+.drawer .hd { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.drawer .pos { color: var(--ink-2); font-size: 14px; }
+.drawer .grid { grid-template-columns: 1fr; }
+
+/* ج. صفحة كاملة */
+.page { display: grid; grid-template-columns: 1fr 330px; gap: 22px; padding: 18px 22px; }
+.page .back { color: var(--accent); font-weight: 700; font-size: 15px; }
+.page .main { background: var(--surface); border-top: 3px double var(--ink); padding: 14px 18px; display: grid; gap: 12px; align-content: start; }
+.page .side { display: grid; gap: 14px; align-content: start; }
+.page .card { background: var(--surface); border: 1px solid var(--rule); padding: 12px 14px; font-size: 14.5px; }
+.page .card h4 { margin: 0 0 6px; font-size: 15px; }
+.page dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; }
+.page dt { color: var(--ink-2); }
+.page dd { margin: 0; }
+.hist { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.hist li { border-inline-start: 3px solid var(--rule); padding-inline-start: 8px; }
+.hist small { color: var(--ink-2); display: block; }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 8px; }
+.qs b { color: var(--accent); }
+.common { margin: 0 0 22px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <h1>نافذة تعديل الحركة</h1>
+  <p class="lead">تُفتح من «تعديل» في مركز المراجعة، ويُعاد استعمالها لاحقاً لتعديل أي حركة من الكشف. هذه ثلاثة أشكال تفاعلية على السجل نفسه: عدّل الحقول وجرّب الحفظ. الموردون والأرقام وهمية<span class="eg">مثال</span>.</p>
+
+  <div class="pick" role="group" aria-label="السجل المعروض">
+    <span class="lbl">جرّب على سجل:</span>
+    <div class="seg" id="recSeg" style="flex:1;min-width:0;max-width:440px"></div>
+  </div>
+
+  <p class="common"><b>في الأشكال الثلاثة:</b> سبب المراجعة ظاهر أعلى النموذج، والحقل المعدَّل يُعلَّم بخط ذهبي، و«التغييرات» تعرض القيمة القديمة والجديدة قبل الحفظ. التحقق نفسه في «إضافة حركة» (المرجع وطوله، الفترة المقفلة، التكرار بتأكيد وسبب). الحفظ معاملة واحدة مع سجل التدقيق. في الفترة المقفلة يُمنع التعديل.</p>
+
+  <section class="opt" aria-labelledby="ha">
+    <h2 id="ha">أ. نافذة وسطى</h2>
+    <p class="why">النافذة تفتح فوق قائمة المراجعة، وعلى الجوال لوحة سفلية كبقية نوافذ النظام. بعد الحفظ تُغلق ويعود المستخدم إلى مكانه في القائمة.</p>
+    <ul><li class="pro">مألوفة: النمط نفسه لنوافذ السبب والتأكيد.</li><li class="pro">أبسط بناءً.</li><li>القائمة مغطّاة أثناء التعديل.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <h2 id="hb">ب. لوحة جانبية بالتتابع</h2>
+    <p class="why">اللوحة تفتح بجانب القائمة فتبقى ظاهرة، و«حفظ والتالي» ينقل إلى السجل التالي في القسم نفسه. على الجوال تصير شاشة كاملة بزر رجوع.</p>
+    <ul><li class="pro">الأسرع لمعالجة 58 سجلاً واحداً تلو الآخر.</li><li class="pro">القائمة والسياق ظاهران.</li><li>مساحة النموذج أضيق على اللوحي.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <h2 id="hc">ج. صفحة تعديل كاملة</h2>
+    <p class="why">صفحة مستقلة على نسق «إضافة حركة»، وبجانبها «الأصل كما نُقل» وسجل الحركة من التدقيق. «رجوع» يعيد إلى مركز المراجعة.</p>
+    <ul><li class="pro">أوسع مساحة وأوضح سياق (الأصل والتاريخ).</li><li class="pro">رابط مباشر لكل حركة.</li><li>انتقال كامل في كل سجل، فهي أبطأ للمراجعة المتتابعة.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الشكل:</b> أ أم ب أم ج؟</li>
+      <li><b>سبب التعديل:</b> إلزامي في كل تعديل ويُحفظ في التدقيق، أم اختياري؟ (في النماذج إلزامي.)</li>
+      <li><b>بعد الحفظ:</b> هل يُعلَّم سجل المراجعة «تمت المراجعة» تلقائياً، أم بخيار «تعليمه محلولاً» كما في النماذج؟</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const RECS = {
+    swap: { label: "تاريخ مقلوب", sup: "المورد (ج)", cell: "B340", kind: "inv", date: "08/03/2026", ref: "12290", voucher: "", details: "فاتورة مشتريات", amount: "4,750.00", reversed: false,
+      issue: "التاريخ مقلوب يوماً وشهراً.", fix: { label: "استعمال المرجّح 03/08/2026", patch: { date: "03/08/2026" } } },
+    untyped: { label: "بلا نوع", sup: "المورد (د)", cell: "B147", kind: "untyped", date: "21/08/2026", ref: "", voucher: "6031", details: "تحويل", amount: "1,200.00", reversed: false,
+      issue: "بلا نوع مستند: حدّد فاتورة أو قيداً واكتب المرجع.", fix: null },
+    reflen: { label: "طول المرجع", sup: "المورد (أ)", cell: "B88", kind: "inv", date: "14/07/2026", ref: "1229", voucher: "", details: "فاتورة مشتريات", amount: "980.50", reversed: false,
+      issue: "المرجع 4 أرقام والفاتورة 5.", fix: null },
+  };
+  const LIST = Object.entries(RECS);
+  let recId = "swap";
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const LABEL = { kind: "النوع", date: "التاريخ", ref: "المرجع", voucher: "السند", details: "التفاصيل", amount: "المبلغ" };
+  const kindName = (k) => ({ inv: "فاتورة", misc: "قيد", untyped: "بلا نوع" })[k];
+
+  function validate(f) {
+    const e = {};
+    if (f.kind === "untyped") e.kind = "حدّد النوع.";
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(f.date)) e.date = "التاريخ يوم/شهر/سنة.";
+    if (f.kind === "inv" && !/^\d{5}$/.test(f.ref)) e.ref = "مرجع الفاتورة 5 أرقام.";
+    if (f.kind === "misc" && !/^\d{4}$/.test(f.ref)) e.ref = "مرجع القيد 4 أرقام.";
+    if (!f.amount || !+f.amount.replace(/,/g, "")) e.amount = "أدخل المبلغ.";
+    if (!f.reason.trim()) e.reason = "اكتب سبب التعديل.";
+    return e;
+  }
+  const changes = (o, f) => Object.keys(LABEL).filter((k) => String(o[k]) !== String(f[k])).map((k) => ({ k, from: k === "kind" ? kindName(o[k]) : o[k] || "—", to: k === "kind" ? kindName(f[k]) : f[k] || "—" }));
+
+  /** حالة مستقلة لكل شكل */
+  function makeState() { const o = RECS[recId]; return { o, f: { ...o, reason: "" }, tried: false, saved: false, resolve: true }; }
+
+  function formHTML(st, opts = {}) {
+    const { o, f } = st;
+    const e = st.tried ? validate(f) : {};
+    const ch = changes(o, f);
+    const chg = (k) => (String(o[k]) !== String(f[k]) ? " chg" : "");
+    const refNo = f.kind === "inv" ? "P" + f.ref : f.kind === "misc" ? "MISC/" + f.date.slice(6) + "/" + f.date.slice(3, 5) + "/" + f.ref : "—";
+    return `
+      <div class="issue"><b>سبب المراجعة:</b> ${esc(o.issue)}${o.fix ? ` <button type="button" class="btn sm sugg" data-fix>${esc(o.fix.label)}</button>` : ""}</div>
+      <div class="grid">
+        <div class="full"><span class="fl">النوع</span>
+          <div class="seg${e.kind ? " need" : ""}" role="group" aria-label="النوع">
+            <button type="button" data-kind="inv" aria-pressed="${f.kind === "inv"}">فاتورة</button>
+            <button type="button" data-kind="misc" aria-pressed="${f.kind === "misc"}">قيد</button>
+          </div>${e.kind ? `<span class="err">${e.kind}</span>` : ""}</div>
+        <label><span class="fl">التاريخ</span><input class="in n${chg("date")}${e.date ? " bad" : ""}" data-f="date" value="${esc(f.date)}" inputmode="decimal">${e.date ? `<span class="err">${e.date}</span>` : ""}</label>
+        <label><span class="fl">المرجع</span><input class="in n${chg("ref")}${e.ref ? " bad" : ""}" data-f="ref" value="${esc(f.ref)}" inputmode="numeric">${e.ref ? `<span class="err">${e.ref}</span>` : `<span class="hint">الرقم المرجعي <b class="num">${esc(refNo)}</b></span>`}</label>
+        <label><span class="fl">${(f.kind === "misc") !== f.reversed ? "مدين" : "دائن"}</span><input class="in n${chg("amount")}${e.amount ? " bad" : ""}" data-f="amount" value="${esc(f.amount)}" inputmode="decimal">${e.amount ? `<span class="err">${e.amount}</span>` : ""}</label>
+        <label><span class="fl">السند</span><input class="in n${chg("voucher")}" data-f="voucher" value="${esc(f.voucher)}" inputmode="numeric"></label>
+        <label class="full"><span class="fl">التفاصيل</span><input class="in${chg("details")}" data-f="details" value="${esc(f.details)}"></label>
+        <label class="full"><span class="fl">سبب التعديل (إلزامي، يُحفظ في التدقيق)</span><input class="in${e.reason ? " bad" : ""}" data-f="reason" value="${esc(f.reason)}" placeholder="مثال: تصحيح تاريخ مقلوب من الإكسل">${e.reason ? `<span class="err">${e.reason}</span>` : ""}</label>
+      </div>
+      <div><span class="fl">التغييرات</span>${ch.length ? `<ul class="diff">${ch.map((c) => `<li><span>${LABEL[c.k]}:</span><s>${esc(c.from)}</s><span aria-hidden="true">←</span><ins>${esc(c.to)}</ins></li>`).join("")}</ul>` : `<p class="diff empty">لا تغيير بعد.</p>`}</div>
+      <span class="chk" role="checkbox" tabindex="0" aria-checked="${st.resolve}" data-resolve><i></i>تعليم سجل المراجعة «تمت المراجعة» بعد الحفظ</span>
+      ${st.saved ? `<p class="done" role="status">✓ حُفظ التعديل وسُجّل في التدقيق${st.resolve ? "، وأُغلق سجل المراجعة" : ""}.</p>` : ""}
+      <div class="acts">${opts.actions}</div>`;
+  }
+
+  function bind(el, st, draw, onSave) {
+    el.addEventListener("input", (ev) => { const k = ev.target.dataset.f; if (k) { st.f[k] = ev.target.value; st.saved = false; const pos = ev.target.selectionStart; draw(); const n = el.querySelector(`[data-f="${k}"]`); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch {} } } });
+    el.addEventListener("click", (ev) => {
+      const t = ev.target.closest("button, [data-resolve]"); if (!t) return;
+      if (t.dataset.kind) { st.f.kind = t.dataset.kind; st.saved = false; draw(); }
+      else if (t.hasAttribute("data-fix")) { Object.assign(st.f, st.o.fix.patch); draw(); }
+      else if (t.hasAttribute("data-resolve")) { st.resolve = !st.resolve; draw(); }
+      else if (t.dataset.act) onSave(t.dataset.act);
+    });
+    el.addEventListener("keydown", (ev) => { if (ev.target.hasAttribute("data-resolve") && (ev.key === " " || ev.key === "Enter")) { ev.preventDefault(); st.resolve = !st.resolve; draw(); } });
+  }
+  const trySave = (st) => { st.tried = true; const ok = !Object.keys(validate(st.f)).length && changes(st.o, st.f).length; if (ok) st.saved = true; return ok; };
+  const mast = (tab) => `<div class="mast"><span class="brand">رصيد</span><div class="tabs"><span>الأرصدة</span><span>كشف الحساب</span><span>الفواتير</span><span>إضافة حركة</span><span class="${tab === "rv" ? "on" : ""}">المراجعة</span></div></div>`;
+  const listHTML = (cur) => `<div class="rvlist"><h3>مركز المراجعة</h3><table class="rvt"><thead><tr><th>المورد</th><th>الخلية</th><th>السبب</th><th>الإجراء</th></tr></thead><tbody>${LIST.map(([id, r]) => `<tr class="${id === cur ? "on" : ""}"><td>${r.sup}</td><td class="num">${r.cell}</td><td class="why2">${r.label}</td><td><button type="button" class="btn sm">تعديل</button></td></tr>`).join("")}</tbody></table></div>`;
+
+  // أ. نافذة وسطى
+  const A = (() => { const el = document.getElementById("sa"); let st;
+    const draw = () => { el.innerHTML = mast("rv") + listHTML(recId) + `<div class="scrim"><div class="dlg" role="dialog" aria-label="تعديل الحركة"><h3>تعديل حركة · ${st.o.sup}</h3><p class="sub">الخلية <span class="num">${st.o.cell}</span> في الإكسل · ${kindName(st.o.kind)}</p>${formHTML(st, { actions: `<button type="button" class="btn primary" data-act="save">حفظ</button><button type="button" class="btn ghost" data-act="cancel">إلغاء</button>` })}</div></div>`; };
+    const reset = () => { st = makeState(); draw(); };
+    bind(el, { get o() { return st.o; }, get f() { return st.f; }, get resolve() { return st.resolve; }, set resolve(v) { st.resolve = v; }, set saved(v) { st.saved = v; } }, () => draw(), (a) => { if (a === "cancel") reset(); else { trySave(st); draw(); } });
+    return { reset };
+  })();
+
+  // ب. لوحة جانبية
+  const B = (() => { const el = document.getElementById("sb"); let st;
+    const draw = () => { const k = LIST.findIndex(([id]) => id === recId); el.innerHTML = mast("rv") + `<div class="split">${listHTML(recId)}<aside class="drawer" aria-label="تعديل الحركة"><div class="hd"><h3 style="font-size:18px">تعديل · ${st.o.sup}</h3><span class="pos">السجل <span class="num">${k + 1}</span> من <span class="num">${LIST.length}</span> في القسم</span></div>${formHTML(st, { actions: `<button type="button" class="btn primary" data-act="next">حفظ والتالي</button><button type="button" class="btn" data-act="save">حفظ</button><button type="button" class="btn ghost" data-act="skip">تخطٍّ</button>` })}</aside></div>`; };
+    const reset = () => { st = makeState(); draw(); };
+    const go = () => { const k = LIST.findIndex(([id]) => id === recId); recId = LIST[(k + 1) % LIST.length][0]; syncSeg(); st = makeState(); draw(); };
+    bind(el, { get o() { return st.o; }, get f() { return st.f; }, get resolve() { return st.resolve; }, set resolve(v) { st.resolve = v; }, set saved(v) { st.saved = v; } }, () => draw(), (a) => { if (a === "skip") go(); else if (trySave(st) && a === "next") setTimeout(go, 600); draw(); });
+    return { reset };
+  })();
+
+  // ج. صفحة كاملة
+  const C = (() => { const el = document.getElementById("sc"); let st;
+    const draw = () => { const o = st.o; el.innerHTML = mast("rv") + `<div class="page"><div class="main"><a class="back" href="#hc">→ رجوع إلى مركز المراجعة</a><h3 style="font-size:20px">تعديل حركة · ${o.sup}</h3>${formHTML(st, { actions: `<button type="button" class="btn primary" data-act="save">حفظ</button><button type="button" class="btn ghost" data-act="cancel">إلغاء</button>` })}</div>
+      <aside class="side"><div class="card"><h4>الأصل كما نُقل</h4><dl><dt>الخلية</dt><dd class="num">${o.cell}</dd><dt>النوع</dt><dd>${kindName(o.kind)}</dd><dt>التاريخ</dt><dd class="num">${o.date}</dd><dt>المرجع</dt><dd class="num">${o.ref || "—"}</dd><dt>المبلغ</dt><dd class="num">${o.amount}</dd></dl></div>
+      <div class="card"><h4>سجل الحركة</h4><ul class="hist"><li>نُقلت من الإكسل<small class="num">11/10/2026 09:12</small></li>${st.saved ? `<li>عدّلها صاحب المنشأة: ${esc(st.f.reason)}<small>الآن</small></li>` : ""}</ul></div></aside></div>`; };
+    const reset = () => { st = makeState(); draw(); };
+    bind(el, { get o() { return st.o; }, get f() { return st.f; }, get resolve() { return st.resolve; }, set resolve(v) { st.resolve = v; }, set saved(v) { st.saved = v; } }, () => draw(), (a) => { if (a === "cancel") reset(); else { trySave(st); draw(); } });
+    return { reset };
+  })();
+
+  const seg = document.getElementById("recSeg");
+  function syncSeg() { seg.innerHTML = LIST.map(([id, r]) => `<button type="button" data-rec="${id}" aria-pressed="${id === recId}">${r.label}</button>`).join(""); }
+  seg.addEventListener("click", (ev) => { const b = ev.target.closest("[data-rec]"); if (!b) return; recId = b.dataset.rec; syncSeg(); A.reset(); B.reset(); C.reset(); });
+  syncSeg(); A.reset(); B.reset(); C.reset();
+})();
+</script>

@@ -11,6 +11,7 @@ import { StatementPage } from "../features/ledger/ui/StatementPage";
 import { InvoicesPage } from "../features/ledger/ui/InvoicesPage";
 import { AddEntryPage } from "../features/ledger/ui/AddEntryPage";
 import { QuickEntryPage } from "../features/ledger/ui/QuickEntryPage";
+import { ReviewPage } from "../features/ledger/ui/ReviewPage";
 import { AppShell } from "./AppShell";
 import { ErrorScreen, LoadingScreen, RouteError } from "./Screens";
 
@@ -90,6 +91,14 @@ const router = createBrowserRouter(
                 { path: "invoices/:sid?", element: <InvoicesPage /> },
                 { path: "add/:sid?", element: <AddEntryPage /> },
                 { path: "quick/:sid?", element: <QuickEntryPage /> },
+                {
+                  path: "review",
+                  element: (
+                    <ManagersOnly>
+                      <ReviewPage />
+                    </ManagersOnly>
+                  ),
+                },
                 {
                   path: "users/:uid?",
                   element: (

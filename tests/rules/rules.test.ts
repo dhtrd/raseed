@@ -733,10 +733,42 @@ describe("أسباب التعديل اليدوي للبيانات المنقول
     await assertSucceeds(getDoc(doc(as("admin"), "migrationIssues/m-s01-r0005")));
     await assertFails(getDoc(doc(as("entry"), "migrationIssues/m-s01-r0005")));
   });
-  it("لا تُكتب من التطبيق", async () => {
+  it("لا تُنشأ ولا تُحذف من التطبيق، ولا تُعدَّل بلا تدقيق", async () => {
     await seed();
     await assertFails(setDoc(doc(as("owner"), "migrationIssues/x"), { resolved: true }));
     await assertFails(updateDoc(doc(as("owner"), "migrationIssues/m-s01-r0005"), { resolved: true }));
     await assertFails(deleteDoc(doc(as("owner"), "migrationIssues/m-s01-r0005")));
+  });
+  const resolve = (uid: string, patch: Record<string, unknown>) =>
+    writeWithAudit(
+      as(uid),
+      uid,
+      "migrationIssues/m-s01-r0005",
+      "migrationIssues",
+      "m-s01-r0005",
+      { resolvedBy: uid, resolvedAt: serverTimestamp(), resolutionNote: "", ...patch },
+      "update",
+    );
+  it("المالك والإدارة يعلّمونها محلولة أو يعيدون فتحها بتدقيق (DECISIONS 2026-10-11)", async () => {
+    await seed();
+    await assertSucceeds(resolve("owner", { resolved: true, resolution: "ignored", resolutionNote: "سليم" }));
+    await assertSucceeds(resolve("admin", { resolved: false, resolution: "reopened" }));
+    await assertSucceeds(resolve("admin", { resolved: true, resolution: "fixed" }));
+  });
+  it("مدخل البيانات لا يغيّرها، ولا تتغير حقول غير الحل", async () => {
+    await seed();
+    await assertFails(resolve("entry", { resolved: true, resolution: "ignored" }));
+    await assertFails(resolve("owner", { resolved: true, resolution: "ignored", issues: [] }));
+    await assertFails(resolve("owner", { resolved: true, resolution: "ignored", supplierId: "s2" }));
+  });
+  it("الحل يُسنَد إلى كاتبه وقت الطلب، وبقيم معروفة", async () => {
+    await seed();
+    await assertFails(resolve("owner", { resolved: true, resolution: "ignored", resolvedBy: "admin" }));
+    await assertFails(resolve("owner", { resolved: true, resolution: "reopened" }));
+    await assertFails(resolve("owner", { resolved: false, resolution: "ignored" }));
+    await assertFails(
+      resolve("owner", { resolved: true, resolution: "ignored", resolutionNote: "x".repeat(301) }),
+    );
+    await assertFails(resolve("owner", { resolved: true, resolution: "ignored", resolvedAt: new Date(0) }));
   });
 });

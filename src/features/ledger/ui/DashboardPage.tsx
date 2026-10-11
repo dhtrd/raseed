@@ -414,6 +414,7 @@ const ALERTS: { k: keyof Omit<ReviewCounts, "total">; side: string; chip: string
   { k: "dates", side: "تاريخاً معطوباً أو مقلوباً", chip: "تاريخاً معطوباً" },
   { k: "duplicates", side: "أرقاماً مرجعية مكررة", chip: "أرقام مكررة" },
   { k: "untyped", side: "سجلاً بلا نوع", chip: "بلا نوع" },
+  { k: "other", side: "سجلاً بأسباب أخرى", chip: "أخرى" },
 ];
 
 function SideAlerts({ review }: { review: Loadable<ReviewCounts> }) {
@@ -429,13 +430,15 @@ function SideAlerts({ review }: { review: Loadable<ReviewCounts> }) {
             {ALERTS.map((a) => (
               <li key={a.k}>
                 <span className={`num ${s.alN}`}>{review.data[a.k]}</span>
-                <span className={s.alT}>{a.side}</span>
+                <Link className={s.alT} to="/review">
+                  {a.side}
+                </Link>
               </li>
             ))}
           </ul>
           <p className={s.alTotal}>
             الإجمالي <span className="num">{review.data.total}</span> سجلاً للتعديل اليدوي، وقد يجمع السجل
-            أكثر من سبب. مركز المراجعة يُبنى في خطوة لاحقة.
+            أكثر من سبب. <Link to="/review">افتح مركز المراجعة</Link>
           </p>
         </>
       ) : null}
@@ -455,8 +458,10 @@ function MobileAlerts({ review }: { review: Loadable<ReviewCounts> }) {
     <ul className={s.mAlerts} aria-label="تنبيهات المراجعة">
       {ALERTS.map((a) => (
         <li key={a.k}>
-          <span className="num">{review.data[a.k]}</span>
-          {a.chip}
+          <Link to="/review">
+            <span className="num">{review.data[a.k]}</span>
+            {a.chip}
+          </Link>
         </li>
       ))}
     </ul>
