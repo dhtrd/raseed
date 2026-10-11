@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
+import { applyRange, shiftRange } from "../../../shared/fields/core/rangeSelect";
 import { Checkbox } from "../../../shared/fields/components/Checkbox";
 import { PeriodFilter, type Period } from "../../../shared/fields/components/PeriodFilter";
 import { ReasonDialog } from "../../../shared/fields/components/ReasonDialog";
@@ -135,13 +136,20 @@ export function InvoicesPage() {
   const selected = selState.key === selKey ? selState.ids : new Set<string>();
   const setSelected = (fn: (s: Set<string>) => Set<string>) =>
     setSelState((cur) => ({ key: selKey, ids: fn(cur.key === selKey ? cur.ids : new Set()) }));
-  const toggle = (id: string) =>
-    setSelected((cur) => {
-      const n = new Set(cur);
-      if (n.has(id)) n.delete(id);
-      else n.add(id);
-      return n;
-    });
+  // Shift+نقر: المدى من آخر فاتورة نُقرت بترتيب العرض الحالي
+  const anchor = useRef<string | null>(null);
+  const toggle = (id: string, shift = false) => {
+    const ids = shift
+      ? shiftRange(
+          rows.map((r) => r.id),
+          anchor.current,
+          id,
+        )
+      : [id];
+    const on = !selected.has(id);
+    anchor.current = id;
+    setSelected((cur) => applyRange(cur, ids, on));
+  };
   const visibleSelected = rows.filter((r) => selected.has(r.id));
   const allChecked: boolean | "mixed" =
     rows.length > 0 && visibleSelected.length === rows.length
@@ -502,8 +510,9 @@ export function InvoicesPage() {
                       selected={selected.has(r.id)}
                       selectMode={selectMode}
                       open={open.has(r.id)}
-                      onToggleSel={() => toggle(r.id)}
+                      onToggleSel={(shift) => toggle(r.id, shift)}
                       onLongPress={() => {
+                        anchor.current = r.id;
                         setSelectMode(true);
                         setSelected((cur) => new Set(cur).add(r.id));
                       }}
@@ -626,7 +635,7 @@ function InvoiceLine(p: {
   selected: boolean;
   selectMode: boolean;
   open: boolean;
-  onToggleSel: () => void;
+  onToggleSel: (shift: boolean) => void;
   onLongPress: () => void;
   onToggleOpen: () => void;
 }) {
@@ -651,13 +660,17 @@ function InvoiceLine(p: {
         },
         onPointerUp: cancel,
         onPointerLeave: cancel,
+        // Shift+نقر على الصف في وضع التحديد لا يظلّل نص الصفوف
+        onMouseDown: (e: React.MouseEvent) => {
+          if (p.selectMode && e.shiftKey) e.preventDefault();
+        },
         onPointerCancel: cancel,
         onClick: (e: React.MouseEvent) => {
           if (fired.current) {
             fired.current = false;
             return;
           }
-          if (p.selectMode && !(e.target as HTMLElement).closest("button, a")) p.onToggleSel();
+          if (p.selectMode && !(e.target as HTMLElement).closest("button, a")) p.onToggleSel(e.shiftKey);
         },
       }
     : {};
@@ -670,7 +683,7 @@ function InvoiceLine(p: {
       >
         {p.manager ? (
           <td className={s.cPick}>
-            <Checkbox checked={p.selected} onChange={p.onToggleSel}>
+            <Checkbox checked={p.selected} onChange={(_, m) => p.onToggleSel(m.shift)}>
               <span className="sr-only">تحديد الفاتورة {r.refNo}</span>
             </Checkbox>
           </td>

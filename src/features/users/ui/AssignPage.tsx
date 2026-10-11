@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useBlocker, useParams } from "react-router";
 import { Checkbox, SearchField } from "../../../shared/fields";
+import { shiftRange } from "../../../shared/fields/core/rangeSelect";
 import { Banner } from "../../../shared/ui/Banner";
 import { useToast } from "../../../shared/ui/Toast";
 import { Button } from "../../../shared/ui/Button";
@@ -128,6 +129,7 @@ export function AssignPage() {
       <section className={s.body} aria-label="الموردون">
         {selected ? (
           <SupplierList
+            key={selected.uid}
             user={selected}
             draft={draftOf(selected)}
             suppliers={active}
@@ -210,6 +212,7 @@ function SupplierList(p: {
 }) {
   const q = p.q.trim();
   const visible = q ? p.suppliers.filter((x) => x.name.includes(q)) : p.suppliers;
+  const anchor = useRef<string | null>(null);
   const on = visible.filter((x) => p.draft.has(x.id)).length;
   const all: boolean | "mixed" =
     visible.length > 0 && on === visible.length ? true : on > 0 ? "mixed" : false;
@@ -249,7 +252,22 @@ function SupplierList(p: {
       </div>
       <div className={s.list}>
         {visible.map((x) => (
-          <Checkbox key={x.id} checked={p.draft.has(x.id)} onChange={(v) => p.onToggle([x.id], v)}>
+          <Checkbox
+            key={x.id}
+            checked={p.draft.has(x.id)}
+            onChange={(v, m) => {
+              // Shift+نقر: كل الموردين الظاهرين بين آخر مورد نُقر وهذا
+              const ids = m.shift
+                ? shiftRange(
+                    visible.map((y) => y.id),
+                    anchor.current,
+                    x.id,
+                  )
+                : [x.id];
+              anchor.current = x.id;
+              p.onToggle(ids, v);
+            }}
+          >
             {x.name}
           </Checkbox>
         ))}
