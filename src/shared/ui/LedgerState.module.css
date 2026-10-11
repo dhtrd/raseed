@@ -41,20 +41,6 @@
   block-size: 52px;
 }
 
-.mark rect {
-  animation: pulse 1.2s ease-in-out infinite;
-}
-
-.mark rect:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-@keyframes pulse {
-  50% {
-    opacity: 0.25;
-  }
-}
-
 .title {
   margin: 0;
   font-size: 18px;
@@ -71,10 +57,4 @@
   justify-content: center;
   gap: 8px;
   margin-block-start: 4px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mark rect {
-    animation: none;
-  }
 }

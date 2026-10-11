@@ -31,7 +31,7 @@ export function SideNav(p: {
   return (
     <nav className={`${s.nav} ${p.rail ? s.rail : ""}`} aria-label="أقسام الدفتر">
       <NavLink to="/" end className={s.brand} aria-label="رصيد، الأرصدة" onClick={p.onNavigate}>
-        <Mark className={s.mark} />
+        <Mark className={s.mark} motion="live" />
         <span className={s.word}>رصيد</span>
       </NavLink>
       {p.groups.map((g) => (

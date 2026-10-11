@@ -1,4 +1,5 @@
 import type { SVGProps } from "react";
+import { drawable } from "./drawable";
 
 const PATHS = {
   calendar: (
@@ -153,10 +154,22 @@ const PATHS = {
 
 export type IconName = keyof typeof PATHS;
 
-export function Icon({ name, ...rest }: { name: IconName } & SVGProps<SVGSVGElement>) {
+// تُحضَّر مرة واحدة: أطوال منسوبة لحركة «رسم الخط» (drawable.tsx)
+const DRAWN = Object.fromEntries(Object.entries(PATHS).map(([k, v]) => [k, drawable(v)])) as Record<
+  IconName,
+  ReturnType<typeof drawable>
+>;
+
+export function Icon({ name, className, ...rest }: { name: IconName } & SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false" {...rest}>
-      {PATHS[name]}
+    <svg
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+      focusable="false"
+      className={`draw-ic ${className ?? ""}`}
+      {...rest}
+    >
+      {DRAWN[name]}
     </svg>
   );
 }

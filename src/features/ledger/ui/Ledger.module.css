@@ -731,3 +731,34 @@
 .ixAdd:hover {
   background: var(--wash);
 }
+
+/* ٥ب «الحبر» لصفوف الجداول: كل صف جديد يُكتب من اليمين لليسار، والأوائل متتابعة (DECISIONS 2026-10-11) */
+.ledger tbody tr > * {
+  animation: ink-in 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.ledger tbody tr:nth-child(2) > * {
+  animation-delay: 30ms;
+}
+
+.ledger tbody tr:nth-child(3) > * {
+  animation-delay: 60ms;
+}
+
+.ledger tbody tr:nth-child(4) > * {
+  animation-delay: 90ms;
+}
+
+.ledger tbody tr:nth-child(5) > * {
+  animation-delay: 120ms;
+}
+
+.ledger tbody tr:nth-child(n + 6) > * {
+  animation-delay: 150ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ledger tbody tr > * {
+    animation: none;
+  }
+}

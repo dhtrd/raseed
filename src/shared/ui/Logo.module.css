@@ -1,0 +1,44 @@
+/*
+ * حركة «علامة التوازن» (DECISIONS 2026-10-11): «الكفّتان» للتحميل، وفي رأس القائمة تتحرك مرة عند المرور
+ * وتستمر أثناء العمل (حفظ/تحميل). تُطفأ كلها مع «تقليل الحركة».
+ */
+.mark rect {
+  transform-box: fill-box;
+}
+
+.loading rect:first-child,
+.busy rect:first-child {
+  animation: pan-top 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) infinite;
+}
+
+.loading rect:last-child,
+.busy rect:last-child {
+  animation: pan-bot 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) infinite;
+}
+
+/* المرور على الرابط الحاوي (الشعار في القائمة أو رأس الجوال) */
+*:hover > .live:not(.busy) rect:first-child {
+  animation: pan-top 1s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+*:hover > .live:not(.busy) rect:last-child {
+  animation: pan-bot 1s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@keyframes pan-top {
+  50% {
+    transform: translateX(-17%);
+  }
+}
+
+@keyframes pan-bot {
+  50% {
+    transform: translateX(17%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark rect {
+    animation: none !important;
+  }
+}

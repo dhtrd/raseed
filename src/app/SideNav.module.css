@@ -73,6 +73,23 @@
   color: var(--ink);
 }
 
+/* ٤د «خط تحتي» كهرماني ينمو عند المرور (DECISIONS 2026-10-11) */
+.item::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 5px;
+  inset-inline: 12px;
+  block-size: 2.5px;
+  border-radius: 2px;
+  background: var(--mark-acc);
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.item:hover::after {
+  transform: scaleX(1);
+}
+
 .item:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: -3px;
@@ -125,6 +142,10 @@
   padding: 0;
 }
 
+.rail .item::after {
+  inset-inline: 22%;
+}
+
 .rail .lbl {
   position: absolute;
   inline-size: 1px;
@@ -135,4 +156,10 @@
 
 .rail .fold .ic {
   transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item::after {
+    transition: none;
+  }
 }

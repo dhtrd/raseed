@@ -1,16 +1,18 @@
 import type { ReactNode } from "react";
+import { useHoldBusy } from "./busy";
 import { Mark } from "./Logo";
 import s from "./LedgerState.module.css";
 
 /**
  * حالتا التحميل والفراغ (الخيار ج المعتمد في proposals/2026-10-11-loading-empty.html، DECISIONS 2026-10-11):
- * صفحة دفتر مسطّرة بهامشها، وفي وسطها شعار «علامة التوازن» تنبض أشرطته أثناء التحميل.
+ * صفحة دفتر مسطّرة بهامشها، وفي وسطها شعار «علامة التوازن» بحركة «الكفّتان» (DECISIONS 2026-10-11).
  */
 export function LoadingLedger({ label }: { label: string }) {
+  useHoldBusy(true);
   return (
     <div className={s.ledger} role="status" aria-live="polite">
       <div className={s.center}>
-        <Mark className={s.mark} />
+        <Mark className={s.mark} motion="loading" />
         <span>{label}</span>
       </div>
     </div>
