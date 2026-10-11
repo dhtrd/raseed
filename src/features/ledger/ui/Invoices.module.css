@@ -142,6 +142,15 @@
   padding: 1.5px 11px;
 }
 
+/* الزر السريع «دخلت ✓» بجانب ختم «لم تدخل» */
+.stWrap {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px 8px;
+}
+
 /* ---------- التقرير الجانبي ---------- */
 .repList {
   margin: 10px 0 0;
