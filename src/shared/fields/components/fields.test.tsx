@@ -8,6 +8,7 @@ import { DateField } from "./DateField";
 import { RefField } from "./RefField";
 import { VoucherField } from "./VoucherField";
 import { Checkbox } from "./Checkbox";
+import { asPeriod } from "./PeriodFilter";
 import { DocTypeSegment, type DocType } from "./Segment";
 import { ReasonDialog } from "./ReasonDialog";
 import { PasswordField } from "./LoginFields";
@@ -265,5 +266,20 @@ describe("PasswordField", () => {
     expect(screen.getByText("القوة: قوية")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "إظهار كلمة المرور" }));
     expect(input).toHaveAttribute("type", "text");
+  });
+});
+
+describe("asPeriod: فترة من حالة التنقل", () => {
+  it("تُقبل السليمة فقط", () => {
+    expect(asPeriod({ kind: "quarter", from: "2026-10-01", to: "2026-12-31" })).toEqual({
+      kind: "quarter",
+      from: "2026-10-01",
+      to: "2026-12-31",
+    });
+    expect(asPeriod(null)).toBeNull();
+    expect(asPeriod({ kind: "week", from: "2026-10-01", to: "2026-12-31" })).toBeNull();
+    expect(asPeriod({ kind: "custom", from: "2026-13-01", to: "2026-12-31" })).toBeNull();
+    expect(asPeriod({ kind: "custom", from: "2026-12-31", to: "2026-10-01" })).toBeNull();
+    expect(asPeriod({ kind: "year", from: "<script>", to: "2026-12-31" })).toBeNull();
   });
 });

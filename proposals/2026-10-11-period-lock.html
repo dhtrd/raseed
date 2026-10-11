@@ -1,0 +1,356 @@
+<title>رصيد · قفل الفترات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاثة خيارات مكدّسة، كل منها شاشة تفاعلية تتبدّل بين الحاسوب (1100px) والجوال (360px)، ثم الأسئلة. الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --neg-wash: #f8e8e9; --tab: #e2e8ee; --amber: #b8752a; --amber-wash: #fbf1e4;
+  --scrim: rgb(20 27 38 / 42%); --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.lead { color: var(--ink-2); max-width: 76ch; margin: 6px 0 16px; }
+.eg { display: inline-block; font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 6px; margin-inline-start: 6px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; display: grid; gap: 6px; }
+
+.opt { margin-bottom: 36px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 82ch; }
+.opt ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; position: relative; width: 1100px; max-width: none; margin-inline: auto; min-height: 560px; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; transition: width .2s; }
+.screen.phone { width: 360px; border-radius: 24px; min-height: 700px; }
+@media (prefers-reduced-motion: reduce) { .screen { transition: none; } }
+
+.mast { display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: var(--surface); border-bottom: 3px double var(--ink); font-weight: 700; }
+.mast .brand { font-family: var(--f-brand); font-size: 20px; }
+.mast .tabs { display: flex; gap: 6px; font-size: 14px; color: var(--ink-2); overflow: hidden; }
+.mast .tabs span { padding: 2px 10px; border-radius: 8px 8px 0 0; background: var(--tab); white-space: nowrap; }
+.mast .tabs span.on { background: var(--paper); color: var(--ink); }
+@container (width < 600px) { .mast .tabs { display: none; } }
+
+/* شريط «القفل مفتوح مؤقتاً» يظهر أعلى كل الشاشات للمالك */
+.tempbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px 16px; background: var(--amber-wash); border-bottom: 2px solid var(--amber); font-size: 15px; }
+.tempbar b { color: var(--amber); }
+.tempbar .sp { flex: 1; min-width: 200px; }
+
+.page { padding: 18px 22px; display: grid; gap: 16px; }
+@container (width < 600px) { .page { padding: 14px 14px 22px; } }
+.page h3.t { font-size: 22px; }
+.sub { color: var(--ink-2); font-size: 14.5px; }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; align-items: start; }
+@container (width < 900px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+
+.card { background: var(--surface); border: 1px solid var(--rule); border-top: 3px double var(--ink); padding: 14px 16px; display: grid; gap: 12px; }
+.lockbig { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.lockbig .ic { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--wash); color: var(--accent); flex: none; }
+.lockbig .ic svg { width: 24px; height: 24px; }
+.lockbig .lbl { font-size: 14px; color: var(--ink-2); }
+.lockbig .val { font-size: 30px; font-weight: 700; line-height: 1.1; }
+.lockbig.open .ic { background: var(--amber-wash); color: var(--amber); }
+.facts { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 14.5px; color: var(--ink-2); }
+.facts b { color: var(--ink); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 4px 16px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; }
+.btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn.ghost { border-color: var(--rule); color: var(--ink); }
+.btn.warn { border-color: var(--amber); color: var(--amber); }
+.btn.sm { min-height: 36px; font-size: 14px; padding: 2px 12px; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; }
+@container (width < 600px) { .acts .btn { flex: 1 1 100%; } }
+
+.form { display: grid; gap: 10px; padding: 12px 14px; background: var(--wash-2); border: 1px dashed var(--rule); border-radius: 6px; }
+.form h4 { font-size: 16px; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+@container (width < 600px) { .g2 { grid-template-columns: 1fr; } }
+.fl { font-size: 13.5px; font-weight: 700; color: var(--ink-2); display: block; margin-bottom: 2px; }
+.in { width: 100%; min-height: 44px; padding: 7px 10px; background: var(--surface); color: var(--ink); border: 0; border-bottom: 1.5px solid var(--rule); border-radius: 4px 4px 0 0; font: inherit; font-size: 16px; }
+.in.n { font-family: var(--f-num); direction: ltr; text-align: right; }
+.in:focus { outline: none; border-bottom-color: var(--accent); background: var(--wash); }
+.in.bad { border-bottom: 2px solid var(--neg); }
+.err { color: var(--neg); font-size: 13.5px; font-weight: 700; }
+.impact { font-size: 14.5px; padding: 8px 10px; border-radius: 4px; background: var(--surface); border-inline-start: 4px solid var(--accent); }
+.impact.opening { border-inline-start-color: var(--amber); }
+
+.hist { list-style: none; margin: 0; padding: 0; display: grid; }
+.hist li { display: grid; gap: 2px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 14.5px; }
+.hist li:last-child { border-bottom: 0; }
+.hist .what { font-weight: 700; }
+.hist .who { color: var(--ink-2); font-size: 13.5px; }
+.hist .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 0 6px; border-radius: 3px; margin-inline-start: 6px; }
+.hist .tag.open { background: var(--amber-wash); color: var(--amber); border: 1px solid var(--amber); }
+.hist .tag.close { background: var(--wash); color: var(--accent); border: 1px solid var(--accent); }
+.side h4 { font-size: 16px; margin-bottom: 4px; }
+.side p { font-size: 14.5px; color: var(--ink-2); }
+.side p + p { margin-top: 6px; }
+
+/* ب. خط الأشهر */
+.yearbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; }
+@container (width < 600px) { .months { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.mo { min-height: 64px; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--surface); font: inherit; cursor: pointer; display: grid; place-items: center; align-content: center; gap: 2px; color: var(--ink); padding: 4px 2px; }
+.mo small { font-size: 12px; color: var(--ink-2); }
+.mo.locked { background: repeating-linear-gradient(135deg, var(--wash) 0 6px, var(--surface) 6px 12px); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.mo.opened { background: var(--amber-wash); border-color: var(--amber); border-style: dashed; color: var(--amber); font-weight: 700; }
+.mo.edge { box-shadow: inset 0 -4px 0 var(--accent); }
+.mo.sel { outline: 3px solid var(--ink); outline-offset: 1px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13.5px; color: var(--ink-2); }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-inline-end: 6px; border: 1.5px solid; }
+.legend .l1 { background: var(--wash); border-color: var(--accent); }
+.legend .l2 { background: var(--amber-wash); border-color: var(--amber); border-style: dashed; }
+.legend .l3 { background: var(--surface); border-color: var(--rule); }
+
+/* ج. من نافذة التعديل */
+.scrim { position: absolute; inset: 0; background: var(--scrim); display: grid; place-items: center; padding: 18px; }
+.screen.phone .scrim { place-items: end stretch; padding: 0; }
+.dlg { width: 560px; max-width: 100%; max-height: 100%; overflow: auto; background: var(--surface); border-radius: 10px; box-shadow: var(--shadow); border-top: 4px solid var(--accent); padding: 16px 18px; display: grid; gap: 12px; }
+.screen.phone .dlg { border-radius: 14px 14px 0 0; }
+.dlg h4 { font-size: 18px; }
+.lockwarn { padding: 10px 12px; border: 1.5px solid var(--amber); border-inline-start-width: 6px; background: var(--amber-wash); border-radius: 4px; font-size: 15px; display: grid; gap: 8px; }
+.lockwarn b { color: var(--amber); }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; counter-reset: s; }
+.steps li { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--ink-2); }
+.steps li::before { counter-increment: s; content: counter(s); width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--rule); font-family: var(--f-num); font-size: 14px; flex: none; }
+.steps li.run { color: var(--ink); font-weight: 700; }
+.steps li.run::before { border-color: var(--accent); color: var(--accent); }
+.steps li.done { color: var(--accent); }
+.steps li.done::before { content: "✓"; background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.chk { display: inline-flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 15px; }
+.chk i { width: 22px; height: 22px; border: 2px solid var(--amber); border-radius: 4px; display: inline-grid; place-items: center; font-style: normal; color: var(--on-accent); font-size: 14px; flex: none; margin-top: 2px; }
+.chk[aria-checked="true"] i { background: var(--amber); }
+.chk[aria-checked="true"] i::after { content: "✓"; }
+.done-msg { color: var(--accent); font-weight: 700; }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 8px; }
+.qs b { color: var(--accent); }
+</style>
+
+<div class="wrap">
+  <h1>شاشة قفل الفترات</h1>
+  <p class="lead">المالك وحده يضبط «مقفل حتى X»: لا إضافة ولا تعديل لحركة بتاريخ قبله أو يساويه، لأي دور. وقرارك (الخيار ب): لتعديل حركة مقفلة يفتح المالك القفل مؤقتاً ثم يعيده. هذه ثلاثة أشكال تفاعلية؛ بدّل كل شاشة بين الحاسوب والجوال. التواريخ والأرقام وهمية<span class="eg">مثال</span>.</p>
+
+  <div class="common">
+    <p><b>في الأشكال الثلاثة:</b> كل تغيير لتاريخ الإقفال يُسجَّل في التدقيق بالسبب ويظهر في «سجل الإقفال». القواعد تمنع غير المالك من التغيير، وتمنع أي كتابة في الفترة المقفلة.</p>
+    <p><b>قيد تقني:</b> خطة Spark بلا Cloud Functions، فلا يعيد الخادم القفل تلقائياً بعد مدة. لذلك الفتح المؤقت يُذكَّر به المالك بشريط ظاهر في كل الشاشات حتى يعيد القفل (أ وب)، أو يعيده التطبيق نفسه فور الحفظ (ج).</p>
+  </div>
+
+  <section class="opt" aria-labelledby="ha">
+    <div class="opt-head"><h2 id="ha">أ. بطاقة الإقفال وسجله</h2><div class="seg" data-view="a" role="group" aria-label="عرض الخيار أ"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">بطاقة واحدة تعرض «مقفل حتى» وأثره، وزرّان: «تغيير تاريخ الإقفال» و«فتح مؤقت». الفتح المؤقت يحفظ التاريخ السابق، ويُظهر شريطاً كهرمانياً أعلى كل الشاشات بزر «إعادة القفل» حتى يعيده المالك.</p>
+    <ul class="pc"><li class="pro">الأبسط والأوضح؛ نموذج واحد مألوف.</li><li class="pro">الفتح المؤقت ظاهر دائماً فلا يُنسى.</li><li>تعديل الحركة المقفلة ثلاث خطوات يدوية (فتح، تعديل، إعادة).</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <div class="opt-head"><h2 id="hb">ب. خط الأشهر</h2><div class="seg" data-view="b" role="group" aria-label="عرض الخيار ب"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">أشهر السنة شريطاً: المقفل مخطّط، والمفتوح مؤقتاً كهرماني متقطع. النقر على شهر يقترح الإقفال حتى نهايته، أو فتحه مؤقتاً. الشريط الكهرماني نفسه أعلى الشاشات.</p>
+    <ul class="pc"><li class="pro">يُرى أي شهر مقفل بنظرة واحدة.</li><li class="pro">مناسب لإقفال الأشهر والأرباع بانتظام.</li><li>الإقفال بنهاية شهر فقط (لا يوم بعينه) إلا من «تاريخ مخصص».</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <div class="opt-head"><h2 id="hc">ج. بطاقة بسيطة + فتح مؤقت من نافذة التعديل</h2><div class="seg" data-view="c" role="group" aria-label="عرض الخيار ج"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">الشاشة للتاريخ وسجله فقط. أما تعديل حركة مقفلة فمن نافذة التعديل نفسها: يرى المالك تنبيهاً وخانة تأكيد، و«حفظ» ينفّذ ثلاث خطوات متتالية: يفتح القفل قبل تاريخ الحركة، ويحفظ التعديل، ويعيد القفل فوراً. كل خطوة في التدقيق.</p>
+    <ul class="pc"><li class="pro">أسرع لتصحيح الحركات المقفلة؛ لا يُنسى القفل مفتوحاً.</li><li class="pro">لا تغيير على القواعد.</li><li>الخطوات الثلاث ليست عملية واحدة: إن انقطع الاتصال بعد الفتح يظهر الشريط الكهرماني حتى تُعاد.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الشكل:</b> أ أم ب أم ج؟</li>
+      <li><b>سبب تغيير تاريخ الإقفال:</b> إلزامي (كما في النماذج) أم اختياري؟</li>
+      <li><b>تاريخ الإقفال في المستقبل:</b> يُمنع (لا يتجاوز اليوم) أم يُسمح؟</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const TODAY = "2026-10-11";
+  const fmt = (iso) => iso ? iso.split("-").reverse().join("/") : "—";
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const parse = (raw) => {
+    const d = String(raw).replace(/\D/g, "");
+    let dd, mm, yy;
+    if (d.length === 6) { dd = d.slice(0, 2); mm = d.slice(2, 4); yy = "20" + d.slice(4); }
+    else if (d.length === 8) { dd = d.slice(0, 2); mm = d.slice(2, 4); yy = d.slice(4); }
+    else return null;
+    const iso = `${yy}-${mm}-${dd}`;
+    const t = new Date(iso + "T00:00:00Z");
+    return isNaN(t) || t.toISOString().slice(0, 10) !== iso ? null : iso;
+  };
+  const lastDay = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+  const lockSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
+  const openSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/></svg>`;
+  /** عدد وهمي للحركات حتى تاريخ: يكفي لإظهار «الأثر» في النموذج */
+  const countUntil = (iso) => Math.max(0, Math.round((Date.parse(iso) - Date.parse("2026-01-01")) / 864e5 * 9.4));
+  const mast = () => `<div class="mast"><span class="brand">رصيد</span><div class="tabs"><span>الأرصدة</span><span>كشف الحساب</span><span>الفواتير</span><span>المراجعة</span><span class="on">قفل الفترات</span></div></div>`;
+
+  function makeState() {
+    return {
+      lock: "2026-06-30", prev: null, form: null, err: {}, saved: "",
+      hist: [
+        { what: "قفل حتى 30/06/2026", from: "2026-03-31", tag: "close", who: "صاحب المنشأة · 05/07/2026 10:12", why: "إقفال الربع الثاني بعد المطابقة" },
+        { what: "قفل حتى 31/03/2026", from: null, tag: "close", who: "صاحب المنشأة · 04/04/2026 09:40", why: "إقفال الربع الأول" },
+      ],
+    };
+  }
+  const tempbar = (st) => st.prev ? `<div class="tempbar" role="status"><span class="sp"><b>القفل مفتوح مؤقتاً:</b> كان مقفلاً حتى <span class="num">${fmt(st.prev)}</span>، والآن حتى <span class="num">${fmt(st.lock)}</span>. أعده بعد انتهاء التصحيح.</span><button type="button" class="btn sm warn" data-act="relock">إعادة القفل إلى ${fmt(st.prev)}</button></div>` : "";
+  const histHTML = (st) => `<ul class="hist">${st.hist.map((h) => `<li><span class="what">${esc(h.what)}<span class="tag ${h.tag}">${h.tag === "open" ? "فتح مؤقت" : h.tag === "re" ? "إعادة قفل" : "قفل"}</span></span><span>${esc(h.why)}</span><span class="who">${esc(h.who)}</span></li>`).join("")}</ul>`;
+  const lockCard = (st, extra = "") => `<div class="lockbig ${st.prev ? "open" : ""}"><span class="ic">${st.prev ? openSvg : lockSvg}</span><div><div class="lbl">${st.prev ? "مفتوح مؤقتاً · مقفل الآن حتى" : "مقفل حتى"}</div><div class="val num">${fmt(st.lock)}</div></div></div>
+    <div class="facts"><span>الحركات المقفلة <b class="num">${countUntil(st.lock).toLocaleString("en-US")}</b></span><span>آخر تغيير <b>${esc(st.hist[0].who.split(" · ")[1] || "")}</b></span></div>${extra}`;
+
+  function formHTML(st) {
+    const f = st.form; if (!f) return "";
+    const iso = parse(f.date);
+    const dir = iso && iso < st.lock ? "opening" : "closing";
+    const impact = iso ? (iso === st.lock ? "التاريخ نفسه؛ لا تغيير." : dir === "opening"
+      ? `يُفتح للكتابة ما بين <span class="num">${fmt(iso)}</span> و<span class="num">${fmt(st.lock)}</span> (نحو <span class="num">${(countUntil(st.lock) - countUntil(iso)).toLocaleString("en-US")}</span> حركة).`
+      : `يُقفل ما بين <span class="num">${fmt(st.lock)}</span> و<span class="num">${fmt(iso)}</span> (نحو <span class="num">${(countUntil(iso) - countUntil(st.lock)).toLocaleString("en-US")}</span> حركة).`) : "اكتب التاريخ يوماً ثم شهراً، مثل 300926.";
+    return `<div class="form"><h4>${f.temp ? "فتح مؤقت لتصحيح حركات" : "تغيير تاريخ الإقفال"}</h4>
+      <div class="g2"><label><span class="fl">${f.temp ? "افتح القفل إلى (أقدم من الحالي)" : "مقفل حتى"}</span><input class="in n${st.err.date ? " bad" : ""}" data-f="date" value="${esc(f.date)}" inputmode="numeric" placeholder="300926">${st.err.date ? `<span class="err">${st.err.date}</span>` : ""}</label>
+      <label><span class="fl">السبب (يُحفظ في التدقيق)</span><input class="in${st.err.why ? " bad" : ""}" data-f="why" value="${esc(f.why)}" placeholder="${f.temp ? "تصحيح تاريخ مقلوب في مارس" : "إقفال الربع الثالث"}">${st.err.why ? `<span class="err">${st.err.why}</span>` : ""}</label></div>
+      <p class="impact ${dir}">${impact}</p>
+      <div class="acts"><button type="button" class="btn primary" data-act="apply">${f.temp ? "فتح مؤقت" : "حفظ تاريخ الإقفال"}</button><button type="button" class="btn ghost" data-act="cancel">إلغاء</button></div></div>`;
+  }
+  function apply(st) {
+    const f = st.form; const iso = parse(f.date); st.err = {};
+    if (!iso) st.err.date = "تاريخ غير صحيح.";
+    else if (iso > TODAY) st.err.date = "لا يتجاوز اليوم.";
+    else if (f.temp && iso >= st.lock) st.err.date = "الفتح المؤقت يكون إلى تاريخ أقدم من الحالي.";
+    if (!f.why.trim()) st.err.why = "اكتب السبب.";
+    if (Object.keys(st.err).length) return false;
+    const stamp = "صاحب المنشأة · 11/10/2026 الآن";
+    if (f.temp) { st.prev = st.lock; st.hist.unshift({ what: `فتح مؤقت إلى ${fmt(iso)}`, tag: "open", who: stamp, why: f.why }); }
+    else { st.prev = null; st.hist.unshift({ what: `قفل حتى ${fmt(iso)}`, tag: "close", who: stamp, why: f.why }); }
+    st.lock = iso; st.form = null; st.saved = f.temp ? "فُتح القفل مؤقتاً، وسُجّل في التدقيق." : "حُفظ تاريخ الإقفال، وسُجّل في التدقيق.";
+    return true;
+  }
+  function relock(st) {
+    if (!st.prev) return;
+    st.hist.unshift({ what: `إعادة القفل حتى ${fmt(st.prev)}`, tag: "re", who: "صاحب المنشأة · 11/10/2026 الآن", why: "انتهى التصحيح" });
+    st.lock = st.prev; st.prev = null; st.saved = "أُعيد القفل، وسُجّل في التدقيق.";
+  }
+  function bindCommon(el, st, draw, extra) {
+    el.addEventListener("input", (e) => { const k = e.target.dataset.f; if (k && st.form) { st.form[k] = e.target.value; const pos = e.target.selectionStart; draw(); const n = el.querySelector(`[data-f="${k}"]`); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch {} } } });
+    el.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-act]"); if (!b) return;
+      const a = b.dataset.act;
+      st.saved = "";
+      if (a === "change") { st.form = { temp: false, date: "", why: "" }; st.err = {}; }
+      else if (a === "temp") { st.form = { temp: true, date: "", why: "" }; st.err = {}; }
+      else if (a === "cancel") { st.form = null; st.err = {}; }
+      else if (a === "apply") apply(st);
+      else if (a === "relock") relock(st);
+      else if (extra) extra(a, b);
+      draw();
+    });
+  }
+
+  // أ
+  (() => { const el = document.getElementById("sa"); const st = makeState();
+    const draw = () => { el.innerHTML = mast() + tempbar(st) + `<div class="page"><div><h3 class="t">قفل الفترات</h3><p class="sub">للمالك فقط. لا كتابة لأي دور في حركة بتاريخ قبل «مقفل حتى» أو يساويه.</p></div>
+      <div class="cols"><div class="card">${lockCard(st, `<div class="acts"><button type="button" class="btn primary" data-act="change">تغيير تاريخ الإقفال</button><button type="button" class="btn warn" data-act="temp" ${st.prev ? "disabled" : ""}>فتح مؤقت لتصحيح حركات</button></div>`)}${formHTML(st)}${st.saved ? `<p class="done-msg" role="status">✓ ${st.saved}</p>` : ""}</div>
+      <aside class="card side"><h4>سجل الإقفال</h4>${histHTML(st)}</aside></div></div>`; };
+    bindCommon(el, st, draw); draw(); })();
+
+  // ب
+  (() => { const el = document.getElementById("sb"); const st = makeState(); st.year = 2026; st.sel = null;
+    const draw = () => {
+      const months = MONTHS.map((n, i) => {
+        const end = `${st.year}-${String(i + 1).padStart(2, "0")}-${String(lastDay(st.year, i + 1)).padStart(2, "0")}`;
+        const locked = end <= st.lock; const opened = st.prev && end > st.lock && end <= st.prev;
+        const edge = end === (st.prev || st.lock);
+        return `<button type="button" class="mo${locked ? " locked" : ""}${opened ? " opened" : ""}${edge ? " edge" : ""}${st.sel === end ? " sel" : ""}" data-act="month" data-end="${end}" aria-label="${n} ${st.year}${locked ? "، مقفل" : opened ? "، مفتوح مؤقتاً" : ""}"><span>${n}</span><small>${locked ? "مقفل" : opened ? "مفتوح مؤقتاً" : end > TODAY ? "قادم" : "مفتوح"}</small></button>`;
+      }).join("");
+      const selBox = st.sel && !st.form ? `<div class="form"><h4>${MONTHS[+st.sel.slice(5, 7) - 1]} ${st.year}</h4><p class="sub">نهاية الشهر <span class="num">${fmt(st.sel)}</span></p><div class="acts">${st.sel > st.lock && st.sel <= TODAY ? `<button type="button" class="btn primary" data-act="lockto">قفل حتى نهايته</button>` : ""}${st.sel <= st.lock && !st.prev ? `<button type="button" class="btn warn" data-act="openfrom">فتح مؤقت من بدايته</button>` : ""}<button type="button" class="btn ghost" data-act="unsel">إغلاق</button></div></div>` : "";
+      el.innerHTML = mast() + tempbar(st) + `<div class="page"><div><h3 class="t">قفل الفترات</h3><p class="sub">انقر شهراً لقفله حتى نهايته أو فتحه مؤقتاً.</p></div>
+      <div class="cols"><div class="card">${lockCard(st)}
+        <div class="yearbar"><button type="button" class="btn sm ghost" data-act="py" aria-label="السنة السابقة">‹ ${st.year - 1}</button><b class="num">${st.year}</b><button type="button" class="btn sm ghost" data-act="ny" aria-label="السنة التالية" ${st.year >= 2026 ? "disabled" : ""}>${st.year + 1} ›</button></div>
+        <div class="months">${months}</div>
+        <div class="legend"><span><i class="l1"></i>مقفل</span><span><i class="l2"></i>مفتوح مؤقتاً</span><span><i class="l3"></i>مفتوح</span></div>
+        ${selBox}${formHTML(st)}
+        <div class="acts"><button type="button" class="btn ghost sm" data-act="change">تاريخ مخصص</button></div>
+        ${st.saved ? `<p class="done-msg" role="status">✓ ${st.saved}</p>` : ""}</div>
+      <aside class="card side"><h4>سجل الإقفال</h4>${histHTML(st)}</aside></div></div>`;
+    };
+    bindCommon(el, st, draw, (a, b) => {
+      if (a === "month") { st.sel = b.dataset.end; st.form = null; }
+      else if (a === "unsel") st.sel = null;
+      else if (a === "py") st.year--; else if (a === "ny") st.year++;
+      else if (a === "lockto") { st.form = { temp: false, date: fmt(st.sel), why: "" }; st.sel = null; }
+      else if (a === "openfrom") { const d = new Date(st.sel + "T00:00:00Z"); d.setUTCDate(0); st.form = { temp: true, date: fmt(d.toISOString().slice(0, 10)), why: "" }; st.sel = null; }
+    });
+    draw(); })();
+
+  // ج
+  (() => { const el = document.getElementById("sc"); const st = makeState(); st.dlg = true; st.ok = false; st.step = 0; st.why = ""; st.dErr = {};
+    const entry = { sup: "المورد (ج)", ref: "P12290", cur: "2026-03-08", fix: "2026-08-03" };
+    const steps = ["فتح القفل مؤقتاً إلى " + fmt("2026-03-07"), "حفظ تعديل الحركة", "إعادة القفل إلى " + fmt("2026-06-30")];
+    const dlgHTML = () => `<div class="scrim"><div class="dlg" role="dialog" aria-label="تعديل الحركة"><h4>تعديل الحركة</h4><p class="sub">${entry.sup} · فاتورة <span class="num">${entry.ref}</span></p>
+      <div class="lockwarn"><p><b>الحركة في فترة مقفلة:</b> تاريخها <span class="num">${fmt(entry.cur)}</span> والقفل حتى <span class="num">${fmt("2026-06-30")}</span>.</p>
+      <span class="chk" role="checkbox" tabindex="0" aria-checked="${st.ok}" data-act="ok"><i></i>افتح القفل مؤقتاً لهذه الحركة ثم أعده فوراً (للمالك فقط)</span>${st.dErr.ok ? `<span class="err">${st.dErr.ok}</span>` : ""}</div>
+      <div class="g2"><label><span class="fl">التاريخ</span><input class="in n" value="${fmt(entry.fix)}" readonly></label><label><span class="fl">التاريخ السابق</span><input class="in n" value="${fmt(entry.cur)}" readonly></label></div>
+      <label><span class="fl">سبب التعديل (يُحفظ في التدقيق)</span><input class="in${st.dErr.why ? " bad" : ""}" data-f="dwhy" value="${esc(st.why)}" placeholder="تاريخ مقلوب يوماً وشهراً">${st.dErr.why ? `<span class="err">${st.dErr.why}</span>` : ""}</label>
+      ${st.step ? `<ol class="steps" aria-label="الخطوات">${steps.map((t, i) => `<li class="${i < st.step - 1 || st.step === 4 ? "done" : i === st.step - 1 ? "run" : ""}">${t}</li>`).join("")}</ol>` : ""}
+      ${st.step === 4 ? `<p class="done-msg" role="status">✓ حُفظ التعديل وأُعيد القفل. ثلاث خطوات في التدقيق.</p>` : ""}
+      <div class="acts"><button type="button" class="btn primary" data-act="save" ${st.step && st.step < 4 ? "disabled" : ""}>${st.step === 4 ? "تم" : "حفظ التعديل"}</button><button type="button" class="btn ghost" data-act="close">${st.step === 4 ? "إغلاق" : "إلغاء"}</button></div></div></div>`;
+    const draw = () => {
+      el.innerHTML = mast() + tempbar(st) + `<div class="page"><div><h3 class="t">قفل الفترات</h3><p class="sub">تاريخ الإقفال وسجله. تصحيح حركة مقفلة يتم من نافذة تعديلها.</p></div>
+        <div class="cols"><div class="card">${lockCard(st, `<div class="acts"><button type="button" class="btn primary" data-act="change">تغيير تاريخ الإقفال</button><button type="button" class="btn ghost" data-act="opendlg">جرّب: تعديل حركة مقفلة</button></div>`)}${formHTML(st)}${st.saved ? `<p class="done-msg" role="status">✓ ${st.saved}</p>` : ""}</div>
+        <aside class="card side"><h4>سجل الإقفال</h4>${histHTML(st)}</aside></div></div>${st.dlg ? dlgHTML() : ""}`;
+    };
+    el.addEventListener("input", (e) => { if (e.target.dataset.f === "dwhy") { st.why = e.target.value; st.dErr.why = null; } });
+    el.addEventListener("keydown", (e) => { if (e.target.dataset.act === "ok" && (e.key === " " || e.key === "Enter")) { e.preventDefault(); st.ok = !st.ok; draw(); } });
+    bindCommon(el, st, draw, (a) => {
+      if (a === "ok") { st.ok = !st.ok; st.dErr.ok = null; }
+      else if (a === "opendlg") { st.dlg = true; st.step = 0; st.ok = false; st.why = ""; st.dErr = {}; }
+      else if (a === "close") st.dlg = false;
+      else if (a === "save") {
+        if (st.step === 4) { st.dlg = false; return; }
+        st.dErr = {};
+        if (!st.ok) st.dErr.ok = "أكّد الفتح المؤقت أولاً.";
+        if (!st.why.trim()) st.dErr.why = "اكتب سبب التعديل.";
+        if (Object.keys(st.dErr).length) return;
+        st.step = 1;
+        const tick = () => { st.step++; if (st.step === 4) {
+            st.hist.unshift({ what: "إعادة القفل حتى 30/06/2026", tag: "re", who: "صاحب المنشأة · الآن", why: "تلقائياً بعد حفظ التعديل" });
+            st.hist.unshift({ what: "فتح مؤقت إلى 07/03/2026", tag: "open", who: "صاحب المنشأة · الآن", why: st.why });
+          } draw(); if (st.step < 4) setTimeout(tick, 650); };
+        setTimeout(tick, 650);
+      }
+    });
+    draw(); })();
+
+  // تبديل حاسوب/جوال
+  document.querySelectorAll(".seg[data-view]").forEach((g) => g.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.getElementById("s" + g.dataset.view).classList.toggle("phone", b.dataset.v === "phone");
+  }));
+})();
+</script>

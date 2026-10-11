@@ -9,6 +9,18 @@ import s from "./PeriodFilter.module.css";
 export type PeriodKind = "year" | "quarter" | "month" | "custom";
 export type Period = { kind: PeriodKind; from: IsoDate; to: IsoDate };
 
+const ISO = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+/** فترة قادمة من خارج المكوّن (مثل حالة التنقل): تُقبل فقط إن كانت سليمة الشكل، وإلا null. */
+export function asPeriod(x: unknown): Period | null {
+  if (!x || typeof x !== "object") return null;
+  const o = x as Record<string, unknown>;
+  const kinds: PeriodKind[] = ["year", "quarter", "month", "custom"];
+  if (!kinds.includes(o.kind as PeriodKind)) return null;
+  if (typeof o.from !== "string" || typeof o.to !== "string") return null;
+  if (!ISO.test(o.from) || !ISO.test(o.to) || o.from > o.to) return null;
+  return { kind: o.kind as PeriodKind, from: o.from, to: o.to };
+}
+
 const lastDay = (y: number, m: number) => new Date(Date.UTC(y, m, 0)).getUTCDate();
 
 export function periodFor(kind: Exclude<PeriodKind, "custom">, y: number, n: number): Period {
