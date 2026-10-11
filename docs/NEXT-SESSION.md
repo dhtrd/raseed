@@ -1,38 +1,43 @@
 # استئناف «رصيد» في جلسة جديدة
 
-> نقطة الاستئناف: 2026-10-10 ليلاً. المرحلة 2 منجزة على `claude/rasid-phase-2-87189q` (لا main) بانتظار مراجعة المستخدم ثم PR. التفاصيل في PROGRESS.md.
+> نقطة الاستئناف: 2026-10-11. المراحل 1–3 مدموجة في `main` ومنشورة على https://dhtrd.github.io/raseed/. المرحلة 4 بدأت للتو.
 
-## حالة المستودع
-- `main` = نهاية المرحلة 1 (`85ec46d`). القواعد مرفوعة إلى `raseed-dhtrd` (Actions run 38081186815).
-- فرع `claude/rasid-project-review-yl4mlo` متقدم على main بـ commits توثيقية فقط (PROGRESS/DECISIONS/هذا الملف).
-- 6 PRs من Dependabot موجّهة إلى main (dhtrd/raseed#1–#6): ترقيات كبرى (TypeScript 7، ESLint 10، jsdom 30، Playwright 1.63، إجراءات Actions). تُراجع بعد دمج المرحلة 2.
-- أسرار GitHub موجودة: `FIREBASE_SERVICE_ACCOUNT` و`VITE_FIREBASE_*` الخمسة (في Secrets لا Variables؛ اقرأها في CI بـ `secrets.`).
+## اقرأ أولاً (بالترتيب)
+CLAUDE.md ← DECISIONS.md ← PROGRESS.md ← هذا الملف ← SPEC.md (v1.2) ← FIELDS.md ← CHOSEN.md ← docs/firestore-schema.md ← docs/migration.md.
 
-## ما لا يوجد في المستودع (عمداً)
-- `private/` (البيانات الحقيقية) ليس في git والمستودع عام. لا تحتاجه المرحلة 2. المرحلة 3 (النقل) تحتاج المستخدم يرفع ملف الإكسل وKNOWN-ISSUES الأصلي من جهازه.
+## حالة المستودع والإنتاج
+- Firebase `raseed-dhtrd`: القواعد مرفوعة. **البيانات الحقيقية منقولة**: 19 مورداً، 2,602 حركة، 2,575 فهرس مرجع، 58 حركة في `migrationIssues` للتعديل اليدوي، 299 فاتورة «دخلت Odoo»، علامة `settings/migration`. مفتاح النقل أُبطل.
+- حساب المالك يعمل (دخول بالبريد فقط). الوضع النهاري دائماً (`data-theme="light"` في index.html).
+- أسرار GitHub: `FIREBASE_SERVICE_ACCOUNT` و`VITE_FIREBASE_*` (في Secrets).
+- 6 PRs من Dependabot (dhtrd/raseed#1–#6) ترقيات كبرى ما زالت مفتوحة.
+- حماية الفرع `main`: أُعطي المستخدم الخطوات، ولم يؤكد التنفيذ.
 
-## صفحات مرجعية (Artifacts خاصة بالمستخدم)
-- نماذج المرحلة 2 (النسخة 2، معتمدة): https://claude.ai/artifact/2GHbnzdf9UoxUVpkWZNPab
-- دليل مفتاح المالك وإنشاء حسابه: https://claude.ai/artifact/18DkupUkhDZmrF8nuhrCCP
-- نماذج الحقول والإدخال السريع (الإصدار 3، معتمدة): https://claude.ai/artifact/81fL5SCNcWciRxQgnSQoti — نسختها في `proposals/2026-10-10-fields-excel-components.html`.
-- إعداد Firebase: https://claude.ai/artifact/8jGJeU8bY5akm6s8mwEC64 و https://claude.ai/artifact/UU4cYbW6LQhkCpoRo4tpLn
+## المرحلة 4 — ما أُنجز (غير مستعمل بعد في الواجهة)
+- `src/features/ledger/core/ledger.ts` + اختباراته (6): `parseEntry`، `formatMoney`، `balanceState`، `withRunningBalance`، `sumBalances`، `currentQuarter`، `kindLabel` (فاتورة مدينة = مرتجع، قيد دائن = استرداد).
+- `src/features/ledger/data/ledgerRepo.ts`: `listVisibleSuppliers` (الكل للمدير، المسنَدون لمدخل البيانات)، `supplierBalance`/`balancesFor` بتجميع `sum()` (السابق + الفترة)، `openingBalance`، `watchStatement` (مستمع مرتب بالتاريخ ثم المعرف)، `reviewCounts` (من `migrationIssues`)، `ledgerStats` (`count()`).
+- `firestore.indexes.json`: فهرس (supplierId، deleted، date). يُرفع تلقائياً مع القواعد عبر `deploy-rules.yml` بعد الدمج في main.
 
-## خطة المرحلة 2 (من BUILD-PROMPT.md)
-1. نماذج تفاعلية (2–3 خيارات) لشاشة الدخول وإدارة المستخدمين، واعتماد المستخدم قبل أي كود.
-2. الدخول: حقل واحد للبريد أو اسم المستخدم (`identifierToEmail` في `src/shared/fields/core/password.ts`)، سياسة كلمة مرور قوية (مفروضة في Firebase: Require enforcement، 12 حرفاً، الأنواع الأربعة)، إنهاء جلسة تلقائي.
-3. الأدوار الثلاثة، حماية حساب المالك، مسميات أدوار قابلة للتعديل (`settings/roleNames`).
-4. إدارة المستخدمين وإسناد الموردين (بلا Cloud Functions: إنشاء حساب Auth لمستخدم آخر من الواجهة يحتاج حلاً — اعرض الخيارات على المستخدم).
-5. سجل التدقيق غير القابل للتعديل (القواعد جاهزة).
-6. قبل أول دخول: إنشاء حساب المالك بسكربت إعداد يشغّله المستخدم.
-7. في آخر المرحلة: PR إلى main يدمجه المستخدم.
+## المرحلة 4 — الخطوة التالية مباشرة
+1. `DashboardPage` (لوحة الأرصدة) حسب النموذج المعتمد `rased-mockups/direction-1/dashboard.html`: جدول كل الموردين (السابق/مدين/دائن/النهائي) + صف إجمالي، فلترة `PeriodFilter` (افتراضي الربع الحالي)، ترتيب الأعمدة، لوحة جانبية بتنبيهات المراجعة والإحصاءات (للمدير فقط)، بطاقات على الجوال، زر تحديث.
+2. `StatementPage` على `statement/:sid?` حسب `statement.html`: اختيار المورد، «كل الحركات» أو فترة، رصيد افتتاحي ورصيد جارٍ، وسوم النوع (مرتجع/استرداد/بلا نوع)، علامة «للمراجعة».
+3. المسارات والتبويبات في `src/app/App.tsx` و`AppShell.tsx`: «الأرصدة» على `/` بدل Home، و«كشف الحساب».
+4. بذرة المحاكي `tests/e2e-auth/seed.ts` بحركات وهمية + اختبارات e2e للوحة والكشف، ثم lint/typecheck/unit/rules/e2e، ثم PR إلى main.
+5. بعدها: تصدير الكشف Excel/PDF وطباعة A4، فهرس الفواتير وحالة Odoo (إرجاعها بسبب إلزامي)، فهرس القيود، إضافة حركة والإدخال السريع، مركز المراجعة، قفل الفترات، شاشة التدقيق.
+6. **نماذج ناقصة قبل بنائها** (2–3 خيارات واعتماد): فهرس القيود، قفل الفترات، التدقيق، الإشعارات، التحميل والفراغ، بطاقة الإدخال السريع على الجوال.
+
+## صفحات مرجعية (Artifacts)
+- نماذج المرحلة 2 المعتمدة: https://claude.ai/artifact/2GHbnzdf9UoxUVpkWZNPab
+- دليل مفتاح المالك: https://claude.ai/artifact/18DkupUkhDZmrF8nuhrCCP
+- نماذج الحقول والإدخال السريع: https://claude.ai/artifact/81fL5SCNcWciRxQgnSQoti
+- نماذج الواجهة 1 «الدفتر» في المستودع: `rased-mockups/direction-1/` (dashboard، statement، invoices، add-entry، review).
 
 ## تشغيل محلي
-- `npm run test:e2e:auth`: e2e الدخول والمستخدمين على المحاكي (يحتاج Java).
+- e2e على المحاكي: `npm run test:e2e:auth` (يحتاج Java). متصفح محلي: `PW_CHROMIUM=/opt/pw-browsers/chromium`.
 - التطوير على المحاكي: `VITE_USE_EMULATORS=true npx vite` مع `npx firebase emulators:start --only auth,firestore --project demo-raseed`.
 
 ## قواعد العمل المتفق عليها
-- العربية RTL في كل الردود، والمصطلحات الإنجليزية معزولة. صفحات الإرشاد الطويلة كـ Artifact RTL مع أزرار نسخ.
-- لا افتراض: اسأل، واذكر «افتراضات» و«يحتاج قرارك» في نهاية كل رد.
-- لا بيانات حقيقية في git. لا عنصر بمظهر المتصفح الافتراضي.
-- نموذج تفاعلي قبل أي شاشة أو مكوّن جديد.
-- اقرأ أولاً: CLAUDE.md، DECISIONS.md، PROGRESS.md، ثم SPEC.md وFIELDS.md وCHOSEN.md وBUILD-PROMPT.md وdocs/firestore-schema.md.
+- العربية RTL والمصطلحات الإنجليزية معزولة. صفحات الإرشاد الطويلة كـ Artifact.
+- لا افتراض: اسأل، واختم بـ «افتراضات» و«يحتاج قرارك».
+- لا بيانات حقيقية في git (المستودع عام). لا عنصر بمظهر المتصفح الافتراضي.
+- المستخدم لا يتعامل مع Node/Git: Claude ينفّذ ويرفع، والمستخدم يدمج PR من GitHub.
+- حدّث PROGRESS.md وأضف إلى DECISIONS.md (إلحاقي) في نهاية كل جلسة.
