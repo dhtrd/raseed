@@ -72,3 +72,27 @@ button {
     animation: none !important;
   }
 }
+
+/* الطباعة: يُخفى التطبيق وتظهر نسخة الطباعة المرسومة خارجه (كشف المورد) */
+@page {
+  size: a4 portrait;
+  margin: 14mm 12mm 16mm;
+
+  @bottom-left {
+    content: "صفحة " counter(page) " من " counter(pages);
+    font-family: var(--f-text);
+    font-size: 8pt;
+    color: var(--ink-2);
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+    print-color-adjust: exact;
+  }
+
+  #root {
+    display: none;
+  }
+}

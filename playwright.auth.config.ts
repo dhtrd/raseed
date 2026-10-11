@@ -20,7 +20,11 @@ export default defineConfig({
     locale: "ar-SA",
     timezoneId: "Asia/Riyadh",
     // تشغيل محلي بمتصفح مثبت مسبقاً (اختياري): PW_CHROMIUM=/path/to/chrome
-    launchOptions: process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {},
+    // لغة نظام UTF-8: بدونها يستبدل Chromium على Linux أسماء الملفات العربية المنزّلة بـ «download»
+    launchOptions: {
+      env: { ...process.env, LANG: "C.UTF-8", LC_ALL: "C.UTF-8" },
+      ...(process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {}),
+    },
   },
   webServer: {
     command: "npx vite --port 5174 --strictPort",

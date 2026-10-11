@@ -1,7 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
+import { createRequire } from "node:module";
 import { getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { ENTRY, OWNER } from "./seed";
+
+// ExcelJS (CommonJS) بمحمّل Node العادي: محمّل Playwright لا يربط اعتمادياته
+const ExcelJS = createRequire(import.meta.url)("exceljs") as typeof import("exceljs");
 
 /**
  * الأرصدة والكشف على بيانات seed.ts الوهمية. الأرقام المتوقعة محسوبة يدوياً (لا من كود التطبيق):
@@ -46,7 +50,7 @@ test("لوحة الأرصدة للمالك: الأرقام والإجمالي و
   ]);
   // المؤرشف داخل الإجمالي ومعلَّم، والمحذوف ناعماً خارجه
   await expect(rowOf(page, /المورد \(ق\)/)).toContainText("مؤرشف");
-  await expect(page.locator("tfoot td")).toHaveText(["-3,910.01", "3,000.00", "3,500.75", "-4,410.76"]);
+  await expect(page.locator("main tfoot td")).toHaveText(["-3,910.01", "3,000.00", "3,500.75", "-4,410.76"]);
   const side = page.getByRole("complementary", { name: "ملخص الدفتر" });
   await expect(side.getByText("تاريخاً معطوباً أو مقلوباً")).toBeVisible();
   await expect(side.locator("li").filter({ hasText: "سجلاً بلا نوع" })).toContainText("1");
@@ -64,7 +68,7 @@ test("ترتيب الأعمدة: النهائي تصاعدياً يضع الأك
   await expect(final).toHaveAttribute("aria-sort", "descending");
   await final.getByRole("button").click();
   await expect(final).toHaveAttribute("aria-sort", "ascending");
-  await expect(page.locator("tbody tr").first()).toContainText("المورد (ب)");
+  await expect(page.locator("main tbody tr").first()).toContainText("المورد (ب)");
 });
 
 test("كشف المورد: الرصيد الجاري، الأحدث أولاً، الوسوم، والفترة برصيد افتتاحي", async ({ page }) => {
@@ -73,16 +77,16 @@ test("كشف المورد: الرصيد الجاري، الأحدث أولاً،
   await page.getByRole("link", { name: "المورد (أ)" }).click();
   await expect(page).toHaveURL(/\/statement\/s1$/);
   await expect(page.getByRole("heading", { name: "المورد (أ)", level: 1 })).toBeVisible();
-  const body = page.locator("tbody tr");
+  const body = page.locator("main tbody tr");
   await expect(body).toHaveCount(7); // المحذوف ناعماً لا يظهر
   await expect(body.first()).toContainText("07/10/2026");
   await expect(body.first().locator("td").last()).toHaveText("-1,050.75");
   await expect(body.last().locator("td").last()).toHaveText("-1,000.00");
-  await expect(page.getByText("مرتجع", { exact: true })).toBeVisible();
-  await expect(page.getByText("بلا نوع", { exact: true })).toBeVisible();
-  await expect(page.locator("tbody").getByText("للمراجعة", { exact: true })).toHaveCount(2);
-  await expect(page.getByText("اتصال لتأكيد موعد التوريد")).toBeVisible();
-  await expect(page.locator("tfoot td").last()).toHaveText("-1,050.75");
+  await expect(page.locator("main").getByText("مرتجع", { exact: true })).toBeVisible();
+  await expect(page.locator("main").getByText("بلا نوع", { exact: true })).toBeVisible();
+  await expect(page.locator("main tbody").getByText("للمراجعة", { exact: true })).toHaveCount(2);
+  await expect(page.locator("main").getByText("اتصال لتأكيد موعد التوريد")).toBeVisible();
+  await expect(page.locator("main tfoot td").last()).toHaveText("-1,050.75");
 
   // التاريخ تصاعدياً: الأقدم أولاً والرصيد نفسه لكل حركة
   await page
@@ -96,7 +100,7 @@ test("كشف المورد: الرصيد الجاري، الأحدث أولاً،
   await expect(page.getByText(/الرصيد الافتتاحي قبل/)).toContainText("0.00");
   await expect(body).toHaveCount(5);
   await expect(page.getByText("الرصيد الختامي للفترة").first()).toBeVisible();
-  await expect(page.locator("tfoot td").last()).toHaveText("-1,050.75");
+  await expect(page.locator("main tfoot td").last()).toHaveText("-1,050.75");
   await page.screenshot({ path: "test-results/statement-1440.png", fullPage: true });
 });
 
@@ -104,7 +108,7 @@ test("مدخل البيانات: موردوه المسندون فقط، بلا �
   await page.setViewportSize({ width: 1440, height: 900 });
   await loginOk(page, ENTRY.email, ENTRY.password);
   await pickQ4(page);
-  await expect(page.locator("tbody tr")).toHaveCount(1);
+  await expect(page.locator("main tbody tr")).toHaveCount(1);
   await expect(
     rowOf(page, /المورد \(ب\)/)
       .locator("td")
@@ -114,8 +118,8 @@ test("مدخل البيانات: موردوه المسندون فقط، بلا �
   await page.goto("/statement/s1");
   await expect(page.getByText("هذا المورد غير موجود أو غير مسند إليك.")).toBeVisible();
   await page.goto("/statement/s2");
-  await expect(page.locator("tbody tr")).toHaveCount(3);
-  await expect(page.getByText("استرداد", { exact: true })).toBeVisible();
+  await expect(page.locator("main tbody tr")).toHaveCount(3);
+  await expect(page.locator("main").getByText("استرداد", { exact: true })).toBeVisible();
 });
 
 for (const w of [360, 834, 1194]) {
@@ -129,7 +133,7 @@ for (const w of [360, 834, 1194]) {
       await page.goto(path);
       // على اللوحي الأفقي يُخفى جدول الأرصدة ويظهر الإجمالي في الفهرس (حساب T)
       await expect(
-        page.locator("tfoot th:visible, aside button:visible").filter({ hasText: ready }).first(),
+        page.locator("main tfoot th:visible, aside button:visible").filter({ hasText: ready }).first(),
       ).toBeVisible();
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow).toBeLessThanOrEqual(0);
@@ -156,7 +160,7 @@ test("الجوال: «ترتيب حسب» بشرائح بدل رؤوس الأع�
   const sort = page.getByRole("group", { name: "ترتيب حسب" });
   await sort.getByRole("button", { name: /التاريخ/ }).click();
   await expect(sort.getByRole("button", { name: "التاريخ، تصاعدي" })).toBeVisible();
-  await expect(page.locator("tbody tr").first()).toContainText("20/06/2026");
+  await expect(page.locator("main tbody tr").first()).toContainText("20/06/2026");
 });
 
 /** كتابة مباشرة في المحاكي (كأن مستخدماً آخر أضاف حركة) لاختبار التحديث التلقائي. */
@@ -169,7 +173,7 @@ test("الأرصدة تتحدث تلقائياً بعد إضافة حركة وح
   await page.setViewportSize({ width: 1440, height: 900 });
   await loginOk(page, OWNER.email, OWNER.password);
   await pickQ4(page);
-  const totals = page.locator("tfoot td");
+  const totals = page.locator("main tfoot td");
   await expect(totals.last()).toHaveText("-4,410.76");
   await expect(page.getByText(/^تتحدث تلقائياً/)).toBeVisible();
   const ref = adminDb().doc("entries/e-live");
@@ -204,4 +208,40 @@ test("الأرصدة تتحدث تلقائياً بعد إضافة حركة وح
     await ref.delete();
   }
   await expect(totals.last()).toHaveText("-4,410.76", { timeout: 15_000 });
+});
+
+test("تصدير الكشف: ملف Excel بالأرقام والمعادلات، ونسخة طباعة A4 بلا «للمراجعة»", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await loginOk(page, OWNER.email, OWNER.password);
+  await page.goto("/statement/s1");
+  await expect(page.locator("main tfoot td").last()).toHaveText("-1,050.75");
+
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: "تصدير Excel" }).click(),
+  ]);
+  expect(download.suggestedFilename()).toMatch(/^كشف-المورد \(أ\)-\d{4}-\d{2}-\d{2}\.xlsx$/);
+  const wb = new ExcelJS.Workbook();
+  await wb.xlsx.readFile(await download.path());
+  const ws = wb.getWorksheet("الكشف");
+  expect(ws?.getCell("A1").value).toBe("كشف حساب: المورد (أ)");
+  expect(ws?.getCell("C6").value).toBe("P10001"); // الأقدم أولاً
+  expect(ws?.getCell("G12").value).toMatchObject({ result: -1050.75 }); // آخر حركة (7 حركات من الصف 6)
+  expect(ws?.getCell("G13").value).toMatchObject({ formula: "G5+E13-F13", result: -1050.75 });
+  const texts: string[] = [];
+  ws?.eachRow((r) => r.eachCell((c) => texts.push(String(c.value))));
+  expect(texts.join(" ")).toContain("اتصال لتأكيد موعد التوريد");
+  expect(texts.join(" ")).not.toContain("للمراجعة");
+
+  await page.emulateMedia({ media: "print" });
+  await expect(page.locator("#root")).toBeHidden();
+  const sheet = page.locator("body > div:not(#root)").filter({ hasText: "كشف حساب مورد" });
+  await expect(sheet).toBeVisible();
+  await expect(sheet.locator("tbody tr").first()).toContainText("20/06/2026");
+  await expect(sheet).toContainText("اتصال لتأكيد موعد التوريد");
+  await expect(sheet).not.toContainText("للمراجعة");
+  await expect(sheet.locator("tbody tr").last()).toContainText("-1,050.75");
+  await page.pdf({ path: "test-results/statement-a4.pdf", format: "A4" });
+  await page.emulateMedia({ media: "screen" });
+  await expect(page.locator("#root")).toBeVisible();
 });
