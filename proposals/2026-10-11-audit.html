@@ -1,0 +1,192 @@
+<title>رصيد · سجل التدقيق</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاثة خيارات لسجل التدقيق (قراءة للمالك والإدارة حسب SPEC)، كل منها شاشة تفاعلية بين الحاسوب والجوال. الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --neg-wash: #f8e8e9; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --tab: #e2e8ee; --mark-acc: #b8752a; --ok: #2f6b45;
+  --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.lead { color: var(--ink-2); max-width: 78ch; margin: 6px 0 16px; }
+.eg { display: inline-block; font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 6px; margin-inline-start: 6px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+.opt { margin-bottom: 34px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 82ch; }
+.opt ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; position: relative; width: 1100px; min-height: 520px; margin-inline: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.screen.phone { width: 360px; border-radius: 24px; }
+.mast { display: flex; align-items: end; gap: 14px; padding: 10px 16px 0; background: var(--tab); border-bottom: 1px solid var(--rule); font-weight: 700; }
+.mast .brand { font-family: var(--f-brand); font-size: 20px; padding-bottom: 8px; }
+.mast .tab { font-size: 14px; padding: 4px 12px 8px; background: var(--surface); border-radius: 8px 8px 0 0; box-shadow: inset 0 3px 0 var(--accent); }
+.page { padding: 16px 20px 22px; display: grid; gap: 12px; }
+@container (width < 600px) { .page { padding: 12px 14px 18px; } }
+.head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 20px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+.head h3 { font-size: 24px; }
+.sub { color: var(--ink-2); font-size: 14.5px; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { min-height: 38px; padding: 0 14px; border: 1.5px solid var(--accent); border-radius: 19px; background: var(--surface); color: var(--accent); font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.pick { min-height: 40px; display: inline-flex; align-items: center; padding: 0 12px; background: var(--wash-2); border-bottom: 1.5px solid var(--rule); border-radius: 4px 4px 0 0; font-size: 15px; }
+.more { justify-self: center; min-height: 40px; padding: 0 18px; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--surface); font: inherit; font-weight: 700; cursor: pointer; color: var(--ink); }
+
+/* أ: خط زمني */
+.day { font-size: 14px; font-weight: 700; color: var(--ink-2); margin-top: 6px; padding-bottom: 2px; border-bottom: 1px solid var(--rule); }
+.ev { display: grid; grid-template-columns: 64px 14px minmax(0, 1fr); gap: 0 10px; padding: 8px 0; }
+.ev .t { font-size: 14px; color: var(--ink-2); text-align: start; }
+.ev .dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 7px; border: 2px solid var(--accent); background: var(--surface); }
+.ev.del .dot { border-color: var(--neg); background: var(--neg-wash); }
+.ev.lock .dot { border-color: var(--mark-acc); }
+.ev .what b { font-weight: 700; }
+.ev .why { font-size: 14.5px; color: var(--ink-2); }
+.ev .why q { quotes: "«" "»"; }
+.diff { margin-top: 4px; display: grid; gap: 2px; font-size: 14px; background: var(--wash-2); border: 1px dashed var(--rule); padding: 6px 10px; border-radius: 4px; }
+.diff del { color: var(--neg); text-decoration-color: var(--neg); }
+.diff ins { color: var(--ok); text-decoration: none; font-weight: 700; }
+.linkish { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; font-size: 14px; font-weight: 700; text-decoration: underline; cursor: pointer; }
+@container (width < 600px) { .ev { grid-template-columns: 14px minmax(0, 1fr); } .ev .t { grid-column: 2; order: -1; } .ev .dot { grid-row: 1 / span 2; } }
+
+/* ب: جدول */
+table { width: 100%; border-collapse: collapse; border-top: 3px double var(--ink); font-size: 15px; }
+th { text-align: start; font-size: 13.5px; color: var(--ink-2); padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+td, tbody th { padding: 8px; border-bottom: 1px solid var(--rule); text-align: start; font-weight: 400; vertical-align: top; }
+.act { font-size: 12.5px; font-weight: 700; padding: 0 6px; border: 1px solid var(--accent); border-radius: 3px; color: var(--accent); white-space: nowrap; }
+.act.del { border-color: var(--neg); color: var(--neg); }
+.act.lock { border-color: var(--mark-acc); color: var(--mark-acc); }
+@container (width < 600px) {
+  thead { display: none; }
+  table, tbody { display: block; }
+  tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  tbody tr > * { display: block; border: 0; padding: 0; }
+  .m-full { grid-column: 1 / -1; }
+}
+
+/* ج: سجل الحركة نفسها */
+.ctx { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+@container (width < 600px) { .ctx { grid-template-columns: minmax(0, 1fr); } }
+.drawer { border: 1px solid var(--rule); border-top: 4px solid var(--accent); border-radius: 6px; padding: 12px 14px; display: grid; gap: 8px; }
+.drawer h4 { font-size: 17px; }
+.mini td, .mini th { font-size: 14.5px; }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 10px; }
+.qs b { color: var(--accent); }
+.qs .sub { font-size: 15px; }
+</style>
+
+<div class="wrap">
+  <h1>سجل التدقيق</h1>
+  <p class="lead">حسب ورقة الاتفاق: يقرؤه المالك والإدارة، ولا يُعدَّل ولا يُحذف (القواعد تفرض ذلك منذ المرحلة 1). كل إضافة وتعديل وحذف واسترجاع وحالة Odoo وقفل وإدارة مستخدمين وموردين مسجّلة فيه بمن ومتى والسبب وقبل/بعد. ثلاثة أشكال تفاعلية بين الحاسوب والجوال. الأسماء وهمية<span class="eg">مثال</span>.</p>
+  <div class="common">في الأشكال الثلاثة:
+    <ul>
+      <li>فلاتر: المستخدم، ونوع العنصر (حركات، Odoo، موردون، مستخدمون، قفل)، والفترة.</li>
+      <li>يُحمَّل 50 سجلاً ثم «تحميل المزيد» كي لا تُستهلك قراءات خطة Spark.</li>
+      <li>النقر على حركة يفتح كشف موردها مع إبرازها (كما في البحث).</li>
+    </ul>
+  </div>
+
+  <section class="opt" aria-labelledby="ha">
+    <div class="opt-head"><h2 id="ha">أ. خط زمني مقروء</h2><div class="seg" data-view="a"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">تبويب «التدقيق»: السجلات مجمّعة باليوم، كل سجل جملة عربية («عدّل سالم القيد … السبب …») وتحتها «قبل ← بعد» عند الطلب. لون النقطة بحسب النوع (حذف أحمر، قفل كهرماني).</p>
+    <ul class="pc"><li class="pro">يُقرأ كقصة بلا مصطلحات.</li><li class="pro">مريح على الجوال.</li><li>أقل كثافة: صفحة أطول لنفس العدد.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <div class="opt-head"><h2 id="hb">ب. جدول كثيف</h2><div class="seg" data-view="b"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">تبويب «التدقيق» بجدول: الوقت، المستخدم، الإجراء (وسم ملوّن)، العنصر، السبب، والتغيير مختصراً. مناسب للمراجعة السريعة لعدد كبير.</p>
+    <ul class="pc"><li class="pro">أكثف: سجلات أكثر في الشاشة.</li><li class="pro">قابل للتصدير Excel لاحقاً بسهولة.</li><li>أصعب قراءة على الجوال.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <div class="opt-head"><h2 id="hc">ج. «سجل الحركة» من مكانها + صفحة عامة مختصرة</h2><div class="seg" data-view="c"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">في تفاصيل كل حركة (والمورد والمستخدم) رابط «السجل» يفتح لوحة جانبية بتاريخ هذا العنصر وحده. والصفحة العامة تعرض آخر التغييرات فقط بالخط الزمني.</p>
+    <ul class="pc"><li class="pro">يجيب مباشرة: «من غيّر هذه الحركة؟».</li><li class="pro">قراءات أقل.</li><li>عملان بدل واحد (رابط في كل مكان + صفحة).</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الشكل:</b> أ أم ب أم ج؟</li>
+      <li><b>من يراه:</b> المالك والإدارة (حسب ورقة الاتفاق)، أم المالك وحده؟</li>
+      <li><b>تصدير Excel للسجل؟</b> <span class="sub">(اختياري؛ يفيد للأرشفة الخارجية)</span></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const EV = [
+    { day: "اليوم 11/10/2026", t: "02:14 م", who: "صاحب المنشأة", kind: "entries", act: "حذف", cls: "del", what: "القيد MISC/2026/10/0503 · المورد (ب)", why: "أُدخل مرتين", diff: [] },
+    { day: "اليوم 11/10/2026", t: "01:40 م", who: "سالم (الإدارة)", kind: "entries", act: "تعديل", cls: "", what: "الفاتورة P10003 · المورد (أ)", why: "تصحيح المبلغ حسب الفاتورة الورقية", diff: [["المبلغ", "2,250.75", "2,205.75"], ["التاريخ", "06/10/2026", "05/10/2026"]] },
+    { day: "اليوم 11/10/2026", t: "11:05 ص", who: "سالم (الإدارة)", kind: "odoo", act: "دخلت Odoo", cls: "", what: "12 فاتورة · المورد (ج)", why: "", diff: [] },
+    { day: "اليوم 11/10/2026", t: "09:30 ص", who: "صاحب المنشأة", kind: "lock", act: "قفل الفترات", cls: "lock", what: "مقفل حتى 30/09/2026", why: "إقفال الربع الثالث", diff: [["مقفل حتى", "30/06/2026", "30/09/2026"]] },
+    { day: "أمس 10/10/2026", t: "04:12 م", who: "صاحب المنشأة", kind: "suppliers", act: "إضافة مورد", cls: "", what: "مؤسسة النخيل للتوريد", why: "", diff: [] },
+    { day: "أمس 10/10/2026", t: "03:01 م", who: "منى (مدخل بيانات)", kind: "entries", act: "إضافة", cls: "", what: "الفاتورة P10010 · المورد (ب)", why: "تكرار مؤكَّد: رقم المورد نفسه في نظامه", diff: [] },
+  ];
+  const KINDS = [["all", "الكل"], ["entries", "الحركات"], ["odoo", "Odoo"], ["suppliers", "الموردون"], ["lock", "القفل"]];
+  const sentence = (e) => `<b>${e.who}</b> · ${e.act} · ${e.what}`;
+
+  function build(id, mode) {
+    const el = document.getElementById(id);
+    const st = { k: "all", open: new Set() };
+    const filters = () => `<div class="filters"><span class="pick">المستخدم: الكل ▾</span><span class="pick">الفترة: آخر 30 يوماً ▾</span><span role="group" aria-label="النوع" style="display:flex;flex-wrap:wrap;gap:6px">${KINDS.map(([k, t]) => `<button type="button" class="chip" aria-pressed="${st.k === k}" data-k="${k}">${t}</button>`).join("")}</span></div>`;
+    const timeline = (rows) => {
+      let last = "";
+      return rows.map((e, i) => {
+        const day = e.day !== last ? `<p class="day">${(last = e.day)}</p>` : "";
+        const open = st.open.has(i);
+        return `${day}<div class="ev ${e.cls}"><span class="t num">${e.t}</span><span class="dot" aria-hidden="true"></span><div><p class="what">${sentence(e)}</p>${e.why ? `<p class="why">السبب: <q>${e.why}</q></p>` : ""}${e.diff.length ? `<button type="button" class="linkish" data-o="${i}" aria-expanded="${open}">${open ? "إخفاء التغيير" : "قبل ← بعد"}</button>${open ? `<div class="diff">${e.diff.map(([f, a, b]) => `<span>${f}: <del class="num">${a}</del> ← <ins class="num">${b}</ins></span>`).join("")}</div>` : ""}` : ""}</div></div>`;
+      }).join("");
+    };
+    const draw = () => {
+      const rows = EV.filter((e) => st.k === "all" || e.kind === st.k);
+      let body = "";
+      if (mode === "a") body = timeline(rows) + `<button type="button" class="more">تحميل المزيد</button>`;
+      else if (mode === "b") body = `<table><thead><tr><th>الوقت</th><th>المستخدم</th><th>الإجراء</th><th>العنصر</th><th>السبب والتغيير</th></tr></thead><tbody>${rows.map((e) => `<tr><td><span class="num">${e.day.split(" ").pop()}</span> <span class="num">${e.t}</span></td><td>${e.who}</td><td><span class="act ${e.cls}">${e.act}</span></td><td class="m-full">${e.what}</td><td class="m-full" style="font-size:14px;color:var(--ink-2)">${e.why ? `«${e.why}»` : ""}${e.diff.map(([f, a, b]) => `<br>${f}: <span class="num">${a}</span> ← <span class="num">${b}</span>`).join("")}</td></tr>`).join("")}</tbody></table><button type="button" class="more">تحميل المزيد</button>`;
+      else {
+        const hist = EV.filter((e) => e.what.startsWith("الفاتورة P10003"));
+        body = `<div class="ctx"><div><h4 style="font-size:17px">آخر التغييرات</h4>${timeline(rows.slice(0, 3))}<button type="button" class="more">كل السجل</button></div><aside class="drawer" aria-label="سجل الحركة"><h4>سجل الحركة P10003</h4><p class="sub">يُفتح من «السجل» في تفاصيل الحركة بالكشف</p><table class="mini"><tbody><tr><td><span class="num">11/10 01:40 م</span></td><td>سالم: تعديل — «تصحيح المبلغ حسب الفاتورة الورقية»<br><span class="num">2,250.75</span> ← <span class="num">2,205.75</span></td></tr><tr><td><span class="num">05/10 10:12 ص</span></td><td>منى: إضافة</td></tr></tbody></table></aside></div>`;
+      }
+      el.innerHTML = `<div class="mast"><span class="brand">رصيد</span><span class="tab">التدقيق</span></div><div class="page"><div class="head"><div><h3>سجل التدقيق</h3><p class="sub">للمالك والإدارة · للقراءة فقط</p></div></div>${filters()}${body}</div>`;
+    };
+    el.addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      if (b.dataset.k) { st.k = b.dataset.k; st.open.clear(); draw(); }
+      else if (b.dataset.o) { const i = +b.dataset.o; st.open.has(i) ? st.open.delete(i) : st.open.add(i); draw(); }
+    });
+    draw();
+  }
+  build("sa", "a"); build("sb", "b"); build("sc", "c");
+  document.querySelectorAll(".seg[data-view]").forEach((g) => g.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.getElementById("s" + g.dataset.view).classList.toggle("phone", b.dataset.v === "phone");
+  }));
+})();
+</script>
