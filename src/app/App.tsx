@@ -10,6 +10,7 @@ import { DashboardPage } from "../features/ledger/ui/DashboardPage";
 import { StatementPage } from "../features/ledger/ui/StatementPage";
 import { InvoicesPage } from "../features/ledger/ui/InvoicesPage";
 import { JournalsPage } from "../features/ledger/ui/JournalsPage";
+import { AuditPage } from "../features/audit/ui/AuditPage";
 import { AddEntryPage } from "../features/ledger/ui/AddEntryPage";
 import { QuickEntryPage } from "../features/ledger/ui/QuickEntryPage";
 import { ReviewPage } from "../features/ledger/ui/ReviewPage";
@@ -100,6 +101,14 @@ const router = createBrowserRouter(
                 { path: "journals/:sid?", element: <JournalsPage /> },
                 { path: "add/:sid?", element: <AddEntryPage /> },
                 { path: "quick/:sid?", element: <QuickEntryPage /> },
+                {
+                  path: "audit",
+                  element: (
+                    <ManagersOnly>
+                      <AuditPage />
+                    </ManagersOnly>
+                  ),
+                },
                 {
                   path: "review",
                   element: (
