@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { flushSync } from "react-dom";
 import { Link, useBlocker, useNavigate, useParams } from "react-router";
 import { Checkbox } from "../../../shared/fields/components/Checkbox";
 import { Segment } from "../../../shared/fields/components/Segment";
@@ -139,6 +140,8 @@ export function QuickEntryPage() {
   }, [wantedKey]);
 
   // التركيز بعد الرسم: الصف الجديد لا يوجد قبل أن يُرسم، فيُحاول لبضعة إطارات
+  // التركيز فوراً إن وُجدت الخانة (الكاتب السريع لا ينتظر إطاراً فتضيع ضغطاته في الخانة السابقة)،
+  // وإلا بعد الرسم لبضعة إطارات
   const setFocusNext = useCallback((id: string) => {
     let tries = 0;
     const go = () => {
@@ -146,9 +149,12 @@ export function QuickEntryPage() {
       if (el) {
         el.focus();
         if (el instanceof HTMLInputElement) el.select();
-      } else if (tries++ < 5) requestAnimationFrame(go);
+        return true;
+      }
+      if (tries++ < 5) requestAnimationFrame(go);
+      return false;
     };
-    requestAnimationFrame(go);
+    go();
   }, []);
   const registerCell = useCallback((id: string, el: HTMLElement | null) => {
     if (el) cells.current.set(id, el);
@@ -199,7 +205,10 @@ export function QuickEntryPage() {
     // آخر خانة: صف جديد يرث التاريخ والنوع ويقترح المرجع التالي
     FIELD_ORDER.forEach((x) => touch(r.key, x));
     const next = view[i + 1];
-    setFocusNext(`${next ? next.key : addRow(i)}:date`);
+    // الصف الجديد يُرسم قبل نقل التركيز إليه، للسبب نفسه
+    let target = next?.key ?? "";
+    if (!next) flushSync(() => (target = addRow(i)));
+    setFocusNext(`${target}:date`);
   };
 
   const commitDate = (i: number) => {
