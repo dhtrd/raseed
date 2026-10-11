@@ -1,0 +1,248 @@
+<title>رصيد · القائمة الجانبية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاثة خيارات لقائمة جانبية بأيقونات بدل الألسنة العلوية، كل منها إطار تطبيق تفاعلي بين الحاسوب واللوحي والجوال. الهوية من CHOSEN.md: «نخلة وتمر» (أخضر داكن + تمري) مع الكحلي للنشط. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --tab: #e2e8ee;
+  --mark-ink: #1e4634; --mark-acc: #b8752a; --brand-panel: #1e4634; --brand-on: #d7eae1; --brand-acc: #c9822b;
+  --scrim: rgb(20 27 38 / 42%); --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1240px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; }
+.lead { color: var(--ink-2); max-width: 80ch; margin: 6px 0 16px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+.icons { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 6px 0 0; padding: 0; list-style: none; }
+.icons li { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-2); }
+.icons svg { width: 22px; height: 22px; color: var(--ink); }
+.opt { margin-bottom: 36px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 84ch; }
+.opt ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; position: relative; width: 1180px; height: 660px; margin-inline: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; display: flex; }
+.screen.tablet { width: 820px; height: 700px; }
+.screen.phone { width: 360px; height: 700px; border-radius: 24px; }
+
+.ic { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.mark { width: 30px; height: 30px; flex: none; }
+.brand { display: flex; align-items: center; gap: 8px; font-family: var(--f-brand); font-size: 21px; font-weight: 600; }
+
+/* المحتوى */
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.top { display: flex; align-items: center; gap: 10px; min-height: 58px; padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--rule); }
+.top h3 { font-size: 19px; }
+.top .tools { margin-inline-start: auto; display: flex; gap: 8px; align-items: center; }
+.tbtn { width: 42px; height: 42px; display: grid; place-items: center; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.who { font-size: 13.5px; color: var(--ink-2); text-align: end; line-height: 1.3; }
+.who b { display: block; color: var(--ink); font-size: 14.5px; }
+.content { flex: 1; padding: 16px; overflow: hidden; display: grid; gap: 10px; align-content: start; }
+.fake { display: grid; gap: 9px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px; }
+.fake span { height: 14px; border-radius: 3px; background: var(--wash-2); }
+.fake span:nth-child(odd) { background: var(--wash); }
+@container (width < 600px) { .who { display: none; } .content { padding-bottom: 80px; } }
+
+/* القائمة: عناصر مشتركة */
+.nav { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; scrollbar-width: thin; }
+.nav h5 { margin: 10px 12px 4px; font-size: 12.5px; font-weight: 700; letter-spacing: .02em; }
+.item { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 12px; border: 0; background: none; font: inherit; font-size: 15.5px; text-align: start; cursor: pointer; border-radius: 6px; width: 100%; position: relative; }
+.item .badge { margin-inline-start: auto; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--neg); color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center; font-family: var(--f-num); }
+
+/* أ: فاتح بعرض كامل يُطوى إلى أيقونات */
+.sa { width: 232px; flex: none; background: var(--surface); border-inline-end: 1px solid var(--rule); display: flex; flex-direction: column; padding: 12px 10px; gap: 6px; transition: width .18s ease; }
+.sa.rail { width: 72px; }
+.sa .brand { padding: 4px 6px 12px; border-bottom: 3px double var(--rule); }
+.sa .item { color: var(--ink-2); }
+.sa .item:hover { background: var(--wash-2); color: var(--ink); }
+.sa .item[aria-current="page"] { background: var(--wash); color: var(--accent); font-weight: 700; box-shadow: inset -4px 0 0 var(--accent); }
+.sa h5 { color: var(--ink-2); }
+.sa.rail .lbl, .sa.rail h5, .sa.rail .word { display: none; }
+.sa.rail .item { justify-content: center; padding: 0; }
+.sa.rail .item .badge { position: absolute; top: 2px; inset-inline-start: 6px; }
+.sa .fold { margin-top: auto; color: var(--ink-2); }
+
+/* ب: شريط أيقونات بتسمية تحتها */
+.sb { width: 92px; flex: none; background: var(--surface); border-inline-end: 1px solid var(--rule); display: flex; flex-direction: column; align-items: stretch; padding: 10px 6px; gap: 2px; }
+.sb .brand { justify-content: center; padding-bottom: 10px; margin-bottom: 4px; border-bottom: 3px double var(--rule); }
+.sb .brand .word { display: none; }
+.sb .item { flex-direction: column; gap: 2px; justify-content: center; min-height: 58px; padding: 4px 2px; font-size: 12.5px; color: var(--ink-2); line-height: 1.25; text-align: center; }
+.sb .item:hover { background: var(--wash-2); }
+.sb .item[aria-current="page"] { color: var(--accent); font-weight: 700; background: var(--wash); box-shadow: inset -3px 0 0 var(--accent); }
+.sb .item .badge { position: absolute; top: 4px; inset-inline-start: 10px; }
+.sb .sep { height: 1px; background: var(--rule); margin: 6px 8px; }
+
+/* ج: لوحة الهوية الخضراء */
+.sc { width: 240px; flex: none; background: var(--brand-panel); color: var(--brand-on); display: flex; flex-direction: column; padding: 14px 10px; gap: 4px; transition: width .18s ease; }
+.sc.rail { width: 72px; }
+.sc .brand { color: #fff; padding: 2px 6px 12px; border-bottom: 1px solid rgb(215 234 225 / 20%); margin-bottom: 4px; }
+.sc .item { color: var(--brand-on); }
+.sc .item:hover { background: rgb(255 255 255 / 8%); }
+.sc .item[aria-current="page"] { background: rgb(255 255 255 / 12%); color: #fff; font-weight: 700; box-shadow: inset -4px 0 0 var(--brand-acc); }
+.sc .item[aria-current="page"] .ic { color: var(--brand-acc); }
+.sc h5 { color: rgb(215 234 225 / 70%); }
+.sc.rail .lbl, .sc.rail h5, .sc.rail .word { display: none; }
+.sc.rail .item { justify-content: center; padding: 0; }
+.sc.rail .item .badge { position: absolute; top: 2px; inset-inline-start: 6px; }
+.sc .fold { margin-top: auto; color: var(--brand-on); }
+.sc .item:focus-visible { outline-color: var(--brand-acc); }
+
+/* الجوال: القائمة درج من جهة البداية + شريط سفلي */
+.menuBtn { display: none; }
+.drawerScrim { display: none; }
+.bnav { display: none; }
+@container (width < 600px) {
+  .sa, .sb, .sc { position: absolute; inset-block: 0; inset-inline-start: 0; z-index: 8; width: 84% !important; max-width: 300px; transform: translateX(110%); transition: transform .2s ease; box-shadow: var(--shadow); }
+  .open .sa, .open .sb, .open .sc { transform: none; }
+  .sb { align-items: stretch; }
+  .sb .item { flex-direction: row; justify-content: flex-start; gap: 12px; min-height: 48px; padding: 0 12px; font-size: 15.5px; text-align: start; }
+  .sb .brand .word { display: inline; }
+  .sb .brand { justify-content: flex-start; }
+  .sa .lbl, .sa h5, .sa .word, .sc .lbl, .sc h5, .sc .word { display: revert !important; }
+  .sa .item, .sc .item { justify-content: flex-start !important; padding: 0 12px !important; }
+  .fold { display: none !important; }
+  .menuBtn { display: grid; }
+  .open .drawerScrim { display: block; position: absolute; inset: 0; background: var(--scrim); z-index: 7; }
+  .bnav { display: grid; position: absolute; inset-inline: 0; bottom: 0; height: 62px; grid-template-columns: repeat(5, 1fr); background: var(--surface); border-top: 3px double var(--rule); z-index: 5; }
+  .bnav button { border: 0; background: none; font: inherit; font-size: 12.5px; color: var(--ink-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; }
+  .bnav button[aria-current="page"] { color: var(--accent); font-weight: 700; box-shadow: inset 0 3px 0 var(--accent); }
+  .phoneHide { display: none; }
+}
+/* اللوحي: الافتراضي شريط أيقونات في أ وج */
+@container (600px <= width < 900px) { .sa:not(.wide), .sc:not(.wide) { width: 72px; } .sa:not(.wide) .lbl, .sa:not(.wide) h5, .sa:not(.wide) .word, .sc:not(.wide) .lbl, .sc:not(.wide) h5, .sc:not(.wide) .word { display: none; } .sa:not(.wide) .item, .sc:not(.wide) .item { justify-content: center; padding: 0; } .sa:not(.wide) .item .badge, .sc:not(.wide) .item .badge { position: absolute; top: 2px; inset-inline-start: 6px; } }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 10px; }
+.qs b { color: var(--accent); }
+.qs .sub { color: var(--ink-2); font-size: 15px; }
+@media (prefers-reduced-motion: reduce) { .sa, .sb, .sc { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <h1>القائمة الجانبية بدل الألسنة العلوية</h1>
+  <p class="lead">بطلبك: قائمة جانبية بأيقونات بهوية «رصيد» ومناسبة للجوال. ثلاثة أشكال تفاعلية؛ بدّل الجهاز (حاسوب، لوحي، جوال)، وانقر الأقسام، وجرّب «طيّ القائمة» وزر القائمة ☰ على الجوال. البيانات وهمية.</p>
+  <div class="common">في الأشكال الثلاثة:
+    <ul>
+      <li>القائمة في جهة البداية (اليمين)، بقسمين: <b>الدفتر</b> (الأرصدة، الكشف، الفواتير، القيود، إضافة حركة، المراجعة) و<b>الإدارة</b> (قفل الفترات، التدقيق، المستخدمون، الإسناد) — يظهر لكل دور ما يخصه.</li>
+      <li>الرأس يبقى أعلى المحتوى: عنوان الشاشة، والبحث، والجرس، والتحديث، والمستخدم والخروج.</li>
+      <li>الجوال: درج جانبي بزر ☰ لكل الأقسام، ويبقى التنقل السفلي المعتمد للخمسة الأكثر استعمالاً.</li>
+      <li>أيقونات خطية بسماكة واحدة (1.8) من رسم النظام، وعدّاد أحمر على «المراجعة»:</li>
+    </ul>
+    <ul class="icons" id="legend"></ul>
+  </div>
+
+  <section class="opt" aria-labelledby="ha">
+    <div class="opt-head"><h2 id="ha">أ. قائمة فاتحة تُطوى إلى أيقونات</h2><div class="seg" data-view="a"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="tablet" aria-pressed="false">لوحي</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">بيضاء على لون الورق كبقية النظام، بأيقونة وتسمية، والنشط كحلي بخط جانبي. زر «طيّ القائمة» يحوّلها إلى أيقونات فقط (ويُحفظ اختيارك). على اللوحي أيقونات افتراضياً.</p>
+    <ul class="pc"><li class="pro">هادئة ومنسجمة مع الواجهة الحالية.</li><li class="pro">مساحة أكبر للجداول عند الطي.</li><li>الهوية تظهر في الشعار فقط.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <div class="opt-head"><h2 id="hb">ب. شريط أيقونات ضيق بتسمية تحتها</h2><div class="seg" data-view="b"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="tablet" aria-pressed="false">لوحي</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">عمود ثابت 92px: أيقونة وتحتها اسم قصير، كتطبيقات الجوال. لا طيّ ولا تمدد؛ نفسه على الحاسوب واللوحي.</p>
+    <ul class="pc"><li class="pro">أقل مساحة دائماً، والأسماء ظاهرة.</li><li class="pro">مألوف لمن يستعمل الجوال.</li><li>الأسماء الطويلة تُختصر («قفل»، «إسناد»).</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <div class="opt-head"><h2 id="hc">ج. لوحة الهوية الخضراء «نخلة وتمر»</h2><div class="seg" data-view="c"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="tablet" aria-pressed="false">لوحي</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">خلفية خضراء داكنة من لوحة الشعار، والنشط بخط تمري وأيقونته تمرية. تُطوى إلى أيقونات كما في (أ). أقوى حضوراً للهوية.</p>
+    <ul class="pc"><li class="pro">هوية «رصيد» واضحة في كل شاشة.</li><li class="pro">تفصل التنقل عن المحتوى بصرياً.</li><li>كتلة لون داكنة بجانب الجداول الفاتحة.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الشكل:</b> أ أم ب أم ج؟</li>
+      <li><b>الجوال:</b> درج ☰ + التنقل السفلي (كما في النموذج)، أم الدرج وحده بلا تنقل سفلي؟
+        <div class="sub">أقترح: الاثنان؛ السفلي للأقسام اليومية والدرج للبقية.</div></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const P = {
+    balances: "M4 4h16v16H4zM4 9h16M4 14h16M10 4v16",
+    statement: "M6 3h12v18H6zM9 8h6M9 12h6M9 16h3",
+    invoices: "M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6",
+    journals: "M4 8h13l-3-3M20 16H7l3 3",
+    add: "M12 5v14M5 12h14",
+    review: "M6 21V4h11l-2.5 4L17 12H6",
+    lock: "M6 11h12v9H6zM9 11V8a3 3 0 0 1 6 0v3",
+    audit: "M12 7v5l3 2M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4",
+    users: "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20a6 6 0 0 1 12 0M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 6",
+    assign: "M7 7h4v4H7zM13 13h4v4h-4zM11 9h3a2 2 0 0 1 2 2v2",
+    menu: "M4 7h16M4 12h16M4 17h16",
+    fold: "M15 6l-6 6 6 6",
+    search: "M10.5 17a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13zM15.5 15.5L20 20",
+    bell: "M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0",
+  };
+  const ic = (k) => `<svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="${P[k]}"/></svg>`;
+  const MARK = `<svg viewBox="0 0 40 40" class="mark" aria-hidden="true"><rect x="4" y="9" width="32" height="6" rx="2" fill="#1e4634"/><rect x="4" y="18" width="32" height="6" rx="2" fill="#1e4634" opacity=".55"/><rect x="4" y="27" width="32" height="6" rx="2" fill="#b8752a"/></svg>`;
+  const LEDGER = [["balances", "الأرصدة", "الأرصدة"], ["statement", "كشف الحساب", "الكشف"], ["invoices", "الفواتير", "الفواتير"], ["journals", "القيود", "القيود"], ["add", "إضافة حركة", "إضافة"], ["review", "المراجعة", "المراجعة", 4]];
+  const ADMIN = [["lock", "قفل الفترات", "القفل"], ["audit", "التدقيق", "التدقيق"], ["users", "المستخدمون", "المستخدمون"], ["assign", "الإسناد", "الإسناد"]];
+  document.getElementById("legend").innerHTML = [...LEDGER, ...ADMIN].map(([k, t]) => `<li>${ic(k)}${t}</li>`).join("");
+
+  function build(id, mode) {
+    const el = document.getElementById(id);
+    const st = { cur: "balances", rail: false, open: false };
+    const all = [...LEDGER, ...ADMIN];
+    const title = () => all.find((x) => x[0] === st.cur)[1];
+    const item = ([k, t, short, badge]) => `<button type="button" class="item" data-go="${k}" ${st.cur === k ? 'aria-current="page"' : ""} title="${t}">${ic(k)}<span class="lbl">${mode === "b" ? short : t}</span>${badge ? `<span class="badge">${badge}</span>` : ""}</button>`;
+    const nav = () => {
+      const cls = mode === "a" ? "sa" : mode === "b" ? "sb" : "sc";
+      const brand = `<div class="brand">${mode === "c" ? MARK.replace(/#1e4634/g, "#d7eae1").replace("#b8752a", "#c9822b") : MARK}<span class="word">رصيد</span></div>`;
+      const body = mode === "b"
+        ? `${LEDGER.map(item).join("")}<div class="sep" role="separator"></div>${ADMIN.map(item).join("")}`
+        : `<h5>الدفتر</h5>${LEDGER.map(item).join("")}<h5>الإدارة</h5>${ADMIN.map(item).join("")}<button type="button" class="item fold" data-fold aria-expanded="${!st.rail}">${ic("fold").replace('class="ic"', `class="ic" style="transform:${st.rail ? "scaleX(-1)" : "none"}"`)}<span class="lbl">طيّ القائمة</span></button>`;
+      return `<nav class="${cls} nav ${st.rail ? "rail" : ""} ${el.classList.contains("tablet") && !st.rail && st.wide ? "wide" : ""}" aria-label="الأقسام">${brand}${body}</nav>`;
+    };
+    const draw = () => {
+      const bottom = LEDGER.filter((x) => x[0] !== "journals").map(([k, , s]) => `<button type="button" data-go="${k}" ${st.cur === k ? 'aria-current="page"' : ""}>${ic(k)}<span>${s}</span></button>`).join("");
+      el.className = `screen ${el.dataset.dev || ""} ${st.open ? "open" : ""}`;
+      el.innerHTML = `${nav()}<div class="drawerScrim" data-close></div><div class="main"><div class="top"><button type="button" class="tbtn menuBtn" data-menu aria-label="القائمة">${ic("menu")}</button><h3>${title()}</h3><div class="tools"><button type="button" class="tbtn" aria-label="بحث">${ic("search")}</button><button type="button" class="tbtn" aria-label="الإشعارات">${ic("bell")}</button><span class="who phoneHide"><b>صاحب المنشأة</b>المالك</span></div></div><div class="content"><div class="fake"><span style="width:60%"></span><span></span><span style="width:85%"></span><span></span><span style="width:70%"></span><span></span><span style="width:90%"></span><span></span></div></div></div><nav class="bnav" aria-label="التنقل الرئيسي">${bottom}</nav>`;
+    };
+    el.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-go],[data-fold],[data-menu],[data-close]"); if (!b) return;
+      if (b.dataset.go) { st.cur = b.dataset.go; st.open = false; }
+      else if ("fold" in b.dataset) { if (el.dataset.dev === "tablet") st.wide = !st.wide; else st.rail = !st.rail; }
+      else if ("menu" in b.dataset) st.open = true;
+      else if ("close" in b.dataset) st.open = false;
+      draw();
+    });
+    el.addEventListener("keydown", (e) => { if (e.key === "Escape" && st.open) { st.open = false; draw(); } });
+    el._draw = draw;
+    draw();
+  }
+  build("sa", "a"); build("sb", "b"); build("sc", "c");
+  document.querySelectorAll(".seg[data-view]").forEach((g) => g.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    const el = document.getElementById("s" + g.dataset.view);
+    el.dataset.dev = b.dataset.v === "desk" ? "" : b.dataset.v;
+    el._draw();
+  }));
+})();
+</script>
