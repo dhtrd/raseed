@@ -36,8 +36,16 @@
 - 16 حرفاً على الأقل (يُفضّل 5–6 كلمات عشوائية أو 24 حرفاً).
 - **احفظها في مدير كلمات المرور أو مكان آمن خارج GitHub.** إن ضاعت فلا سبيل لفتح أي نسخة.
 
+### 3.5) حساب خدمة للنسخ (مرة واحدة)
+حساب رفع القواعد `raseed-ci-deployer` لا يقرأ البيانات عمداً، فللنسخ حساب مستقل بأقل صلاحية:
+1. https://console.cloud.google.com/iam-admin/serviceaccounts?project=raseed-dhtrd ← **Create service account**.
+2. الاسم `raseed-backup` ← **Create and continue**.
+3. الأدوار: **Cloud Datastore User** و**Firebase Authentication Viewer** فقط ← **Continue** ← **Done**.
+4. افتح الحساب ← تبويب **Keys** ← **Add key** ← **Create new key** ← **JSON** ← **Create**. يُنزَّل ملف JSON.
+5. افتح الملف بمحرر نصوص، وانسخ محتواه كاملاً قيمةً للسر `BACKUP_SERVICE_ACCOUNT`، ثم **احذف الملف** من جهازك.
+
 ### 4) الأسرار في GitHub
-المستودع ← Settings ← Environments ← **production** ← Add secret (البيئة نفسها التي فيها `FIREBASE_SERVICE_ACCOUNT`):
+المستودع ← Settings ← Environments ← **production** ← Add secret:
 
 | الاسم | القيمة |
 |---|---|
@@ -45,6 +53,7 @@
 | `DROPBOX_APP_SECRET` | App secret |
 | `DROPBOX_REFRESH_TOKEN` | refresh_token |
 | `BACKUP_PASSPHRASE` | عبارة السر |
+| `BACKUP_SERVICE_ACCOUNT` | محتوى ملف JSON لحساب `raseed-backup` |
 
 ### 5) تجربة فورية
 Actions ← **Daily backup to Dropbox** ← **Run workflow**. بعد نجاحه يظهر الملفان في Dropbox، ويختفي تنبيه «لم يُفعَّل بعد» من الجرس.

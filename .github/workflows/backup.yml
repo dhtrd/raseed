@@ -2,8 +2,10 @@ name: Daily backup to Dropbox
 
 # نسخ احتياطي يومي الساعة 11:30 بتوقيت الرياض (08:30 UTC) — DECISIONS 2026-10-11.
 # ملف بيانات كامل مشفر (AES-256-GCM) + ملف Excel بكلمة مرور، إلى مجلد تطبيق Dropbox، والحالة في settings/backup.
-# الأسرار في بيئة production فقط: FIREBASE_SERVICE_ACCOUNT, BACKUP_PASSPHRASE,
+# الأسرار في بيئة production فقط: BACKUP_SERVICE_ACCOUNT, BACKUP_PASSPHRASE,
 # DROPBOX_APP_KEY, DROPBOX_APP_SECRET, DROPBOX_REFRESH_TOKEN. لا تُطبع ولا تُكتب في أي ملف داخل المستودع.
+# BACKUP_SERVICE_ACCOUNT حساب خدمة مستقل (raseed-backup) بدورين فقط: Cloud Datastore User وFirebase Authentication
+# Viewer. حساب رفع القواعد (FIREBASE_SERVICE_ACCOUNT) لا يقرأ البيانات عمداً ولا يُستعمل هنا (DECISIONS 2026-10-11).
 on:
   schedule:
     - cron: "30 8 * * *"
@@ -28,14 +30,14 @@ jobs:
       - run: npm ci
       - name: Backup
         env:
-          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_JSON: ${{ secrets.BACKUP_SERVICE_ACCOUNT }}
           BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
           DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
           DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
           DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
           RASEED_PROJECT_ID: raseed-dhtrd
         run: |
-          if [ -z "$SA_JSON" ]; then echo "::error::السر FIREBASE_SERVICE_ACCOUNT غير موجود في بيئة production."; exit 1; fi
+          if [ -z "$SA_JSON" ]; then echo "::error::السر BACKUP_SERVICE_ACCOUNT غير موجود في بيئة production (انظر docs/backup.md)."; exit 1; fi
           umask 077
           printf '%s' "$SA_JSON" > "$RUNNER_TEMP/sa.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
