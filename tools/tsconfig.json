@@ -14,5 +14,5 @@
     "noEmit": true,
     "types": ["node", "vitest/globals"]
   },
-  "include": ["admin/**/*.ts", "migrate/**/*.ts"]
+  "include": ["admin/**/*.ts", "migrate/**/*.ts", "backup/**/*.ts", "../tests/rules/backup-roundtrip.test.ts"]
 }

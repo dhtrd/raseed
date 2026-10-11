@@ -24,7 +24,9 @@
     "admin:create-owner": "node tools/admin/create-owner.ts",
     "admin:reset-password": "node tools/admin/reset-password.ts",
     "test:e2e:auth": "firebase emulators:exec --only auth,firestore --project demo-raseed \"playwright test -c playwright.auth.config.ts\"",
-    "migrate": "node tools/migrate/migrate.ts"
+    "migrate": "node tools/migrate/migrate.ts",
+    "backup": "node tools/backup/backup.ts",
+    "backup:restore": "node tools/backup/restore.ts"
   },
   "dependencies": {
     "exceljs": "4.4.0",

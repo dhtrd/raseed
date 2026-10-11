@@ -44,7 +44,7 @@ export function buildAlerts(a: AlertInput): SystemAlert[] {
       sig: "backup-none",
       tone: "info",
       title: "النسخ الاحتياطي اليومي لم يُفعَّل بعد",
-      text: "لم تُسجَّل أي نسخة إلى Dropbox. يُفعَّل في خطوة لاحقة من ورقة الاتفاق.",
+      text: "لم تُسجَّل أي نسخة إلى Dropbox بعد. تبدأ تلقائياً 11:30 بتوقيت الرياض بعد إضافة أسرار Dropbox وعبارة السر في GitHub.",
       href: null,
     });
   } else if (b && b.lastStatus === "failed") {
