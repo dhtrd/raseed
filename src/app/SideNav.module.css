@@ -1,0 +1,138 @@
+/* القائمة الجانبية (الخيار أ، proposals/2026-10-11-sidebar.html): فاتحة، تُطوى إلى أيقونات */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  block-size: 100%;
+  padding: 12px 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  background: var(--surface);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 52px;
+  padding: 0 6px 12px;
+  margin-block-end: 6px;
+  border-block-end: 3px double var(--rule);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.mark {
+  inline-size: 34px;
+  block-size: 34px;
+  flex: none;
+}
+
+.word {
+  font-family: var(--f-brand);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title {
+  margin: 10px 12px 4px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  letter-spacing: 0.02em;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  inline-size: 100%;
+  min-block-size: 46px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 15.5px;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--wash-2);
+  color: var(--ink);
+}
+
+.item:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.item[aria-current="page"] {
+  background: var(--wash);
+  color: var(--accent);
+  font-weight: 700;
+  box-shadow: inset -4px 0 0 var(--accent);
+}
+
+.ic {
+  inline-size: 22px;
+  block-size: 22px;
+  flex: none;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lbl {
+  white-space: nowrap;
+}
+
+.fold {
+  margin-block-start: auto;
+}
+
+/* السهم يشير إلى جهة الطي (اليمين)، ويُعكس في الوضع المطوي */
+.fold .ic {
+  transform: scaleX(-1);
+}
+
+/* مطوية: أيقونات فقط، والتسمية لقارئ الشاشة وتلميح */
+.rail .word,
+.rail .title {
+  display: none;
+}
+
+.rail .brand {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.rail .item {
+  justify-content: center;
+  padding: 0;
+}
+
+.rail .lbl {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.rail .fold .ic {
+  transform: none;
+}

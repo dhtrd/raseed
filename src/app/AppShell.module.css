@@ -1,80 +1,48 @@
-.masthead {
-  display: flex;
-  align-items: flex-end;
-  gap: 28px;
-  max-inline-size: 1640px;
-  margin-inline: auto;
-  padding: 14px 24px 0;
+/* إطار الواجهة (القائمة الجانبية الخيار أ، proposals/2026-10-11-sidebar.html):
+   القائمة في جهة البداية (اليمين)، وشريط الأدوات أعلى المحتوى. */
+.app {
+  --side: 232px;
+
+  display: grid;
+  grid-template-columns: var(--side) minmax(0, 1fr);
+  min-block-size: 100dvh;
 }
 
-.brand {
-  display: inline-flex;
+.isRail {
+  --side: 72px;
+}
+
+.side {
+  position: sticky;
+  inset-block-start: 0;
+  block-size: 100dvh;
+  border-inline-end: 1px solid var(--rule);
+  background: var(--surface);
+  z-index: 20;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+/* غير ثابت: عناصر الصفحات اللاصقة بالأعلى (مثل تحذير التكرار) تبقى ظاهرة */
+.top {
+  display: flex;
   align-items: center;
   gap: 10px;
-  min-block-size: 48px;
-  padding-block-end: 10px;
-  color: var(--ink);
-  text-decoration: none;
-  flex: none;
-}
-
-.mark {
-  inline-size: 38px;
-  block-size: 38px;
-}
-
-.word {
-  font-family: var(--f-brand);
-  font-weight: 600;
-  font-size: 26px;
-  line-height: 1;
-}
-
-.tabs {
-  display: flex;
-  gap: 3px;
-  flex: 1;
-  min-inline-size: 0;
-  overflow-x: auto;
-}
-
-.tabs a {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 46px;
-  padding: 6px 20px 8px;
-  color: var(--ink-2);
-  text-decoration: none;
-  font-weight: 500;
-  white-space: nowrap;
-  background: var(--tab);
-  border: 1px solid var(--rule);
-  border-block-end: 0;
-  border-radius: var(--r-tab) var(--r-tab) 0 0;
-}
-
-.tabs a:hover {
-  color: var(--ink);
-  background: var(--wash-2);
-}
-
-.tabs a[aria-current="page"] {
-  position: relative;
-  z-index: 2;
-  margin-block-end: -1px;
-  padding-block-end: 9px;
-  background: var(--surface);
-  color: var(--ink);
-  font-weight: 700;
-  box-shadow: inset 0 3px 0 var(--accent);
+  min-block-size: 62px;
+  padding: 8px 20px;
+  background: var(--paper);
+  border-block-end: 1px solid var(--rule);
 }
 
 .tools {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding-block-end: 10px;
-  flex: none;
+  gap: 10px;
+  margin-inline-start: auto;
 }
 
 .who {
@@ -111,9 +79,9 @@
   cursor: progress;
 }
 
-/* إعادة التحميل: للجوال واللوحي فقط (طلب المستخدم 2026-10-11) */
+.tbtn,
 .reload {
-  display: none;
+  display: inline-grid;
   place-items: center;
   inline-size: var(--touch);
   block-size: var(--touch);
@@ -130,96 +98,149 @@
   block-size: 20px;
 }
 
+.tbtn:hover,
+.tbtn:focus-visible,
 .reload:hover,
 .reload:focus-visible {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-@media (width <= 1279px) {
+.ic {
+  inline-size: 22px;
+  block-size: 22px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+/* إعادة التحميل: للجوال واللوحي فقط (طلب المستخدم 2026-10-11) */
+@media (width >= 1280px) {
   .reload {
-    display: inline-grid;
+    display: none;
   }
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.mark {
+  inline-size: 30px;
+  block-size: 30px;
+}
+
+.word {
+  font-family: var(--f-brand);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .shell {
   position: relative;
   z-index: 1;
-  max-inline-size: 1640px;
-  margin-inline: auto;
+  flex: 1;
+
+  /* الصفحات (l.sheet) ترث الارتفاع فتمتد ألواحها الجانبية إلى أسفل الشاشة */
+  min-block-size: calc(100dvh - 62px);
   background: var(--surface);
-  border-block-start: 1px solid var(--rule);
-  min-block-size: calc(100dvh - 72px);
 }
 
-@media (width >= 601px) {
-  .shell {
-    border: 1px solid var(--rule);
-    border-inline-start: 4px double var(--margin);
-  }
-}
-
-/* عشرة ألسنة للمالك: مضغوطة على الحاسوب الواسع، وفي سطر مستقل تحت الشعار حتى 1599px */
-@media (width >= 1600px) {
-  .masthead {
-    gap: 16px;
+/* الجوال: لا قائمة ثابتة؛ درج من اليمين، والتنقل السفلي يبقى */
+@media (width <= 600px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .tabs a {
+  .top {
+    gap: 8px;
+    padding: 6px 12px;
+    padding-block-start: calc(6px + env(safe-area-inset-top, 0px));
+  }
+
+  .tools {
+    gap: 8px;
+  }
+
+  .who {
+    display: none;
+  }
+
+  .out {
     padding-inline: 12px;
-    font-size: 15.5px;
-  }
-}
-
-@media (width <= 1599px) {
-  .masthead {
-    flex-wrap: wrap;
-    gap: 0 16px;
-    padding-inline: 16px;
-  }
-
-  .tabs {
-    order: 3;
-    flex-basis: 100%;
-  }
-
-  .tools {
-    margin-inline-start: auto;
-  }
-}
-
-@media (width <= 600px) {
-  .masthead {
-    padding: 8px 12px 0;
-  }
-
-  .brand,
-  .tools {
-    padding-block-end: 6px;
-  }
-
-  .tabs a {
-    flex: 1;
-    justify-content: center;
-    padding-inline: 10px;
-  }
-
-  .who span {
-    display: none;
-  }
-}
-
-/* الجوال: الأقسام الخمسة في التنقل السفلي (CHOSEN)، فيبقى في الألسنة العلوية ما سواها (للمالك والإدارة) */
-@media (width <= 600px) {
-  .tabs a.core {
-    display: none;
-  }
-
-  .tabs:not(:has(a:not(.core))) {
-    display: none;
   }
 
   .shell {
     padding-block-end: calc(var(--bnav) + 24px);
+  }
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: var(--scrim);
+}
+
+.drawer {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: min(84vw, 300px);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  animation: slide 0.2s ease-out;
+}
+
+.drawerDlg {
+  position: relative;
+  block-size: 100%;
+  padding-block-start: env(safe-area-inset-top, 0);
+  outline: none;
+}
+
+.drawerClose {
+  position: absolute;
+  inset-block-start: calc(14px + env(safe-area-inset-top, 0px));
+  inset-inline-end: 12px;
+  z-index: 1;
+  inline-size: 40px;
+  block-size: 40px;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer {
+    animation: none;
+  }
+}
+
+@media print {
+  .side,
+  .top {
+    display: none;
+  }
+
+  .app {
+    display: block;
   }
 }

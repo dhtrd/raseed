@@ -1,7 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
 import { ENTRY, OWNER } from "./seed";
 
-/** التنقل السفلي على الجوال (CHOSEN §التنقل السفلي، النموذج المعتمد direction-1). */
+/**
+ * التنقل: القائمة الجانبية في اليمين (الخيار أ، DECISIONS 2026-10-11) على الحاسوب واللوحي،
+ * وعلى الجوال درج ☰ + التنقل السفلي (CHOSEN §التنقل السفلي).
+ */
 async function loginOk(page: Page, id: string, pw: string) {
   await page.goto("/login");
   await page.getByLabel("البريد الإلكتروني").fill(id);
@@ -10,52 +13,87 @@ async function loginOk(page: Page, id: string, pw: string) {
   await expect(page).not.toHaveURL(/\/login$/);
 }
 
-const nav = (page: Page) => page.getByRole("navigation", { name: "التنقل الرئيسي" });
+const side = (page: Page) => page.getByRole("navigation", { name: "أقسام الدفتر" });
+const bottom = (page: Page) => page.getByRole("navigation", { name: "التنقل الرئيسي" });
+const LEDGER = ["الأرصدة", "كشف الحساب", "الفواتير", "القيود", "إضافة حركة", "المراجعة"];
+const ADMIN = ["قفل الفترات", "التدقيق", "المستخدمون", "الإسناد"];
 
-test("المالك على الجوال: خمس خانات، والألسنة العلوية لما سواها فقط", async ({ page }) => {
-  await page.setViewportSize({ width: 360, height: 780 });
-  await loginOk(page, OWNER.email, OWNER.password);
-  await expect(nav(page).getByRole("link")).toHaveText(["الأرصدة", "الكشف", "الفواتير", "إضافة", "المراجعة"]);
-  await expect(nav(page).getByRole("link", { name: "الأرصدة" })).toHaveAttribute("aria-current", "page");
-  const top = page.getByRole("navigation", { name: "أقسام الدفتر" });
-  await expect(top.getByRole("link")).toHaveText([
-    "القيود",
-    "قفل الفترات",
-    "التدقيق",
-    "المستخدمون",
-    "الإسناد",
-  ]);
-  await nav(page).getByRole("link", { name: "الفواتير" }).click();
-  await expect(page).toHaveURL(/\/invoices$/);
-  await expect(nav(page).getByRole("link", { name: "الفواتير" })).toHaveAttribute("aria-current", "page");
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  expect(overflow).toBeLessThanOrEqual(0);
-  await page.screenshot({ path: "test-results/bottom-nav-360.png" });
-});
-
-test("مدخل البيانات على الجوال: أربع خانات بلا «المراجعة»، و«القيود» وحدها في الأعلى", async ({ page }) => {
-  await page.setViewportSize({ width: 360, height: 780 });
-  await loginOk(page, ENTRY.email, ENTRY.password);
-  await expect(nav(page).getByRole("link")).toHaveText(["الأرصدة", "الكشف", "الفواتير", "إضافة"]);
-  await expect(page.getByRole("navigation", { name: "أقسام الدفتر" }).getByRole("link")).toHaveText([
-    "القيود",
-  ]);
-});
-
-test("الحاسوب: لا تنقل سفلي، والألسنة كاملة", async ({ page }) => {
+test("الحاسوب: قائمة يمنى بقسمين، والطيّ إلى أيقونات يُحفظ", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await loginOk(page, OWNER.email, OWNER.password);
-  await expect(nav(page)).toBeHidden();
-  await expect(page.getByRole("navigation", { name: "أقسام الدفتر" }).getByRole("link")).toHaveCount(10);
+  await expect(bottom(page)).toBeHidden();
+  await expect(side(page).getByRole("group", { name: "الدفتر" }).getByRole("link")).toHaveText(LEDGER);
+  await expect(side(page).getByRole("group", { name: "الإدارة" }).getByRole("link")).toHaveText(ADMIN);
+  const box = await side(page).boundingBox();
+  // في جهة اليمين (البداية في RTL)
+  expect(box && Math.round(box.x + box.width)).toBeGreaterThanOrEqual(1430);
+  expect(box && Math.round(box.width)).toBeGreaterThan(200);
+  await page.screenshot({ path: "test-results/sidebar-1440.png" });
+
+  await side(page).getByRole("button", { name: "طيّ القائمة" }).click();
+  await expect.poll(async () => Math.round((await side(page).boundingBox())?.width ?? 0)).toBeLessThan(80);
+  // التسمية تبقى اسماً للرابط
+  await side(page).getByRole("link", { name: "الفواتير" }).click();
+  await expect(page).toHaveURL(/\/invoices$/);
+  await page.reload();
+  await expect.poll(async () => Math.round((await side(page).boundingBox())?.width ?? 0)).toBeLessThan(80);
+  await side(page).getByRole("button", { name: "توسيع القائمة" }).click();
+  await expect
+    .poll(async () => Math.round((await side(page).boundingBox())?.width ?? 0))
+    .toBeGreaterThan(200);
 });
 
-for (const w of [1280, 1366, 1440, 1920]) {
-  test(`الحاسوب ${w}px: ألسنة المالك العشرة كلها ظاهرة بلا قص`, async ({ page }) => {
+test("اللوحي: أيقونات افتراضياً، بلا تمرير أفقي", async ({ page }) => {
+  await page.setViewportSize({ width: 834, height: 1112 });
+  await loginOk(page, OWNER.email, OWNER.password);
+  await expect.poll(async () => Math.round((await side(page).boundingBox())?.width ?? 0)).toBeLessThan(80);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+  await page.screenshot({ path: "test-results/sidebar-834.png" });
+});
+
+for (const w of [1280, 1366, 1920]) {
+  test(`الحاسوب ${w}px: بلا تمرير أفقي`, async ({ page }) => {
     await page.setViewportSize({ width: w, height: 900 });
     await loginOk(page, OWNER.email, OWNER.password);
-    const tabs = page.getByRole("navigation", { name: "أقسام الدفتر" });
-    await expect(tabs.getByRole("link")).toHaveCount(10);
-    const hidden = await tabs.evaluate((el) => el.scrollWidth - el.clientWidth);
-    expect(hidden).toBeLessThanOrEqual(1);
+    await expect(side(page)).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
   });
 }
+
+test("المالك على الجوال: التنقل السفلي خمس خانات، والدرج ☰ من اليمين لكل الأقسام", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 });
+  await loginOk(page, OWNER.email, OWNER.password);
+  await expect(bottom(page).getByRole("link")).toHaveText([
+    "الأرصدة",
+    "الكشف",
+    "الفواتير",
+    "إضافة",
+    "المراجعة",
+  ]);
+  await expect(side(page)).toHaveCount(0);
+  await page.getByRole("button", { name: "القائمة", exact: true }).click();
+  const d = page.getByRole("dialog", { name: "القائمة" });
+  await expect(d.getByRole("group", { name: "الإدارة" }).getByRole("link")).toHaveText(ADMIN);
+  const box = await d.boundingBox();
+  expect(box && Math.round(box.x + box.width)).toBeGreaterThanOrEqual(355);
+  await page.screenshot({ path: "test-results/sidebar-360.png" });
+  await d.getByRole("link", { name: "القيود" }).click();
+  await expect(page).toHaveURL(/\/journals$/);
+  await expect(d).toHaveCount(0);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test("مدخل البيانات على الجوال: أربع خانات، والدرج بلا «المراجعة» ولا «الإدارة»", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 });
+  await loginOk(page, ENTRY.email, ENTRY.password);
+  await expect(bottom(page).getByRole("link")).toHaveText(["الأرصدة", "الكشف", "الفواتير", "إضافة"]);
+  await page.getByRole("button", { name: "القائمة", exact: true }).click();
+  const d = page.getByRole("dialog", { name: "القائمة" });
+  await expect(d.getByRole("group", { name: "الدفتر" }).getByRole("link")).toHaveText(LEDGER.slice(0, 5));
+  await expect(d.getByRole("group", { name: "الإدارة" })).toHaveCount(0);
+  await d.getByRole("button", { name: "إغلاق القائمة" }).click();
+  await expect(d).toHaveCount(0);
+});
