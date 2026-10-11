@@ -20,6 +20,10 @@ body {
 }
 
 @media (width <= 600px) {
+  :root {
+    --bnav: calc(63px + env(safe-area-inset-bottom, 0px));
+  }
+
   body {
     font-size: 16.5px;
   }

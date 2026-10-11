@@ -182,7 +182,7 @@
 /* شريط الحفظ ثابت أسفل الشاشة */
 .bar {
   position: sticky;
-  inset-block-end: 0;
+  inset-block-end: var(--bnav);
   z-index: 2;
   display: flex;
   flex-wrap: wrap;
