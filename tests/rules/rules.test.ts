@@ -699,3 +699,27 @@ describe("مدة الخمول (DECISIONS 2026-10-10)", () => {
     await assertFails(getDoc(doc(as("inactive"), "settings/session")));
   });
 });
+
+describe("أسباب التعديل اليدوي للبيانات المنقولة", () => {
+  const seed = () =>
+    env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(asDb(ctx.firestore()), "migrationIssues/m-s01-r0005"), {
+        entryId: "m-s01-r0005",
+        supplierId: "s1",
+        issues: [{ code: "untyped", text: "بلا نوع" }],
+        resolved: false,
+      });
+    });
+  it("يقرؤها المالك والإدارة فقط", async () => {
+    await seed();
+    await assertSucceeds(getDoc(doc(as("owner"), "migrationIssues/m-s01-r0005")));
+    await assertSucceeds(getDoc(doc(as("admin"), "migrationIssues/m-s01-r0005")));
+    await assertFails(getDoc(doc(as("entry"), "migrationIssues/m-s01-r0005")));
+  });
+  it("لا تُكتب من التطبيق", async () => {
+    await seed();
+    await assertFails(setDoc(doc(as("owner"), "migrationIssues/x"), { resolved: true }));
+    await assertFails(updateDoc(doc(as("owner"), "migrationIssues/m-s01-r0005"), { resolved: true }));
+    await assertFails(deleteDoc(doc(as("owner"), "migrationIssues/m-s01-r0005")));
+  });
+});

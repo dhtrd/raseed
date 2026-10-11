@@ -26,10 +26,12 @@ export function isInside(path: string, root: string): boolean {
 /** يتحقق من بيئة التشغيل قبل أي اتصال: مشروع صريح ومفتاح أو محاكي. */
 export function checkEnv(
   env: Record<string, string | undefined>,
+  /** سكربت النقل يحتاج Firestore وحده؛ سكربتا الحسابات يحتاجان Auth أيضاً */
+  needs: { auth: boolean } = { auth: true },
 ): { ok: true; projectId: string; emulator: boolean } | { ok: false; error: string } {
   const projectId = env.RASEED_PROJECT_ID?.trim();
   if (!projectId) return { ok: false, error: "حدّد المشروع في RASEED_PROJECT_ID (مثلاً raseed-dhtrd)." };
-  const emulator = Boolean(env.FIREBASE_AUTH_EMULATOR_HOST && env.FIRESTORE_EMULATOR_HOST);
+  const emulator = Boolean(env.FIRESTORE_EMULATOR_HOST && (!needs.auth || env.FIREBASE_AUTH_EMULATOR_HOST));
   if (!emulator && !env.GOOGLE_APPLICATION_CREDENTIALS) {
     return {
       ok: false,
@@ -113,4 +115,10 @@ export async function askHidden(question: string): Promise<string> {
 export function fail(msg: string): never {
   console.error(`✗ ${msg}`);
   process.exit(1);
+}
+
+/** يغلق قارئ الأسطر كي ينتهي البرنامج دون انتظار إدخال. */
+export function closePrompt(): void {
+  rl?.close();
+  rl = null;
 }
