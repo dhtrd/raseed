@@ -114,3 +114,114 @@ for (const w of [834, 1194]) {
     await page.screenshot({ path: `test-results/review-${w}.png`, fullPage: true });
   });
 }
+
+test.describe("نافذة تعديل الحركة", () => {
+  const dlg = (page: Page) => page.getByRole("dialog", { name: "تعديل الحركة" });
+
+  test("تاريخ مستقبلي: السبب إلزامي، والقيد ينتقل إلى رقم شهره الجديد، وتمت المراجعة بخيار صريح", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await loginOk(page, OWNER.email, OWNER.password);
+    await page.goto("/review");
+    const row = section(page, /بتواريخ معطوبة/)
+      .getByRole("row")
+      .filter({ hasText: "بلا ترجيح" });
+    await row.getByRole("button", { name: "تعديل" }).click();
+    const d = dlg(page);
+    await expect(d).toContainText("MISC/2026/10/0502");
+    const date = d.getByRole("textbox", { name: /^التاريخ/ });
+    await date.fill("060926");
+    await date.press("Tab");
+    await expect(d.getByRole("list", { name: "التغييرات" })).toContainText("MISC/2026/09/0502");
+    // بلا سبب لا يُحفظ
+    await d.getByRole("button", { name: "حفظ التعديل" }).click();
+    await expect(d.getByText("اكتب سبب التعديل؛ يُحفظ في سجل التدقيق.")).toBeVisible();
+    await d.getByRole("textbox", { name: /سبب التعديل/ }).fill("التاريخ مستقبلي خطأً في الإكسل");
+    await d.getByRole("checkbox", { name: /تمت المراجعة/ }).click();
+    await page.screenshot({ path: "test-results/edit-1440.png", fullPage: true });
+    await d.getByRole("button", { name: "حفظ التعديل" }).click();
+    await expect(page.getByText(/حُفظ تعديل حركة .* وأُغلق سجل المراجعة/)).toBeVisible();
+    await expect(d).toBeHidden();
+
+    const db = adminDb();
+    const e = await db.doc("entries/e107").get();
+    expect(e.get("date")).toBe("2026-09-06");
+    expect(e.get("refNo")).toBe("MISC/2026/09/0502");
+    expect(e.get("needsManualFix")).toBe(false);
+    expect((await db.doc("refs/MISC|2026|09|0502").get()).get("ids")).toEqual(["e107"]);
+    const old = await db.doc("refs/MISC|2026|10|0502").get();
+    expect(old.exists ? (old.get("ids") as string[]).includes("e107") : false).toBe(false);
+    const issue = await db.doc("migrationIssues/e107").get();
+    expect(issue.get("resolution")).toBe("fixed");
+    const audit = await db.doc(`auditLog/${e.get("auditId") as string}`).get();
+    expect(audit.get("action")).toBe("update");
+    expect(audit.get("reason")).toBe("التاريخ مستقبلي خطأً في الإكسل");
+    expect(audit.get("after")).toMatchObject({ date: "2026-09-06", refNo: "MISC/2026/09/0502" });
+  });
+
+  test("بلا نوع: يُصنَّف فاتورة، ويبقى سجل المراجعة مفتوحاً ما لم يُختر صراحة", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await loginOk(page, OWNER.email, OWNER.password);
+    await page.goto("/review");
+    await section(page, /بلا نوع/)
+      .getByRole("button", { name: "تعديل" })
+      .click();
+    const d = dlg(page);
+    await d.getByRole("radio", { name: "فاتورة" }).click();
+    const ref = d.getByRole("textbox", { name: /المرجع الرئيسي/ });
+    await ref.fill("10010");
+    await ref.press("Tab");
+    await d.getByRole("textbox", { name: /سبب التعديل/ }).fill("تصنيف حركة منقولة");
+    await d.getByRole("button", { name: "حفظ التعديل" }).click();
+    await expect(page.getByText(/حُفظ تعديل حركة .*P10010.* وسُجّل في التدقيق\.$/)).toBeVisible();
+    const e = await adminDb().doc("entries/e108").get();
+    expect(e.get("kind")).toBe("inv");
+    expect(e.get("refNo")).toBe("P10010");
+    expect(e.get("credit")).toBe(5025);
+    expect((await adminDb().doc("migrationIssues/e108").get()).get("resolved")).toBe(false);
+  });
+
+  test("الفترة المقفلة: المرجّح داخلها يُرفض بوضوح قبل الإرسال", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await loginOk(page, OWNER.email, OWNER.password);
+    await page.goto("/review");
+    const row = section(page, /بتواريخ معطوبة/)
+      .getByRole("row")
+      .filter({ hasText: "الأرجح" });
+    await row.getByRole("button", { name: "تعديل" }).click();
+    const d = dlg(page);
+    await d.getByRole("button", { name: /استعمال المرجّح 07\/05\/2026/ }).click();
+    await d.getByRole("textbox", { name: /سبب التعديل/ }).fill("تاريخ مقلوب");
+    await d.getByRole("button", { name: "حفظ التعديل" }).click();
+    await expect(d.getByText(/الفترة مقفلة حتى 30\/06\/2026/).first()).toBeVisible();
+    expect((await adminDb().doc("entries/e102").get()).get("date")).toBe("2026-07-05");
+    await d.getByRole("button", { name: "إلغاء" }).click();
+    await expect(d).toBeHidden();
+  });
+
+  test("الجوال: لوحة سفلية بلا تمرير أفقي ولا عنصر أصلي", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 780 });
+    await loginOk(page, OWNER.email, OWNER.password);
+    await page.goto("/review");
+    await page
+      .getByRole("list", { name: "عرض قسم" })
+      .getByRole("button", { name: /تواريخ/ })
+      .click();
+    await section(page, /بتواريخ معطوبة/)
+      .getByRole("button", { name: "تعديل" })
+      .first()
+      .click();
+    await expect(dlg(page)).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+    const banned = await page.evaluate(
+      () =>
+        document.querySelectorAll(
+          'select, input[type="checkbox"], input[type="radio"], input[type="number"], input[type="date"]',
+        ).length,
+    );
+    expect(banned).toBe(0);
+    await page.screenshot({ path: "test-results/edit-360.png" });
+  });
+});

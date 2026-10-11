@@ -11,6 +11,8 @@ export type DialogProps = {
   tone?: "default" | "warn";
   /** نافذة تنبيه لا تُغلق إلا بزر صريح (مثل تحذير الخمول). */
   alert?: boolean;
+  /** نافذة أعرض للنماذج (مثل تعديل الحركة)؛ على الجوال لوحة سفلية كالبقية */
+  wide?: boolean;
 };
 
 /** نافذة وسطى، ولوحة سفلية على الجوال (CHOSEN، DECISIONS 2026-10-10 «نافذة وسطى»). */
@@ -25,7 +27,7 @@ export function Dialog(p: DialogProps) {
         if (!open) p.onDismiss?.();
       }}
     >
-      <Modal className={`${s.modal} ${p.tone === "warn" ? s.warn : ""}`}>
+      <Modal className={`${s.modal} ${p.tone === "warn" ? s.warn : ""} ${p.wide ? s.wide : ""}`}>
         <AriaDialog className={s.dialog} role={p.alert ? "alertdialog" : "dialog"}>
           <Heading slot="title" className={s.title}>
             {p.title}

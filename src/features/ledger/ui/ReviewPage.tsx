@@ -15,10 +15,13 @@ import {
   type ReviewRow,
   type ReviewSection,
 } from "../core/review";
+import { watchLockedThrough } from "../data/invoicesRepo";
 import { setResolution, watchEntriesByIds, watchOpenIssues } from "../data/reviewRepo";
+import { EditEntryDialog, type EditTarget } from "./EditEntryDialog";
 import { HeadSar } from "./Amount";
+import { ReasonText } from "./ReasonText";
 import { SupplierIndex, useIndexCollapse } from "./SupplierIndex";
-import { readError, useKeyedWatch } from "./useLedgerData";
+import { readError, useKeyedWatch, useVisibleSuppliers } from "./useLedgerData";
 import l from "./Ledger.module.css";
 import s from "./Review.module.css";
 
@@ -63,7 +66,16 @@ export function ReviewPage() {
   const [busy, setBusy] = useState(false);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [undoRow, setUndoRow] = useState<ReviewRow | null>(null);
+  const [editing, setEditing] = useState<EditTarget | null>(null);
+  const lock = useKeyedWatch<string | null>("lock", watchLockedThrough, "قراءة تاريخ الإقفال");
+  const lockedThrough = lock.status === "ready" ? lock.data : null;
 
+  // اسم المورد الحالي من سجله: فهرس الأرقام يشترط مطابقته (اسم سجل المراجعة لقطة وقت النقل)
+  const suppliers = useVisibleSuppliers(profile);
+  const nameOf = useMemo(
+    () => new Map(suppliers.status === "ready" ? suppliers.data.map((x) => [x.id, x.name] as const) : []),
+    [suppliers],
+  );
   const issues = useKeyedWatch("open", watchOpenIssues, "قراءة سجلات المراجعة");
   const ids = issues.status === "ready" ? [...new Set(issues.data.map((x) => x.entryId))].sort() : [];
   const idsKey = issues.status === "ready" ? `e:${ids.join(",")}` : null;
@@ -76,8 +88,15 @@ export function ReviewPage() {
   const [entryMap, setEntryMap] = useState<Map<string, LedgerEntry>>(() => new Map());
   if (entries.status === "ready" && entries.data !== entryMap) setEntryMap(entries.data);
   const sections = useMemo(
-    () => buildReview(issues.status === "ready" ? issues.data : [], entryMap),
-    [issues, entryMap],
+    () =>
+      buildReview(
+        (issues.status === "ready" ? issues.data : []).map((x) => ({
+          ...x,
+          supplierName: nameOf.get(x.supplierId) ?? x.supplierName,
+        })),
+        entryMap,
+      ),
+    [issues, entryMap, nameOf],
   );
   const counts = reviewCountsOf(sections);
   const loading =
@@ -180,6 +199,20 @@ export function ReviewPage() {
                   rows={sections[k]}
                   entriesReady={entries.status === "ready"}
                   busy={busy}
+                  onEdit={(r) => {
+                    const name = nameOf.get(r.issue.supplierId);
+                    if (!r.entry || !name) return;
+                    setOutcome(null);
+                    setEditing({
+                      entry: r.entry,
+                      supplierName: name,
+                      issueId: r.issue.id,
+                      sheetRow: r.issue.row,
+                      // كل أسباب السجل (لا هذا القسم وحده)، ليرى المستخدم ما يُغلقه
+                      reasons: r.issue.issues,
+                      suggestedDate: r.suggestedDate,
+                    });
+                  }}
                   onIgnore={(r) => {
                     setOutcome(null);
                     setNote("");
@@ -214,11 +247,23 @@ export function ReviewPage() {
             فوراً.
           </p>
           <p>
-            تصحيح الحركة نفسها من نافذة «تعديل الحركة»، وهي بانتظار اعتماد نموذجها؛ إلى حينها افتح الحركة في
-            كشف المورد.
+            «تعديل» يفتح الحركة بسبب إلزامي يُحفظ في التدقيق، و«تمت المراجعة» تُعلَّم بعد الحفظ بخيار صريح
+            فقط.
           </p>
         </section>
       </aside>
+
+      <EditEntryDialog
+        target={editing}
+        uid={profile.uid}
+        lockedThrough={lockedThrough}
+        onClose={() => setEditing(null)}
+        onSaved={(text) => {
+          setEditing(null);
+          setUndoRow(null);
+          setOutcome({ tone: "ok", text });
+        }}
+      />
 
       <Dialog
         isOpen={ignoring !== null}
@@ -262,6 +307,7 @@ function Section(p: {
   rows: ReviewRow[];
   entriesReady: boolean;
   busy: boolean;
+  onEdit: (r: ReviewRow) => void;
   onIgnore: (r: ReviewRow) => void;
 }) {
   const head = SECTION_HEAD[p.k];
@@ -313,6 +359,7 @@ function Section(p: {
                   k={p.k}
                   entriesReady={p.entriesReady}
                   busy={p.busy}
+                  onEdit={p.onEdit}
                   onIgnore={p.onIgnore}
                 />
               ))}
@@ -329,6 +376,7 @@ function Row(p: {
   k: ReviewSection;
   entriesReady: boolean;
   busy: boolean;
+  onEdit: (r: ReviewRow) => void;
   onIgnore: (r: ReviewRow) => void;
 }) {
   const { r } = p;
@@ -399,31 +447,17 @@ function Row(p: {
       </td>
       <td data-l="الإجراء" className={s.act}>
         <div className={s.acts}>
-          <Link className={s.open} to={`/statement/${r.issue.supplierId}`}>
-            فتح في الكشف
-          </Link>
+          <Button size="sm" variant="primary" disabled={p.busy || !e} onClick={() => p.onEdit(r)}>
+            تعديل
+          </Button>
           <Button size="sm" variant="ghost" disabled={p.busy} onClick={() => p.onIgnore(r)}>
             تجاهل
           </Button>
+          <Link className={s.open} to={`/statement/${r.issue.supplierId}`}>
+            الكشف
+          </Link>
         </div>
       </td>
     </tr>
-  );
-}
-
-/** نص السبب كما كتبه سكربت النقل، بتواريخه يوماً/شهراً/سنة كبقية النظام وبلا كسر داخل التاريخ. */
-function ReasonText({ text }: { text: string }) {
-  return (
-    <>
-      {text.split(/(\d{4}-\d{2}-\d{2})/).map((part, i) =>
-        i % 2 ? (
-          <span key={i} className="num">
-            {formatDate(part)}
-          </span>
-        ) : (
-          part
-        ),
-      )}
-    </>
   );
 }

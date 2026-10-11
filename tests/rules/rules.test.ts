@@ -772,3 +772,49 @@ describe("أسباب التعديل اليدوي للبيانات المنقول
     await assertFails(resolve("owner", { resolved: true, resolution: "ignored", resolvedAt: new Date(0) }));
   });
 });
+
+describe("تعديل الحركة: نقلها بين فهارس الأرقام (DECISIONS 2026-10-11)", () => {
+  const OLD = refKey("P10590");
+  const place = { entryId: "e0", supplierId: "s1", supplierName: "المورد (أ)" };
+  const move = (uid: string, opts: { moveEntry?: boolean; keep?: string[] } = {}) => {
+    const db = as(uid);
+    const b = writeBatch(db);
+    if (opts.moveEntry !== false) {
+      const aid = newAuditId();
+      b.update(doc(db, "entries/e0"), {
+        mainRef: "10591",
+        refNo: "P10591",
+        updatedAt: serverTimestamp(),
+        auditId: aid,
+      });
+      b.set(doc(db, `auditLog/${aid}`), {
+        actor: uid,
+        at: serverTimestamp(),
+        action: "update",
+        entity: "entries",
+        entityId: "e0",
+      });
+      b.set(doc(db, `refs/${refKey("P10591")}`), { ids: ["e0"], places: [place] });
+    }
+    b.update(doc(db, `refs/${OLD}`), { ids: opts.keep ?? [], places: [] });
+    return b.commit();
+  };
+  it("المالك والإدارة يزيلون الحركة من رقمها القديم حين تنتقل في الدفعة نفسها", async () => {
+    await assertSucceeds(move("owner"));
+  });
+  it("الإدارة كذلك", () => assertSucceeds(move("admin")));
+  it("لا إزالة لحركة لم تنتقل، ولا لمدخل البيانات", async () => {
+    await assertFails(move("owner", { moveEntry: false }));
+    await assertFails(move("entry"));
+  });
+  it("لا تُزال إلا حركة واحدة بمكانها", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(asDb(ctx.firestore()), `refs/${OLD}`), {
+        ids: ["e0", "eX"],
+        places: [place, { entryId: "eX", supplierId: "s2", supplierName: "المورد (ب)" }],
+      });
+    });
+    // إزالة الاثنين معاً مرفوضة
+    await assertFails(move("owner"));
+  });
+});
