@@ -245,3 +245,90 @@ test("تصدير الكشف: ملف Excel بالأرقام والمعادلات�
   await page.emulateMedia({ media: "screen" });
   await expect(page.locator("#root")).toBeVisible();
 });
+
+test.describe("فهرس الفواتير وحالة Odoo", () => {
+  const counter = (page: Page, label: string) =>
+    page
+      .locator("main dl div")
+      .filter({ has: page.getByText(label, { exact: true }) })
+      .locator("dd");
+
+  test("المالك: تحديد كـدخلت جماعي يستثني المقفل، والإرجاع بسبب، وكل تغيير في التدقيق", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await loginOk(page, OWNER.email, OWNER.password);
+    await page.getByRole("link", { name: "الفواتير" }).click();
+    await page.getByRole("radio", { name: "كل الفترات" }).click();
+    await expect(counter(page, "إجمالي الفواتير")).toHaveText("6");
+    await expect(counter(page, "دخلت")).toHaveText("1");
+    await expect(counter(page, "لم تدخل Odoo")).toHaveText("5");
+
+    await page.getByRole("radio", { name: "لم تدخل" }).click();
+    await expect(page.locator("main tbody tr")).toHaveCount(5);
+    await page.getByRole("checkbox", { name: "تحديد الكل الظاهر" }).click();
+    await expect(page.getByText("5 فاتورة محددة").first()).toBeVisible();
+    await page.getByRole("button", { name: "تحديد كـدخلت" }).first().click();
+    await expect(page.getByText("حُددت 3 فاتورة كـ«دخلت» وسُجّل كل تغيير في التدقيق.")).toBeVisible();
+    await expect(page.getByText(/2 فاتورة في فترة مقفلة .* لم تتغير: P10001، P90001/)).toBeVisible();
+    await expect(counter(page, "دخلت")).toHaveText("4");
+    await expect(counter(page, "لم تدخل Odoo")).toHaveText("2");
+    await expect(page.locator("main tbody tr")).toHaveCount(2);
+
+    await page.getByRole("radio", { name: "الكل", exact: true }).click();
+    await page.getByRole("checkbox", { name: "تحديد الفاتورة P10002" }).click();
+    await page.getByRole("button", { name: "إرجاع إلى «لم تدخل»" }).first().click();
+    const dlg = page.getByRole("dialog");
+    await dlg.getByRole("button", { name: "إرجاع إلى «لم تدخل»" }).click();
+    await expect(dlg.getByText("اختر سبب الإرجاع.")).toBeVisible();
+    await dlg.getByRole("radio", { name: /حُددت بالخطأ/ }).click();
+    await dlg.getByRole("button", { name: "إرجاع إلى «لم تدخل»" }).click();
+    await expect(page.getByText("أُرجعت 1 فاتورة إلى «لم تدخل» وسُجّل كل تغيير في التدقيق.")).toBeVisible();
+    await expect(counter(page, "لم تدخل Odoo")).toHaveText("3");
+    await expect(counter(page, "دخلت")).toHaveText("3");
+
+    const audit = await adminDb().collection("auditLog").where("entity", "==", "entries").get();
+    const actions = audit.docs.map((d) => d.get("action") as string);
+    expect(actions.filter((a) => a === "odooEntered")).toHaveLength(3);
+    expect(actions.filter((a) => a === "odooReverted")).toHaveLength(1);
+    const p10002 = await adminDb().doc("entries/e103").get();
+    expect(p10002.get("odoo")).toMatchObject({ entered: false, reason: "wrong" });
+    await page.screenshot({ path: "test-results/invoices-1440.png", fullPage: true });
+  });
+
+  test("مدخل البيانات: فواتير موردِيه فقط وللاطلاع، بلا تحديد", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await loginOk(page, ENTRY.email, ENTRY.password);
+    await page.goto("/invoices");
+    await page.getByRole("radio", { name: "كل الفترات" }).click();
+    await expect(page.locator("main tbody tr")).toHaveCount(1);
+    await expect(page.locator("main tbody tr").first()).toContainText("P20001");
+    await expect(page.getByRole("checkbox")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "تحديد كـدخلت" })).toHaveCount(0);
+    await expect(page.getByText("صلاحية مدخل البيانات للاطلاع فقط")).toBeVisible();
+  });
+
+  test("الجوال: بطاقات، ووضع التحديد بشريط سفلي، بلا تمرير أفقي ولا عنصر أصلي", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 780 });
+    await loginOk(page, OWNER.email, OWNER.password);
+    await page.goto("/invoices");
+    await page.getByRole("radio", { name: "كل الفترات" }).click();
+    await expect(page.locator("main tbody tr").first()).toBeVisible();
+    await expect(page.getByRole("columnheader")).toHaveCount(0);
+    await page.getByRole("button", { name: "تحديد فواتير" }).click();
+    const bar = page.getByRole("region", { name: "إجراءات التحديد" });
+    await expect(bar).toBeVisible();
+    await page.locator("main tbody tr").first().click();
+    await expect(bar).toContainText("1 فاتورة محددة");
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+    const banned = await page.evaluate(
+      () =>
+        document.querySelectorAll(
+          'select, input[type="checkbox"], input[type="radio"], input[type="number"], input[type="date"]',
+        ).length,
+    );
+    expect(banned).toBe(0);
+    await page.screenshot({ path: "test-results/invoices-360.png", fullPage: true });
+    await bar.getByRole("button", { name: "إلغاء" }).click();
+    await expect(bar).toHaveCount(0);
+  });
+});

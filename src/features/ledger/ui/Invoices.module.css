@@ -1,0 +1,315 @@
+/* فهرس الفواتير وحالة Odoo (direction-1/invoices.html، CHOSEN §3.3 و§4 «ختم حالة Odoo») */
+
+.counters {
+  display: flex;
+  margin: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+}
+
+.counters div {
+  padding: 6px 18px;
+  min-inline-size: 8em;
+}
+
+.counters div + div {
+  border-inline-start: 1px solid var(--rule);
+}
+
+.counters dt {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.counters dd {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 20px;
+  margin-block-end: 14px;
+}
+
+.pickSup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  inline-size: min(100%, 320px);
+}
+
+.clear {
+  align-self: flex-start;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-block-end: 12px;
+  padding-block: 8px;
+  border-block: 1px solid var(--rule);
+}
+
+.bulk > span {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.selCount {
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+.mobileOnly {
+  display: none !important;
+}
+
+.outcome {
+  margin-block-end: 12px;
+}
+
+.line {
+  display: block;
+}
+
+.hint {
+  font-size: 14.5px;
+  color: var(--ink-2);
+  margin: 0 0 10px;
+}
+
+/* ---------- الجدول ---------- */
+.cPick {
+  inline-size: 52px;
+}
+
+.isSel {
+  background: var(--wash);
+}
+
+.inv tbody tr.isSel:hover {
+  background: var(--wash);
+}
+
+.cDesc {
+  min-inline-size: 12em;
+  font-size: 15.5px;
+}
+
+.flag {
+  display: inline-block;
+  margin-inline-start: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+  padding: 0 6px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+/* ختم Odoo: «دخلت» إطار مزدوج كحلي، و«لم تدخل» متقطع أحمر */
+.stamp {
+  display: inline-block;
+  padding: 0 10px;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+
+.in {
+  color: var(--accent);
+  border: 3px double currentcolor;
+}
+
+.out {
+  color: var(--neg);
+  border: 1.5px dashed currentcolor;
+  padding: 1.5px 11px;
+}
+
+/* ---------- التقرير الجانبي ---------- */
+.repList {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.repList li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-block-end: 1px solid var(--rule);
+  font-size: 15px;
+}
+
+.repEmpty {
+  margin-block-start: 8px;
+}
+
+.repBtn {
+  margin-block-start: 14px;
+}
+
+.selbar {
+  display: none;
+}
+
+/* =====================================================================
+   ≤ 600 جوال: كل فاتورة بطاقة، والتحديد بضغط مطوّل وشريط سفلي
+   ===================================================================== */
+@media (width <= 600px) {
+  .mobileOnly {
+    display: inline-flex !important;
+  }
+
+  .desktopOnly {
+    display: none !important;
+  }
+
+  .counters {
+    inline-size: 100%;
+  }
+
+  .counters div {
+    flex: 1;
+    min-inline-size: 0;
+    padding: 6px 12px;
+  }
+
+  .counters dd {
+    font-size: 22px;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pickSup {
+    inline-size: 100%;
+  }
+
+  .inv tbody tr.row {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "refno st" "date amt" "desc amt";
+    gap: 2px 12px;
+    padding: 14px 4px;
+    border-block-end: 1px solid var(--rule);
+    user-select: none;
+    -webkit-touch-callout: none;
+    transition: padding 0.15s ease;
+  }
+
+  .cPick {
+    display: none !important;
+  }
+
+  .cRefno {
+    grid-area: refno;
+    font-size: 18px;
+  }
+
+  .cDate {
+    grid-area: date;
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+
+  .cV,
+  .cSup {
+    display: none !important;
+  }
+
+  .inv .cDesc {
+    grid-area: desc;
+    min-inline-size: 0;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+
+  .cDesc:empty {
+    display: none !important;
+  }
+
+  .cAmt {
+    grid-area: amt;
+    align-self: end;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .cSt {
+    grid-area: st;
+    text-align: end;
+  }
+
+  .selecting .inv tbody tr.row {
+    padding-inline-start: 56px;
+    cursor: pointer;
+  }
+
+  .selecting .cPick {
+    display: block !important;
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+  }
+
+  .inv tbody tr.isSel {
+    box-shadow: inset -4px 0 0 var(--accent);
+  }
+
+  .selecting .bulk {
+    display: none;
+  }
+
+  .selbar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 32;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--surface);
+    border-block-start: 2px solid var(--accent);
+    box-shadow: var(--shadow);
+  }
+
+  .selbar .selCount {
+    flex-basis: 100%;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .selecting {
+    padding-block-end: 150px;
+  }
+}
+
+/* اللوحي: الفهرس يختار المورد */
+@media (width >= 601px) and (width <= 1279px) {
+  .pickSup {
+    display: none;
+  }
+}
