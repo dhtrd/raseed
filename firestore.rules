@@ -251,6 +251,13 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ---------- أسباب «التعديل اليدوي» للبيانات المنقولة (المرحلة 3) ----------
+    // يكتبها سكربت النقل وحده (firebase-admin)؛ تُقرأ في مركز المراجعة للمالك والإدارة.
+    match /migrationIssues/{eid} {
+      allow read: if isManager();
+      allow write: if false;
+    }
+
     // ---------- سجل التدقيق: إضافة فقط، لا تعديل ولا حذف ----------
     match /auditLog/{aid} {
       allow read: if isManager();

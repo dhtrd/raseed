@@ -41,5 +41,15 @@ describe("سكربتات المالك", () => {
     expect(
       checkEnv({ RASEED_PROJECT_ID: "demo", FIREBASE_AUTH_EMULATOR_HOST: "x", FIRESTORE_EMULATOR_HOST: "y" }),
     ).toMatchObject({ ok: true, emulator: true });
+    // النقل يحتاج Firestore وحده
+    expect(checkEnv({ RASEED_PROJECT_ID: "demo", FIRESTORE_EMULATOR_HOST: "y" })).toMatchObject({
+      ok: false,
+    });
+    expect(
+      checkEnv({ RASEED_PROJECT_ID: "demo", FIRESTORE_EMULATOR_HOST: "y" }, { auth: false }),
+    ).toMatchObject({
+      ok: true,
+      emulator: true,
+    });
   });
 });
