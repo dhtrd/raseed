@@ -1,0 +1,331 @@
+/* إضافة حركة (direction-1/add-entry.html، CHOSEN §3.4) */
+
+.voucher {
+  border: 1px solid var(--rule);
+  border-block-start: 3px double var(--ink);
+  padding: 18px 18px 20px;
+  background: var(--surface);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px 22px;
+}
+
+.fSup,
+.fType,
+.fDate,
+.fRef,
+.fRefno,
+.fV,
+.fDesc,
+.fAmt {
+  min-inline-size: 0;
+}
+
+.hint {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.loading {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.msg {
+  margin-block-end: 14px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-block-start: 22px;
+  padding-block-start: 18px;
+  border-block-start: 1px solid var(--rule);
+}
+
+.errSum {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--neg);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.kbd,
+.kbdOn {
+  display: inline-block;
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-family: var(--f-num);
+  font-size: 13px;
+  line-height: 1.3;
+  font-weight: 600;
+  padding: 1px 6px;
+  border: 1px solid currentcolor;
+  border-block-end-width: 2px;
+  border-radius: var(--r-sm);
+  opacity: 0.85;
+}
+
+.kbd {
+  display: none;
+}
+
+/* ---------- التحذير الصارم ---------- */
+.dup {
+  border: 2px solid var(--neg);
+  border-inline-start-width: 8px;
+  background: var(--neg-wash);
+  padding: 16px 18px 18px;
+  border-radius: var(--r-sm);
+}
+
+.dup h2 {
+  color: var(--neg);
+  font-size: 19px;
+}
+
+.dup p {
+  color: var(--ink);
+  margin-block-start: 8px;
+  font-size: 15.5px;
+}
+
+.dup.ok {
+  border-color: var(--rule);
+  border-inline-start-color: var(--accent);
+  background: var(--wash-2);
+}
+
+.dup.ok h2 {
+  color: var(--accent);
+}
+
+.mine {
+  display: none;
+}
+
+.dupRec {
+  margin: 12px 0;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+}
+
+.dupRec div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 12px;
+  border-block-end: 1px solid var(--rule);
+}
+
+.dupRec div:last-child {
+  border-block-end: 0;
+}
+
+.dupRec dt {
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+.dupRec dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.dupCount {
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.reason {
+  margin-block-start: 12px;
+}
+
+.dupErr {
+  color: var(--neg) !important;
+  font-weight: 700;
+}
+
+.backWrap {
+  display: none;
+}
+
+.kbdHelp dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 14px;
+  align-items: center;
+  margin: 0;
+  font-size: 15px;
+}
+
+.kbdHelp dt {
+  text-align: end;
+}
+
+.kbdHelp dd {
+  margin: 0;
+}
+
+/* =====================================================================
+   ≤ 600 جوال: التحذير فوق النموذج، وعند التكرار يحل محله بملء الشاشة
+   ===================================================================== */
+@media (width <= 600px) {
+  .sheet {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .side {
+    order: -1;
+    padding: 16px 16px 0;
+    border-block-start: 0;
+  }
+
+  .main {
+    padding-block-start: 16px;
+  }
+
+  .kbdHelp {
+    display: none;
+  }
+
+  .voucher {
+    border-inline: 0;
+    padding: 16px 0 6px;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .takeover .main {
+    display: none;
+  }
+
+  .takeover .side {
+    padding: 0;
+  }
+
+  .takeover .dup {
+    min-block-size: calc(100dvh - 140px);
+    border-radius: 0;
+    border-width: 0;
+    border-block-start: 8px solid var(--neg);
+    padding: 22px 18px 28px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .takeover .dup h2 {
+    font-size: 23px;
+  }
+
+  .takeover .mine {
+    display: block;
+  }
+
+  .takeover .backWrap {
+    display: block;
+    margin-block-start: auto;
+    padding-block-start: 18px;
+  }
+}
+
+/* ≥ 601: الحقول في عمودين */
+@media (width >= 601px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .fSup,
+  .fDesc,
+  .fAmt,
+  .fRefno {
+    grid-column: 1 / -1;
+  }
+}
+
+/* اللوحي: مقطّع النوع مع اختصاراته أعرض من نصف العمود، فيأخذ سطراً كاملاً */
+@media (width >= 601px) and (width <= 1279px) {
+  .fType {
+    grid-column: 1 / -1;
+  }
+}
+
+/* 601–1024: التحذير فوق النموذج */
+@media (width >= 601px) and (width <= 1024px) {
+  .sheet.sheet {
+    grid-template-areas: "idx side" "idx main";
+  }
+
+  .side {
+    border-block-start: 0;
+    padding-block-end: 0;
+  }
+
+  .kbdHelp {
+    display: none;
+  }
+}
+
+/* 1025–1279: الموردون 260 | النموذج | التحذير والاختصارات 300 */
+@media (width >= 1025px) and (width <= 1279px) {
+  .sheet.sheet {
+    grid-template-columns: 260px minmax(0, 1fr) 300px;
+    grid-template-areas: "idx main side";
+  }
+
+  .side {
+    border-block-start: 0;
+    border-inline-start: 1px solid var(--rule);
+    background: var(--wash-2);
+    align-self: stretch;
+  }
+
+  .kbd {
+    display: inline-block;
+  }
+}
+
+/* ≥ 1280: النموذج في ثلاثة أعمدة، والتحذير ثابت أثناء التمرير */
+@media (width >= 1280px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .fSup,
+  .fDesc {
+    grid-column: span 2;
+  }
+
+  .fRefno {
+    grid-column: auto;
+  }
+
+  .fAmt {
+    grid-column: 1 / -1;
+  }
+
+  .dup {
+    position: sticky;
+    top: 16px;
+  }
+
+  .kbd {
+    display: inline-block;
+  }
+}
+
+.side > section + section {
+  margin-block-start: 26px;
+}
