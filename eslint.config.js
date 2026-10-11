@@ -48,7 +48,7 @@ export default tseslint.config(
   },
   {
     // سكربتات المالك في الطرفية: الطباعة هي واجهتها
-    files: ["tools/admin/**/*.ts", "tools/migrate/**/*.ts"],
+    files: ["tools/admin/**/*.ts", "tools/migrate/**/*.ts", "tools/backup/**/*.ts"],
     languageOptions: { globals: { ...globals.node } },
     rules: { "no-console": "off" },
   },
