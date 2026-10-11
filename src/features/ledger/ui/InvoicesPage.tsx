@@ -7,6 +7,7 @@ import { Segment } from "../../../shared/fields/components/Segment";
 import { SupplierCombobox } from "../../../shared/fields/components/SupplierCombobox";
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
 import { Banner } from "../../../shared/ui/Banner";
+import { EmptyLedger, LoadingLedger } from "../../../shared/ui/LedgerState";
 import { Button } from "../../../shared/ui/Button";
 import { Icon, RIYAL_PATH } from "../../../shared/ui/Icon";
 import { useProfile } from "../../auth/session/SessionProvider";
@@ -380,11 +381,7 @@ export function InvoicesPage() {
         ) : null}
 
         <p className={l.status} role="status" aria-live="polite">
-          {loading
-            ? "جارٍ تحميل الفواتير…"
-            : progress
-              ? `جارٍ التحديث: ${progress.done} من ${progress.of}…`
-              : ""}
+          {progress ? `جارٍ التحديث: ${progress.done} من ${progress.of}…` : ""}
         </p>
         {outcome ? (
           <div className={s.outcome}>
@@ -419,7 +416,30 @@ export function InvoicesPage() {
           <Banner tone="err">هذا المورد غير موجود أو غير مسند إليك.</Banner>
         ) : null}
 
-        {invoices.status === "ready" ? (
+        {loading ? <LoadingLedger label="جارٍ تحميل الفواتير…" /> : null}
+        {invoices.status === "ready" && rows.length === 0 ? (
+          <EmptyLedger
+            title="لا فواتير بهذا الفلتر"
+            actions={
+              scope === "period" || status !== "all" ? (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setScope("all");
+                    setStatus("all");
+                  }}
+                >
+                  عرض كل الفواتير
+                </Button>
+              ) : null
+            }
+          >
+            {scope === "period" || status !== "all"
+              ? "جرّب فترة أوسع أو حالة Odoo أخرى، أو اعرض الكل."
+              : "لم تُسجَّل أي فاتورة بعد. الفواتير تُضاف من «إضافة حركة»."}
+          </EmptyLedger>
+        ) : null}
+        {invoices.status === "ready" && rows.length > 0 ? (
           <>
             {manager ? (
               <p className={`${s.hint} ${s.mobileOnly}`}>
@@ -468,11 +488,6 @@ export function InvoicesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.length === 0 ? (
-                    <tr className={l.more}>
-                      <td colSpan={8}>لا فواتير بهذا الفلتر.</td>
-                    </tr>
-                  ) : null}
                   {rows.map((r) => (
                     <InvoiceLine
                       key={r.id}

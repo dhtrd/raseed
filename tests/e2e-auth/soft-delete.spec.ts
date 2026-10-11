@@ -54,7 +54,8 @@ test("المالك: الحذف من نافذة التعديل بسبب إلزا�
 
   await expect(page.getByText(/حُذفت حركة MISC\/2026\/08\/0701 وخرجت من الرصيد/)).toBeVisible();
   await expect(row(page)).toHaveCount(0);
-  await expect(balance(page)).toContainText("0.00");
+  // لا حركات قائمة: حالة الفراغ (الخيار ج) بدل الجدول
+  await expect(page.getByRole("status").filter({ hasText: "كل حركات هذا المورد محذوفة" })).toBeVisible();
   const e = await adminDb().doc("entries/e501").get();
   expect(e.get("deleted")).toBe(true);
   expect(e.get("deletion.reason")).toBe("حركة ملغاة");

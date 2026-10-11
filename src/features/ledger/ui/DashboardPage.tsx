@@ -4,6 +4,7 @@ import { PeriodFilter, type Period } from "../../../shared/fields/components/Per
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
+import { LoadingLedger } from "../../../shared/ui/LedgerState";
 import { useProfile } from "../../auth/session/SessionProvider";
 import { SupplierDialog } from "../../suppliers/ui/SupplierDialog";
 import { isManager } from "../../users/core/users";
@@ -160,7 +161,7 @@ export function DashboardPage() {
         </div>
         <p className={l.status} role="status" aria-live="polite">
           {loading
-            ? "جارٍ حساب الأرصدة…"
+            ? ""
             : updatedAt && balances.status === "ready"
               ? refreshing
                 ? "وصل تغيير جديد؛ جارٍ تحديث الأرصدة…"
@@ -181,6 +182,7 @@ export function DashboardPage() {
           </div>
         ) : null}
 
+        {balances.status === "loading" && !supError ? <LoadingLedger label="جارٍ حساب الأرصدة…" /> : null}
         {balances.status === "ready" ? (
           <>
             <section className={`${s.hero} ${l.mOnly}`} aria-labelledby="hero-h">
