@@ -220,7 +220,7 @@ export function DashboardPage() {
                 {balanceState(folio.final).label}
               </p>
               {selected && picked !== TOTAL ? (
-                <Link className={l.linkBtn} to={`/statement/${selected.id}`}>
+                <Link className={l.linkBtn} to={`/statement/${selected.id}`} state={{ period }}>
                   فتح كشف الحساب
                 </Link>
               ) : null}
@@ -278,6 +278,7 @@ export function DashboardPage() {
                     <BalanceRow
                       key={r.id}
                       r={r}
+                      period={period}
                       open={open.has(r.id)}
                       flash={flash === r.id}
                       onToggle={() =>
@@ -342,7 +343,14 @@ export function DashboardPage() {
   );
 }
 
-function BalanceRow(p: { r: SupplierBalance; open: boolean; flash: boolean; onToggle: () => void }) {
+function BalanceRow(p: {
+  r: SupplierBalance;
+  /** فترة اللوحة: الكشف يُفتح بها (DECISIONS 2026-10-11) */
+  period: Period;
+  open: boolean;
+  flash: boolean;
+  onToggle: () => void;
+}) {
   const { r } = p;
   const st = balanceState(r.final);
   return (
@@ -361,7 +369,7 @@ function BalanceRow(p: { r: SupplierBalance; open: boolean; flash: boolean; onTo
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </button>
-            <Link to={`/statement/${r.id}`} className={s.nm}>
+            <Link to={`/statement/${r.id}`} state={{ period: p.period }} className={s.nm}>
               {r.name}
             </Link>
             {r.archived ? <span className={l.tag}>مؤرشف</span> : null}

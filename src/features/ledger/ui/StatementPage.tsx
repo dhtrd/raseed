@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
-import { Link, useNavigate, useParams } from "react-router";
-import { PeriodFilter, type Period } from "../../../shared/fields/components/PeriodFilter";
+import { Link, useLocation, useNavigate, useParams } from "react-router";
+import { asPeriod, PeriodFilter, type Period } from "../../../shared/fields/components/PeriodFilter";
 import { Segment } from "../../../shared/fields/components/Segment";
 import { SupplierCombobox } from "../../../shared/fields/components/SupplierCombobox";
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
@@ -41,8 +41,11 @@ export function StatementPage() {
   const idx = useIndexCollapse();
   const suppliers = useVisibleSuppliers(profile);
 
-  const [scope, setScope] = useState<Scope>("all");
-  const [period, setPeriod] = useState<Period>(() => currentQuarter(today));
+  // القادم من لوحة الأرصدة يفتح بفترتها نفسها، و«كل الحركات» يزيل الفلترة
+  const location = useLocation();
+  const [fromDashboard] = useState(() => asPeriod((location.state as { period?: unknown } | null)?.period));
+  const [scope, setScope] = useState<Scope>(fromDashboard ? "period" : "all");
+  const [period, setPeriod] = useState<Period>(() => fromDashboard ?? currentQuarter(today));
   const [sort, setSort] = useState<SortState<Col>>({ key: "date", dir: "desc" });
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [retry, setRetry] = useState(0);

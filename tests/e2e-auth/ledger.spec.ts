@@ -59,6 +59,21 @@ test("لوحة الأرصدة للمالك: الأرقام والإجمالي و
   await page.screenshot({ path: "test-results/dashboard-1440.png", fullPage: true });
 });
 
+test("اسم المورد في اللوحة يفتح كشفه بفترة اللوحة نفسها، و«كل الحركات» يزيلها", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await loginOk(page, OWNER.email, OWNER.password);
+  await pickQ4(page);
+  await page.locator("main").getByRole("link", { name: "المورد (أ)" }).click();
+  await expect(page).toHaveURL(/\/statement\/s1$/);
+  await expect(page.getByRole("radio", { name: "فترة" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "مخصص" })).toBeChecked();
+  await expect(page.getByRole("textbox", { name: /^من/ })).toHaveValue(/01\/10\/2026/);
+  await expect(page.getByRole("textbox", { name: /^إلى/ })).toHaveValue(/31\/12\/2026/);
+  await page.getByRole("radio", { name: "كل الحركات" }).click();
+  await expect(page.getByRole("radio", { name: "كل الحركات" })).toBeChecked();
+  await expect(page.getByRole("textbox", { name: /^من/ })).toHaveCount(0);
+});
+
 test("ترتيب الأعمدة: النهائي تصاعدياً يضع الأكثر استحقاقاً أولاً", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await loginOk(page, OWNER.email, OWNER.password);
@@ -77,6 +92,9 @@ test("كشف المورد: الرصيد الجاري، الأحدث أولاً،
   await page.getByRole("link", { name: "المورد (أ)" }).click();
   await expect(page).toHaveURL(/\/statement\/s1$/);
   await expect(page.getByRole("heading", { name: "المورد (أ)", level: 1 })).toBeVisible();
+  // من اللوحة يُفتح بفترتها (الربع الحالي)؛ «كل الحركات» يزيل الفلترة
+  await expect(page.getByRole("radio", { name: "فترة" })).toBeChecked();
+  await page.getByRole("radio", { name: "كل الحركات" }).click();
   const body = page.locator("main tbody tr");
   await expect(body).toHaveCount(7); // المحذوف ناعماً لا يظهر
   await expect(body.first()).toContainText("07/10/2026");
