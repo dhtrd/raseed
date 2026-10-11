@@ -7,6 +7,7 @@ import { isManager, DEFAULT_ROLE_NAMES, type RoleNames } from "../features/users
 import { watchRoleNames } from "../features/users/data/settingsRepo";
 import { RoleNamesContext } from "../features/users/ui/roleNames";
 import { TempLockBar } from "../features/ledger/ui/TempLockBar";
+import { Icon } from "../shared/ui/Icon";
 import { SearchPalette } from "../features/ledger/ui/SearchPalette";
 import { clearSearchCache } from "../features/ledger/data/searchRepo";
 import s from "./AppShell.module.css";
@@ -57,6 +58,16 @@ export function AppShell() {
         </nav>
         <div className={s.tools}>
           <SearchPalette profile={profile} />
+          {/* الجوال واللوحي: التطبيق من الشاشة الرئيسية بلا زر تحديث للمتصفح (طلب المستخدم 2026-10-11) */}
+          <button
+            type="button"
+            className={s.reload}
+            aria-label="إعادة تحميل الصفحة"
+            title="إعادة تحميل الصفحة"
+            onClick={() => window.location.reload()}
+          >
+            <Icon name="reload" />
+          </button>
           <span className={s.who}>
             <b>{profile.displayName}</b>
             <span>{names[profile.role]}</span>

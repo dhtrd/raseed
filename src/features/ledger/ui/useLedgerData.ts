@@ -12,7 +12,7 @@ export function readError(e: unknown, what: string): string {
   if (code === "permission-denied") return `لا صلاحية لـ${what}. إن كان هذا خطأً فأبلغ المالك.`;
   if (code === "unavailable") return `تعذّر ${what}: لا اتصال بالخادم. تحقق من الإنترنت ثم أعد المحاولة.`;
   if (code === "failed-precondition")
-    return `تعذّر ${what}: فهرس قاعدة البيانات قيد الإنشاء. أعد المحاولة بعد دقائق.`;
+    return `تعذّر ${what}: فهرس قاعدة البيانات غير جاهز (قيد الإنشاء أو ناقص). أعد المحاولة بعد دقائق، وإن استمر فأبلغ Claude بالنص: فهرس ناقص.`;
   return `تعذّر ${what}. أعد المحاولة، وإن تكرر فأبلغ المالك بالنص: ${code || String(e)}`;
 }
 

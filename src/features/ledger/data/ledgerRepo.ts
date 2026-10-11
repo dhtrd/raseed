@@ -54,9 +54,19 @@ function entriesOf(supplierId: string, ...extra: QueryConstraint[]) {
   return query(collection(db, "entries"), where("supplierId", "==", supplierId), where("deleted", "==", false), ...extra);
 }
 
+/**
+ * مجموع حقل واحد لكل طلب: الخادم يحسب sum() من فهرس يضم الحقل المجموع، وجمع حقلين في طلب واحد
+ * يحتاج فهرساً يضمهما معاً (خلل الإنتاج 2026-10-11). طلبان متوازيان يطابق كلٌّ منهما فهرسه
+ * (supplierId، deleted، date، debit) و(… credit)، والتكلفة قراءة لكل ألف حركة لكل طلب.
+ */
+async function sumOf(q: ReturnType<typeof entriesOf>, field: "debit" | "credit"): Promise<number> {
+  const s = await getAggregateFromServer(q, { v: sum(field) });
+  return s.data().v ?? 0;
+}
+
 async function sums(q: ReturnType<typeof entriesOf>): Promise<{ debit: number; credit: number }> {
-  const s = await getAggregateFromServer(q, { debit: sum("debit"), credit: sum("credit") });
-  return { debit: s.data().debit ?? 0, credit: s.data().credit ?? 0 };
+  const [debit, credit] = await Promise.all([sumOf(q, "debit"), sumOf(q, "credit")]);
+  return { debit, credit };
 }
 
 /** رصيد مورد لفترة: السابق (قبل البداية) ومدين ودائن الفترة والنهائي. */
