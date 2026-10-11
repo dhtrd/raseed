@@ -1,0 +1,272 @@
+<title>رصيد · متابعة النسخ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* نافذة متابعة النسخ الاحتياطي: ثلاثة خيارات، بيانات وهمية. ألوان CHOSEN.md، نهاري كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9; --wash: #e3eaf4; --wash-2: #f5f8fb;
+  --neg: #a3242b; --neg-wash: #f8e8e9; --ok: #2f6b45; --ok-wash: #e6f2ea; --warn: #8a5a12; --warn-wash: #fbf1e0;
+  --mark-ink: #1e4634; --mark-acc: #b8752a;
+  --shadow: 0 8px 22px rgb(27 42 68 / 18%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { direction: rtl; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.75; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 24px 120px; }
+h1 { margin: 0; font-size: 26px; line-height: 1.35; text-wrap: balance; }
+h2 { margin: 0; font-size: 20px; } h3 { margin: 0; font-size: 17px; } p { margin: 0; }
+.lead { color: var(--ink-2); max-width: 82ch; margin: 6px 0 14px; }
+.common { margin: 0 0 22px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; }
+.n { font-family: var(--f-brand); color: var(--mark-acc); margin-inline-end: 6px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 14px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: 700 14.5px var(--f-text); cursor: pointer; text-decoration: none; }
+.btn:hover { background: var(--wash); }
+.btn.pri, .btn[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 38px; padding: 0 12px; border: 0; background: var(--surface); color: var(--accent); font: 700 14px var(--f-text); cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+section.opt { margin-bottom: 34px; }
+.opt-head { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: end; margin-bottom: 8px; }
+.opt-head .why { color: var(--ink-2); font-size: 15px; max-width: 76ch; }
+.opt-head .acts { display: flex; flex-wrap: wrap; gap: 8px; }
+ul.pc { margin: 0 0 10px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+li.pro { color: var(--ink); }
+section.opt.chosen .screen { box-shadow: 0 0 0 3px var(--accent), var(--shadow); }
+
+/* إطار الشاشة: القائمة + المحتوى */
+.screen-wrap { overflow-x: auto; padding-block: 4px 8px; }
+.screen { width: 1000px; margin-inline: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; display: grid; grid-template-columns: 1fr 170px; min-height: 520px; container-type: inline-size; }
+.screen.phone { width: 380px; grid-template-columns: 1fr; border-radius: 24px; }
+.screen.phone .snav { display: none; }
+.snav { background: var(--surface); border-inline-start: 1px solid var(--rule); padding: 12px 10px; display: grid; gap: 4px; align-content: start; font-size: 13.5px; color: var(--ink-2); order: 2; }
+.snav .brand { font-family: var(--f-brand); font-size: 18px; color: var(--mark-ink); padding: 0 6px 8px; border-bottom: 1px solid var(--rule); margin-bottom: 4px; }
+.snav span { padding: 5px 8px; border-radius: 5px; }
+.snav span.on { background: var(--wash); color: var(--accent); font-weight: 700; box-shadow: inset -3px 0 0 var(--accent); }
+.content { padding: 16px 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.phone .content { padding: 12px; }
+.ptitle { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+.ptitle h3 { font-size: 22px; }
+.ptitle .sub { color: var(--ink-2); font-size: 14px; }
+
+/* بطاقة الحالة */
+.status { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 5px solid var(--ok); border-radius: 8px; padding: 12px 14px; }
+.status.err { border-inline-start-color: var(--neg); background: var(--neg-wash); }
+.phone .status { grid-template-columns: auto 1fr; }
+.phone .status .meta, .pop .status .meta { grid-column: 1 / -1; }
+.pop .status { grid-template-columns: auto 1fr; }
+.dot { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--ok-wash); color: var(--ok); font-size: 20px; font-weight: 700; }
+.err .dot { background: #fff; color: var(--neg); }
+.status b { font-size: 17px; }
+.status .s2 { color: var(--ink-2); font-size: 14px; }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13.5px; color: var(--ink-2); }
+.meta b { color: var(--ink); font-weight: 700; font-size: 14px; }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.phone .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tile { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; }
+.tile dt { font-size: 12.5px; color: var(--ink-2); } .tile dd { margin: 0; font-size: 18px; }
+
+/* جدول الدفتر */
+table { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--surface); }
+thead th { text-align: start; font-size: 12.5px; color: var(--ink-2); padding: 6px 8px; border-bottom: 1px solid var(--rule); border-top: 3px double var(--ink); }
+td { padding: 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr.fail td { background: var(--neg-wash); }
+.tag { display: inline-block; padding: 0 8px; border-radius: 999px; font-size: 12.5px; font-weight: 700; }
+.tag.ok { background: var(--ok-wash); color: var(--ok); } .tag.bad { background: var(--neg-wash); color: var(--neg); border: 1px solid var(--neg); } .tag.kept { background: var(--warn-wash); color: var(--warn); }
+.xp { border: 0; background: none; color: var(--accent); cursor: pointer; font: 700 13px var(--f-text); padding: 0; }
+.detail td { background: var(--wash-2); font-size: 13px; color: var(--ink-2); }
+.phone table thead { display: none; }
+.phone table, .phone tbody, .phone tr, .phone td { display: block; }
+.phone tr { border-bottom: 1px solid var(--rule); padding: 6px 4px; }
+.phone td { border: 0; padding: 2px 4px; }
+.err-text { color: var(--neg); font-size: 13px; }
+
+/* ب: الشريط الزمني */
+.strip { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 12px; }
+.days { display: grid; grid-template-columns: repeat(30, minmax(0, 1fr)); gap: 3px; margin: 8px 0 4px; }
+.phone .days { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+.day { aspect-ratio: 1; border-radius: 3px; border: 0; padding: 0; cursor: pointer; background: var(--ok); opacity: .85; }
+.day.bad { background: var(--neg); opacity: 1; }
+.day.none { background: var(--rule); }
+.day.month { box-shadow: inset 0 0 0 2px var(--mark-acc); }
+.day[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 1px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--ink-2); }
+.legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-inline-end: 4px; vertical-align: -1px; }
+.split { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 12px; }
+.phone .split { grid-template-columns: 1fr; }
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 12px; display: grid; gap: 8px; align-content: start; }
+.card h4 { margin: 0; font-size: 15px; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 13.5px; }
+.kv dt { color: var(--ink-2); } .kv dd { margin: 0; }
+.files { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+.files li { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: 1px dashed var(--rule); }
+
+/* ج: داخل الجرس */
+.topbar { display: flex; justify-content: flex-start; gap: 8px; padding: 8px 12px; background: var(--paper); border-bottom: 1px solid var(--rule); position: relative; }
+.bell { position: relative; width: 40px; height: 40px; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--surface); display: grid; place-items: center; cursor: pointer; }
+.bell svg { width: 20px; height: 20px; fill: none; stroke: var(--ink-2); stroke-width: 1.8; stroke-linecap: round; }
+.bell b { position: absolute; top: -6px; inset-inline-end: -6px; background: var(--neg); color: #fff; font: 700 11px var(--f-num); border-radius: 999px; padding: 0 5px; }
+.pop { position: absolute; top: 54px; inset-inline-end: 12px; width: 360px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; box-shadow: var(--shadow); z-index: 2; }
+.phone .pop { inset-inline: 8px; width: auto; }
+.pop-tabs { display: flex; border-bottom: 1px solid var(--rule); }
+.pop-tabs button { flex: 1; min-height: 40px; border: 0; background: none; font: 700 14px var(--f-text); color: var(--ink-2); cursor: pointer; }
+.pop-tabs button[aria-pressed="true"] { color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
+.pop-body { padding: 10px 12px; display: grid; gap: 8px; }
+.mini { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--rule); font-size: 13.5px; }
+.ghost-page { padding: 16px; display: grid; gap: 8px; opacity: .5; }
+.ghost-page i { display: block; height: 10px; background: var(--rule); border-radius: 3px; }
+
+.picker { position: fixed; inset-inline: 0; bottom: 0; background: var(--surface); border-top: 3px double var(--ink); padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 5; }
+.picker .in { max-width: 1180px; margin-inline: auto; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; font-size: 14.5px; color: var(--ink-2); }
+.picker b { color: var(--ink); }
+</style>
+
+<div class="wrap">
+  <h1>نافذة متابعة النسخ الاحتياطي — ثلاثة خيارات</h1>
+  <p class="lead">كل خيار بشاشة تفاعلية وبيانات وهمية: 30 يوماً، فيها فشلان. بدّل بين الحاسوب والجوال، وبين «سليم» و«آخر نسخة فشلت»، واضغط على الصفوف والأيام.</p>
+  <div class="common">
+    <b>مشترك بين الخيارات الثلاثة:</b>
+    <ul>
+      <li><b>للمالك والإدارة فقط</b> (كالجرس)، قراءة فقط. لا أحد يستطيع تشغيل النسخ أو حذفها من التطبيق؛ زر «تشغيل الآن» يفتح صفحة GitHub Actions (يحتاج حساب GitHub).</li>
+      <li><b>يحتاج إضافة صغيرة لسير النسخ:</b> كل تشغيل يكتب سجلاً في مجموعة جديدة <span class="num">backupRuns</span> (التاريخ، النتيجة، المدة، الحجم، أعداد كل مجموعة، رسالة الخطأ، والملفات المحفوظة في Dropbox بعد الاحتفاظ). القواعد: قراءة للمالك والإدارة، ولا كتابة من التطبيق.</li>
+      <li>التطبيق لا يتصل بـ Dropbox ولا يرى ملفاته (الرموز في GitHub فقط)؛ قائمة الملفات منقولة من السجل.</li>
+    </ul>
+  </div>
+
+  <section class="opt" data-k="a">
+    <div class="opt-head"><div><h2><span class="n">أ</span>صفحة «سجل النسخ»</h2><p class="why">صفحة في القائمة الجانبية تحت «الإدارة»: بطاقة الحالة في الأعلى، ثم أرقام سريعة، ثم دفتر التشغيلات صفاً لكل يوم، وكل صف يُفتح بالتفاصيل.</p></div><div class="acts"></div></div>
+    <ul class="pc"><li class="pro">كل التاريخ في مكان واحد، بنسق الدفتر المألوف</li><li class="pro">مناسب للمراجعة الدورية</li><li>عنصر جديد في القائمة الجانبية</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" data-k="b">
+    <div class="opt-head"><div><h2><span class="n">ب</span>الشريط الزمني</h2><p class="why">نفس الصفحة، لكن قلبها شريط 30 مربعاً (يوم لكل مربع: أخضر نجح، أحمر فشل، رمادي لم يعمل). اضغط يوماً لتفاصيله، وبجانبه قائمة الملفات الموجودة في Dropbox.</p></div><div class="acts"></div></div>
+    <ul class="pc"><li class="pro">الثغرات والفشل تُرى بنظرة</li><li class="pro">يوضّح سياسة الاحتفاظ (المربعات بإطار كهرماني = نسخة الشهر الدائمة)</li><li>أقل تفصيلاً في العرض الأول</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" data-k="c">
+    <div class="opt-head"><div><h2><span class="n">ج</span>تبويب في الجرس</h2><p class="why">بلا صفحة جديدة: نافذة الجرس الحالية تصير بتبويبين «التنبيهات» و«النسخ الاحتياطي»، فيه الحالة وآخر 7 تشغيلات ورابط «السجل الكامل في GitHub».</p></div><div class="acts"></div></div>
+    <ul class="pc"><li class="pro">لا عنصر جديد في القائمة</li><li class="pro">في متناول اليد من أي شاشة</li><li>تاريخ قصير فقط (7 أيام)</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+</div>
+
+<div class="picker"><div class="in"><span id="picked">اختر خياراً بزر «اختر هذا».</span><span style="display:flex;gap:8px"><button class="btn" type="button" id="copy" disabled>نسخ الاختيار</button></span></div></div>
+
+<script>
+(() => {
+  // بيانات وهمية: 30 يوماً تنتهي في 11/10/2026، فشلان، ويوم بلا تشغيل
+  const days = [];
+  const base = Date.UTC(2026, 9, 11);
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(base - i * 86400000);
+    const iso = d.toISOString().slice(0, 10);
+    const status = i === 0 ? "ok" : i === 4 || i === 17 ? "failed" : i === 11 ? "none" : "ok";
+    days.push({
+      iso, label: `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}`,
+      status, time: status === "none" ? "—" : `11:${(31 + (i * 7) % 20).toString().padStart(2, "0")}`,
+      dur: 38 + (i * 13) % 25, size: (412 + i * 3) + " ك.ب",
+      err: i === 4 ? "Dropbox رفع raseed-2026-10-07.xlsx: 409 path/insufficient_space" : i === 17 ? "PERMISSION_DENIED: Missing or insufficient permissions." : "",
+      kept: iso.endsWith("-01"),
+    });
+  }
+  const counts = "entries 2,604 · refs 2,577 · auditLog 1,180 · migrationIssues 58 · suppliers 19 · users 6 · settings 5 · حسابات الدخول 6";
+  const files = ["raseed-2026-10-11.json.gz.enc", "raseed-2026-10-11.xlsx", "raseed-2026-10-10.json.gz.enc", "raseed-2026-10-10.xlsx", "… 52 ملفاً لآخر 30 يوماً", "raseed-2026-09-01.json.gz.enc  (دائمة)", "raseed-2026-08-01.json.gz.enc  (دائمة)"];
+  const st = { device: { a: "desk", b: "desk", c: "desk" }, fail: { a: false, b: false, c: false }, open: new Set(), day: 0, tab: "backup", pick: null };
+  const nav = (on) => `<aside class="snav"><div class="brand">رصيد</div>${["الأرصدة", "كشف الحساب", "الفواتير", "القيود", "قفل الفترات", "التدقيق", "النسخ الاحتياطي", "المستخدمون"].map((t) => `<span class="${on && t === "النسخ الاحتياطي" ? "on" : ""}">${t}</span>`).join("")}</aside>`;
+  const head = (k) => {
+    const last = st.fail[k] ? { ...days[0], status: "failed", err: "Dropbox تجديد رمز الدخول: 400 invalid_grant" } : days[0];
+    const ok = last.status === "ok";
+    return `<div class="status ${ok ? "" : "err"}"><span class="dot">${ok ? "✓" : "!"}</span>
+      <div><b>${ok ? "آخر نسخة سليمة" : "فشلت آخر نسخة"}</b><p class="s2">${ok ? `اليوم ${last.label} الساعة <span class="num">${last.time}</span> · الملفان في Dropbox` : `<span class="err-text">${last.err}</span>`}</p></div>
+      <div class="meta"><span>النسخة القادمة <b>غداً 11:30</b></span><span>آخر نجاح <b>${ok ? "اليوم" : "أمس"}</b></span><a class="btn" href="#" onclick="return false">تشغيل الآن ↗</a></div></div>`;
+  };
+  const okCount = days.filter((d) => d.status === "ok").length;
+
+  function A() {
+    const k = "a";
+    const rows = days.slice(0, 12).map((d, i) => {
+      const s = d.status === "ok" ? '<span class="tag ok">نجحت</span>' : d.status === "failed" ? '<span class="tag bad">فشلت</span>' : '<span class="tag">لم تعمل</span>';
+      const open = st.open.has(i);
+      return `<tr class="${d.status === "failed" ? "fail" : ""}"><td class="num">${d.label}</td><td class="num">${d.time}</td><td>${s}${d.kept ? ' <span class="tag kept">دائمة</span>' : ""}</td><td class="num">${d.status === "ok" ? d.dur + " ث" : "—"}</td><td class="num">${d.status === "ok" ? d.size : "—"}</td><td><button class="xp" data-row="${i}">${open ? "إخفاء" : "تفاصيل"}</button></td></tr>
+        ${open ? `<tr class="detail"><td colspan="6">${d.status === "failed" ? `<span class="err-text">${d.err}</span>` : d.status === "none" ? "لم يعمل السير في هذا اليوم (تأخّر GitHub أو توقف المهام المجدولة)." : `الأعداد: <span class="num">${counts}</span><br>الملفان: <span class="num">raseed-${d.iso}.json.gz.enc · raseed-${d.iso}.xlsx</span>`}</td></tr>` : ""}`;
+    }).join("");
+    return nav(true) + `<div class="content"><div class="ptitle"><div><h3>النسخ الاحتياطي</h3><p class="sub">يومياً 11:30 بتوقيت الرياض إلى Dropbox · الاحتفاظ 30 يوماً + نسخة كل شهر</p></div></div>
+      ${head(k)}
+      <dl class="tiles"><div class="tile"><dt>نجحت (30 يوماً)</dt><dd class="num">${okCount}/30</dd></div><div class="tile"><dt>متوسط المدة</dt><dd class="num">49 ث</dd></div><div class="tile"><dt>حجم آخر نسخة</dt><dd class="num">412 ك.ب</dd></div><div class="tile"><dt>نسخ دائمة</dt><dd class="num">3</dd></div></dl>
+      <table><thead><tr><th>التاريخ</th><th>الوقت</th><th>النتيجة</th><th>المدة</th><th>الحجم</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+      <button class="btn" style="justify-self:start">عرض الأقدم</button></div>`;
+  }
+  function B() {
+    const k = "b";
+    const d = days[st.day];
+    const sq = [...days].reverse().map((x, j) => { const i = 29 - j; return `<button class="day ${x.status === "failed" ? "bad" : x.status === "none" ? "none" : ""} ${x.kept ? "month" : ""}" data-day="${i}" aria-pressed="${st.day === i}" aria-label="${x.label}" title="${x.label}"></button>`; }).join("");
+    return nav(true) + `<div class="content"><div class="ptitle"><div><h3>النسخ الاحتياطي</h3><p class="sub">يومياً 11:30 بتوقيت الرياض إلى Dropbox</p></div></div>
+      ${head(k)}
+      <div class="strip"><h4 style="margin:0;font-size:15px">آخر 30 يوماً <span class="num" style="color:var(--ink-2);font-size:13px">(${okCount} نجحت)</span></h4><div class="days">${sq}</div>
+        <div class="legend"><span><i style="background:var(--ok)"></i>نجحت</span><span><i style="background:var(--neg)"></i>فشلت</span><span><i style="background:var(--rule)"></i>لم تعمل</span><span><i style="background:var(--surface);box-shadow:inset 0 0 0 2px var(--mark-acc)"></i>نسخة الشهر الدائمة</span><span>الأقدم في اليمين، والأحدث في اليسار</span></div></div>
+      <div class="split"><div class="card"><h4>${d.label}</h4><dl class="kv"><dt>النتيجة</dt><dd>${d.status === "ok" ? '<span class="tag ok">نجحت</span>' : d.status === "failed" ? '<span class="tag bad">فشلت</span>' : '<span class="tag">لم تعمل</span>'}</dd><dt>الوقت</dt><dd class="num">${d.time}</dd><dt>المدة</dt><dd class="num">${d.status === "ok" ? d.dur + " ث" : "—"}</dd><dt>الحجم</dt><dd class="num">${d.status === "ok" ? d.size : "—"}</dd></dl>
+        ${d.status === "failed" ? `<p class="err-text">${d.err}</p>` : d.status === "ok" ? `<p style="font-size:13px;color:var(--ink-2)">الأعداد: <span class="num">${counts}</span></p>` : '<p style="font-size:13px;color:var(--ink-2)">لم يعمل السير في هذا اليوم.</p>'}</div>
+      <div class="card"><h4>الملفات في Dropbox الآن</h4><ul class="files">${files.map((f) => `<li><span class="num">${f}</span></li>`).join("")}</ul></div></div></div>`;
+  }
+  function C() {
+    const k = "c";
+    const list = days.slice(0, 7).map((d) => `<div class="mini"><span class="num">${d.label}</span><span>${d.status === "ok" ? '<span class="tag ok">نجحت</span>' : d.status === "failed" ? '<span class="tag bad">فشلت</span>' : '<span class="tag">لم تعمل</span>'}</span><span class="num" style="color:var(--ink-2)">${d.time}</span></div>`).join("");
+    const body = st.tab === "backup"
+      ? `${head(k)}<div>${list}</div><a class="btn" href="#" onclick="return false" style="justify-self:start">السجل الكامل في GitHub ↗</a>`
+      : `<div class="mini"><span>!</span><span>3 ملاحظات مراجعة مفتوحة</span><span></span></div><div class="mini"><span>🔒</span><span>الفترة مفتوحة مؤقتاً من 01/09/2026</span><span></span></div>`;
+    return `<div class="content" style="padding:0;position:relative"><div class="topbar"><button class="bell" type="button"><svg viewBox="0 0 20 20"><path d="M5 14.5V9a5 5 0 0 1 10 0v5.5l1.5 1.5h-13zM8.5 18a1.5 1.5 0 0 0 3 0"/></svg>${st.fail[k] ? "<b>1</b>" : ""}</button><span style="font-size:13px;color:var(--ink-2);align-self:center">الجرس مفتوح ↓</span></div>
+      <div class="pop"><div class="pop-tabs"><button data-tab="alerts" aria-pressed="${st.tab === "alerts"}">التنبيهات</button><button data-tab="backup" aria-pressed="${st.tab === "backup"}">النسخ الاحتياطي</button></div><div class="pop-body">${body}</div></div>
+      <div class="ghost-page"><i style="width:40%"></i><i></i><i></i><i style="width:70%"></i><i></i><i></i></div></div>` + nav(false);
+  }
+  const R = { a: A, b: B, c: C };
+  function render(k) {
+    const el = document.getElementById("s" + k);
+    el.className = "screen" + (st.device[k] === "phone" ? " phone" : "");
+    el.innerHTML = R[k]();
+  }
+  document.querySelectorAll("section.opt").forEach((sec) => {
+    const k = sec.dataset.k;
+    sec.querySelector(".acts").innerHTML =
+      `<div class="seg" role="group" aria-label="الجهاز"><button data-dev="desk" aria-pressed="true">حاسوب</button><button data-dev="phone" aria-pressed="false">جوال</button></div>
+       <div class="seg" role="group" aria-label="الحالة"><button data-fail="0" aria-pressed="true">سليم</button><button data-fail="1" aria-pressed="false">آخر نسخة فشلت</button></div>
+       <button class="btn pick" type="button" aria-pressed="false">اختر هذا</button>`;
+    sec.addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      if (b.dataset.dev) { st.device[k] = b.dataset.dev; sec.querySelectorAll("[data-dev]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); }
+      else if (b.dataset.fail) { st.fail[k] = b.dataset.fail === "1"; sec.querySelectorAll("[data-fail]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); }
+      else if (b.dataset.row) { const i = +b.dataset.row; st.open.has(i) ? st.open.delete(i) : st.open.add(i); }
+      else if (b.dataset.day) st.day = +b.dataset.day;
+      else if (b.dataset.tab) st.tab = b.dataset.tab;
+      else if (b.classList.contains("pick")) { st.pick = st.pick === k ? null : k; pickRender(); return; }
+      else return;
+      render(k);
+    });
+    render(k);
+  });
+  const NAMES = { a: "أ. صفحة «سجل النسخ»", b: "ب. الشريط الزمني", c: "ج. تبويب في الجرس" };
+  const picked = document.getElementById("picked"), copy = document.getElementById("copy");
+  function pickRender() {
+    document.querySelectorAll("section.opt").forEach((s) => {
+      const on = st.pick === s.dataset.k; s.classList.toggle("chosen", on);
+      const b = s.querySelector(".pick"); b.setAttribute("aria-pressed", String(on)); b.textContent = on ? "مختار ✓" : "اختر هذا";
+    });
+    picked.innerHTML = st.pick ? `اخترت: <b>${NAMES[st.pick]}</b>` : "اختر خياراً بزر «اختر هذا».";
+    copy.disabled = !st.pick;
+  }
+  copy.addEventListener("click", async () => {
+    const t = `نافذة متابعة النسخ: ${NAMES[st.pick]}`;
+    try { await navigator.clipboard.writeText(t); copy.textContent = "نُسخ ✓"; } catch { copy.textContent = t; }
+    setTimeout(() => (copy.textContent = "نسخ الاختيار"), 2000);
+  });
+})();
+</script>
