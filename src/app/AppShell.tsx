@@ -8,7 +8,7 @@ import { watchRoleNames } from "../features/users/data/settingsRepo";
 import { RoleNamesContext } from "../features/users/ui/roleNames";
 import s from "./AppShell.module.css";
 
-/** الرأس وألسنة الدفتر (direction-1). الأقسام المالية تُضاف في المرحلة 4. */
+/** الرأس وألسنة الدفتر (direction-1). بقية أقسام المرحلة 4 (الفواتير، الإضافة، المراجعة) تُضاف تباعاً. */
 export function AppShell() {
   const profile = useProfile();
   const { endSession } = useSession();
@@ -23,7 +23,10 @@ export function AppShell() {
     [],
   );
 
-  const tabs = [{ to: "/", label: "الرئيسية", end: true }];
+  const tabs = [
+    { to: "/", label: "الأرصدة", end: true },
+    { to: "/statement", label: "كشف الحساب", end: false },
+  ];
   if (isManager(profile.role)) {
     tabs.push(
       { to: "/users", label: "المستخدمون", end: false },
@@ -34,7 +37,7 @@ export function AppShell() {
   return (
     <RoleNamesContext.Provider value={names}>
       <header className={s.masthead}>
-        <NavLink to="/" className={s.brand} aria-label="رصيد، الرئيسية">
+        <NavLink to="/" className={s.brand} aria-label="رصيد، الأرصدة">
           <Mark className={s.mark} />
           <span className={s.word}>رصيد</span>
         </NavLink>

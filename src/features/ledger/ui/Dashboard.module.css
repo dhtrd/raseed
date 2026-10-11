@@ -1,0 +1,396 @@
+/* لوحة الأرصدة (direction-1/dashboard.html، CHOSEN §3.1) */
+
+.title {
+  min-inline-size: 0;
+}
+
+.period {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 14px;
+}
+
+.err {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-block-end: 16px;
+}
+
+/* ---------- الجدول ---------- */
+.sup .nm {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 6px;
+}
+
+.sup .nm:hover {
+  color: var(--accent);
+  text-decoration-color: currentcolor;
+}
+
+.state {
+  display: none;
+}
+
+/* ---------- الرقم البطل (جوال) ---------- */
+.heroLabel {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.heroNum {
+  margin: 2px 0 0;
+  font-size: 40px;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.heroNum > span {
+  border-block-end: 5px double var(--ink);
+  padding-block-end: 2px;
+}
+
+.heroNote {
+  margin: 10px 0 0;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.heroStats {
+  margin-block-start: 12px;
+}
+
+/* ---------- الإحصاءات والتنبيهات ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+  margin: 0;
+}
+
+.stats div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 7px 0;
+  border-block-end: 1px solid var(--rule);
+}
+
+.stats dt {
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+.stats dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.statsSide {
+  grid-template-columns: 1fr;
+}
+
+.alertList {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.alertList li {
+  display: grid;
+  grid-template-columns: 3.2em minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-block-size: 56px;
+  padding: 8px 4px;
+}
+
+.alertList li + li {
+  border-block-start: 1px solid var(--rule);
+}
+
+.alN {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--neg);
+  text-align: end;
+  line-height: 1.1;
+}
+
+.alT {
+  font-weight: 500;
+}
+
+.side .alTotal {
+  margin-block-start: 8px;
+  font-size: 14.5px;
+}
+
+.mAlerts {
+  display: none;
+  gap: 8px;
+  overflow-x: auto;
+  margin: 0 -16px 18px;
+  padding: 2px 16px 6px;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.mAlerts li {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 48px;
+  padding: 4px 14px;
+  border: 1.5px solid var(--neg);
+  border-radius: 24px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.mAlerts :global(.num) {
+  color: var(--neg);
+  font-weight: 700;
+  font-size: 19px;
+}
+
+/* ---------- حساب T (لوحي أفقي) ---------- */
+.folioName {
+  margin: 0;
+  font-size: 20px;
+}
+
+.folioSub {
+  margin: 0 0 18px;
+  color: var(--ink-2);
+}
+
+.taccount {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-block-start: 3px double var(--ink);
+}
+
+.tSide {
+  padding: 12px 18px 16px;
+}
+
+.tSide + .tSide {
+  border-inline-start: 2px solid var(--ink);
+}
+
+.tSide h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.tSide p {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 600;
+  text-align: end;
+}
+
+.recon {
+  margin: 14px 0 0;
+  border-block-start: 1px solid var(--rule);
+}
+
+.recon div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 9px 0;
+  border-block-end: 1px solid var(--rule);
+}
+
+.recon dt {
+  color: var(--ink-2);
+}
+
+.recon dd {
+  margin: 0;
+  font-size: 19px;
+}
+
+.recon .res {
+  border-block-end: 0;
+  padding-block-start: 14px;
+}
+
+.recon .res dt {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.recon .res dd {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.folioState {
+  margin: 6px 0 18px;
+  font-weight: 700;
+}
+
+/* =====================================================================
+   ≤ 600 جوال: العنوان ← الرقم البطل ← التنبيهات ← الفترة ← سطور الموردين ← الإجمالي
+   ===================================================================== */
+@media (width <= 600px) {
+  .side {
+    display: none;
+  }
+
+  .main {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .head {
+    display: contents;
+  }
+
+  .title {
+    order: -4;
+    margin-block-end: 12px;
+  }
+
+  .hero {
+    order: -3;
+    padding: 4px 0 18px;
+    margin-block-end: 14px;
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .mAlerts {
+    order: -2;
+    display: flex;
+  }
+
+  .period {
+    order: -1;
+    margin-block-end: 18px;
+    padding-block-end: 18px;
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .dash tbody tr {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas: "nm nm fin" "p d c";
+    gap: 6px 10px;
+    padding: 14px 0;
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .dash tbody tr:hover {
+    background: none;
+  }
+
+  .sup {
+    grid-area: nm;
+    font-size: 17px;
+  }
+
+  .cPrev {
+    grid-area: p;
+  }
+
+  .cDr {
+    grid-area: d;
+  }
+
+  .cCr {
+    grid-area: c;
+  }
+
+  .fin {
+    grid-area: fin;
+  }
+
+  .dash .fin {
+    text-align: end;
+  }
+
+  .dash tbody .fin :global(.num) {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .state {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+
+  .dash .cPrev,
+  .dash .cDr,
+  .dash .cCr {
+    font-size: 15px;
+    text-align: start;
+  }
+
+  .dash tfoot tr {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas: "nm nm fin" "p d c";
+    gap: 6px 10px;
+    padding: 16px 0 8px;
+    border-block-start: 2px solid var(--ink);
+  }
+
+  .dash tfoot th {
+    grid-area: nm;
+  }
+
+  .dash tfoot .amt :global(.num) {
+    border-block-start: 0;
+  }
+}
+
+/* 601–1024: التنبيهات والإحصاءات تحت الجدول في عمودين */
+@media (width >= 601px) and (width <= 1279px) {
+  .side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 28px;
+  }
+
+  .side > section + section {
+    margin-block-start: 0;
+    padding-block-start: 0;
+    border-block-start: 0;
+  }
+
+  .side > .howto {
+    grid-column: 1 / -1;
+    margin-block-start: 22px;
+    padding-block-start: 18px;
+    border-block-start: 1px solid var(--rule);
+  }
+}
+
+@media (width >= 601px) and (width <= 1024px) {
+  .head .period {
+    inline-size: 100%;
+  }
+}
+
+/* 1025–1279: حساب T بدل الجدول */
+@media (width >= 1025px) and (width <= 1279px) {
+  .dashWrap,
+  .legend,
+  .cap {
+    display: none;
+  }
+}
