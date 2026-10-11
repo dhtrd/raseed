@@ -30,7 +30,8 @@ export async function updateEntry(uid: string, orig: LedgerEntry, patch: EntryPa
     // القراءات أولاً كما تشترط Firestore
     const newSnap = newRefDoc ? await tx.get(newRefDoc) : null;
     const oldSnap = oldRefDoc ? await tx.get(oldRefDoc) : null;
-    const newExists = newSnap?.exists() === true;
+    // الفهرس الفارغ (رقم حرّره تعديل أو حذف) لا يُعدّ تكراراً
+    const newExists = ((newSnap?.exists() ? (newSnap.get("ids") as string[] | undefined) : undefined) ?? []).length > 0;
     if (newExists && !o.dupReason)
       throw new EntrySaveError(
         `الرقم المرجعي ${patch.refNo} مسجّل لحركة أخرى. أكّد أنها مختلفة واكتب السبب، أو عدّل المرجع.`,
@@ -67,8 +68,8 @@ export async function updateEntry(uid: string, orig: LedgerEntry, patch: EntryPa
 
     if (newRefDoc) {
       const place: RefPlace = { entryId: orig.id, supplierId: orig.supplierId, supplierName: o.supplierName };
-      if (newExists) {
-        const d = newSnap?.data() as { ids?: string[]; places?: RefPlace[] } | undefined;
+      if (newSnap?.exists()) {
+        const d = newSnap.data() as { ids?: string[]; places?: RefPlace[] } | undefined;
         tx.update(newRefDoc, { ids: [...(d?.ids ?? []), orig.id], places: [...(d?.places ?? []), place] });
       } else tx.set(newRefDoc, { ids: [orig.id], places: [place] });
     }

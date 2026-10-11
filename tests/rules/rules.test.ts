@@ -9,6 +9,7 @@ import {
 import {
   arrayUnion,
   deleteDoc,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -539,14 +540,157 @@ describe("حالة Odoo", () => {
     assertFails(createEntry(as("owner"), "owner", "o1", journal("s1", "0399", { odoo: ODOO_NEW }))));
 });
 
-describe("الحذف", () => {
-  it("المالك يحذف حذفاً ناعماً", () =>
-    assertSucceeds(updateEntry(as("owner"), "owner", "e0", { deleted: true })));
-  it("الإدارة لا تحذف", () => assertFails(updateEntry(as("admin"), "admin", "e0", { deleted: true })));
+describe("الحذف الناعم والاسترجاع (DECISIONS 2026-10-11)", () => {
+  const P = refKey("P10590");
+  const place = { entryId: "e0", supplierId: "s1", supplierName: "المورد (أ)" };
+  /** الحذف كما يفعله التطبيق: الحركة + التدقيق بسبب + تحرير الرقم (+ إغلاق سجل المراجعة) */
+  const del = (
+    uid: string,
+    eid = "e0",
+    o: { reason?: string; by?: string; extra?: Record<string, unknown>; ref?: boolean; issue?: boolean } = {},
+  ) => {
+    const db = as(uid);
+    const b = writeBatch(db);
+    const aid = newAuditId();
+    const reason = o.reason ?? "أُدخلت مرتين";
+    b.update(doc(db, `entries/${eid}`), {
+      deleted: true,
+      deletion: { by: o.by ?? uid, at: serverTimestamp(), reason },
+      updatedAt: serverTimestamp(),
+      auditId: aid,
+      ...o.extra,
+    });
+    b.set(doc(db, `auditLog/${aid}`), {
+      actor: uid,
+      at: serverTimestamp(),
+      action: "delete",
+      entity: "entries",
+      entityId: eid,
+      ...(reason ? { reason } : {}),
+    });
+    if (o.ref !== false && eid === "e0") b.update(doc(db, `refs/${P}`), { ids: [], places: [] });
+    if (o.issue) {
+      const ia = newAuditId();
+      b.update(doc(db, `migrationIssues/${eid}`), {
+        resolved: true,
+        resolution: "deleted",
+        resolutionNote: reason,
+        resolvedBy: uid,
+        resolvedAt: serverTimestamp(),
+        auditId: ia,
+      });
+      b.set(doc(db, `auditLog/${ia}`), {
+        actor: uid,
+        at: serverTimestamp(),
+        action: "reviewDeleted",
+        entity: "migrationIssues",
+        entityId: eid,
+      });
+    }
+    return b.commit();
+  };
+  const restore = (
+    uid: string,
+    o: { reason?: string; dup?: string; refIds?: string[]; places?: unknown[] } = {},
+  ) => {
+    const db = as(uid);
+    const b = writeBatch(db);
+    const aid = newAuditId();
+    const reason = o.reason ?? "حُذفت بالخطأ";
+    b.update(doc(db, "entries/e0"), {
+      deleted: false,
+      deletion: deleteField(),
+      updatedAt: serverTimestamp(),
+      auditId: aid,
+      ...(o.dup ? { dup: { reason: o.dup } } : {}),
+    });
+    b.set(doc(db, `auditLog/${aid}`), {
+      actor: uid,
+      at: serverTimestamp(),
+      action: "restore",
+      entity: "entries",
+      entityId: "e0",
+      ...(reason ? { reason } : {}),
+    });
+    b.update(doc(db, `refs/${P}`), {
+      ids: [...(o.refIds ?? []), "e0"],
+      places: [...(o.places ?? []), place],
+    });
+    return b.commit();
+  };
+
+  it("المالك يحذف بسبب، ويُحرَّر الرقم في الدفعة نفسها", async () => {
+    await assertSucceeds(del("owner"));
+    const r = await getDoc(doc(as("owner"), `refs/${P}`));
+    if ((r.get("ids") as string[]).length !== 0) throw new Error("الرقم لم يتحرر");
+  });
+  it("الإدارة ومدخل البيانات لا يحذفون", async () => {
+    await assertFails(del("admin"));
+    await assertFails(del("entry"));
+  });
+  it("لا حذف بلا سبب، ولا بسبب منسوب لغيره، ولا مع تعديل حقل آخر", async () => {
+    await assertFails(del("owner", "e0", { reason: "" }));
+    await assertFails(del("owner", "e0", { by: "admin" }));
+    await assertFails(del("owner", "e0", { extra: { details: "تغيير" } }));
+  });
+  it("لا حذف في الفترة المقفلة", () => assertFails(del("owner", "eL", { ref: false })));
   it("لا حذف نهائي لأحد", () => assertFails(deleteDoc(doc(as("owner"), "entries/e0"))));
-  it("المحذوف لا يراه مدخل البيانات", async () => {
-    await updateEntry(as("owner"), "owner", "e0", { deleted: true });
+  it("المحذوف لا يراه مدخل البيانات، ولا يُعدَّل", async () => {
+    await del("owner");
     await assertFails(getDoc(doc(as("entry"), "entries/e0")));
+    await assertSucceeds(getDoc(doc(as("admin"), "entries/e0")));
+    await assertFails(updateEntry(as("owner"), "owner", "e0", { details: "تعديل" }));
+  });
+  it("لا يُحذف بالتعديل العادي ولا يُزال من فهرس رقمه بلا حذف", async () => {
+    await assertFails(updateEntry(as("owner"), "owner", "e0", { deleted: true }));
+    await assertFails(updateDoc(doc(as("owner"), `refs/${P}`), { ids: [], places: [] }));
+  });
+  it("الرقم المحرَّر يُستعمل لحركة جديدة بلا تحذير تكرار", async () => {
+    await del("owner");
+    await assertSucceeds(
+      createEntry(as("owner"), "owner", "eNew", invoice("s1", "10590"), { refExists: true }),
+    );
+  });
+  it("المالك يسترجع بسبب، ويعود الرقم إلى فهرسه", async () => {
+    await del("owner");
+    await assertFails(restore("admin"));
+    await assertFails(restore("owner", { reason: "" }));
+    await assertSucceeds(restore("owner"));
+  });
+  it("استرجاع رقم استُعمل بعد الحذف يحتاج تأكيداً وسبباً", async () => {
+    await del("owner");
+    await createEntry(as("owner"), "owner", "eNew", invoice("s1", "10590"), { refExists: true });
+    const other = { entryId: "eNew", supplierId: "s1", supplierName: "المورد (أ)" };
+    await assertFails(restore("owner", { refIds: ["eNew"], places: [other] }));
+    await assertSucceeds(restore("owner", { refIds: ["eNew"], places: [other], dup: "حركتان مختلفتان" }));
+  });
+  it("حذف الحركة يُغلق سجل مراجعتها بوسم «حُذفت»، ولا يُستعمل الوسم بلا حذف", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(asDb(ctx.firestore()), "migrationIssues/e0"), {
+        entryId: "e0",
+        supplierId: "s1",
+        issues: [{ code: "ref_length", text: "طول" }],
+        resolved: false,
+      });
+    });
+    await assertFails(
+      writeWithAudit(
+        as("owner"),
+        "owner",
+        "migrationIssues/e0",
+        "migrationIssues",
+        "e0",
+        {
+          resolved: true,
+          resolution: "deleted",
+          resolutionNote: "",
+          resolvedBy: "owner",
+          resolvedAt: serverTimestamp(),
+        },
+        "update",
+      ),
+    );
+    await assertSucceeds(del("owner", "e0", { issue: true }));
   });
 });
 

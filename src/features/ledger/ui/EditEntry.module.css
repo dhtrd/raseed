@@ -101,3 +101,16 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* الحذف الناعم للمالك (الخيار أ، proposals/2026-10-11-soft-delete.html) */
+.dangerZone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-block-start: 10px;
+  border-block-start: 1px dashed var(--rule);
+  font-size: 14px;
+  color: var(--ink-2);
+}

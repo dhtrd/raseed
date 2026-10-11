@@ -1,0 +1,86 @@
+/* نافذة الحذف الناعم والاسترجاع (الخيار أ، proposals/2026-10-11-soft-delete.html) */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sum {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--neg-wash);
+  border-inline-start: 4px solid var(--neg);
+  border-radius: var(--r-sm);
+  font-size: 15px;
+}
+
+.sum p {
+  margin: 0;
+}
+
+.restore {
+  background: var(--wash);
+  border-inline-start-color: var(--accent);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  min-block-size: 36px;
+  padding: 0 12px;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14.5px;
+  cursor: pointer;
+}
+
+.chip:hover,
+.chip:focus-visible {
+  border-color: var(--neg);
+}
+
+.chip[aria-pressed="true"] {
+  border-color: var(--neg);
+  background: var(--neg-wash);
+  color: var(--neg);
+  font-weight: 700;
+}
+
+.chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dup {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 2px solid var(--neg);
+  border-inline-start-width: 6px;
+  background: var(--neg-wash);
+  border-radius: var(--r-sm);
+}
+
+.dup p {
+  margin: 0;
+}
+
+.dup b {
+  color: var(--neg);
+}
+
+.err {
+  margin: 0;
+  color: var(--neg);
+  font-size: 14.5px;
+  font-weight: 700;
+}

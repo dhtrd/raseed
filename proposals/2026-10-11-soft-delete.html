@@ -1,0 +1,285 @@
+<title>رصيد · الحذف الناعم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاثة خيارات للحذف الناعم والاسترجاع (للمالك فقط حسب SPEC)، كل منها كشف تفاعلي يتبدّل بين الحاسوب والجوال. الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --neg-wash: #f7e7e8; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --amber: #b8752a; --scrim: rgb(27 42 68 / 45%);
+  --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.lead { color: var(--ink-2); max-width: 78ch; margin: 6px 0 16px; }
+.eg { display: inline-block; font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 6px; margin-inline-start: 6px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+
+.opt { margin-bottom: 34px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 82ch; }
+.opt ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; position: relative; width: 1100px; min-height: 470px; margin-inline: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.screen.phone { width: 360px; min-height: 640px; border-radius: 24px; }
+.mast { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding: 10px 16px 0; background: var(--surface); border-bottom: 3px double var(--ink); font-weight: 700; }
+.mast .brand { font-family: var(--f-brand); font-size: 20px; padding-bottom: 8px; }
+.tabs { display: flex; gap: 2px; }
+.tabs button { border: 0; background: none; font: inherit; font-size: 14.5px; color: var(--ink-2); padding: 4px 10px 8px; cursor: pointer; border-bottom: 3px solid transparent; }
+.tabs button[aria-current="page"] { color: var(--accent); border-bottom-color: var(--accent); }
+.page { padding: 16px 20px 22px; display: grid; gap: 10px; }
+@container (width < 600px) { .page { padding: 12px 14px 18px; } }
+.page h3 { font-size: 22px; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.toast { padding: 8px 12px; background: var(--wash); border-inline-start: 4px solid var(--accent); font-size: 15px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+.toast .link { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.chk { display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; color: var(--ink-2); cursor: pointer; }
+.chk input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+/* الجدول */
+table { width: 100%; border-collapse: collapse; background: var(--surface); border-top: 3px double var(--ink); font-size: 15px; }
+th { text-align: start; font-size: 13.5px; color: var(--ink-2); padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+td, tbody th { padding: 9px 8px; border-bottom: 1px solid var(--rule); text-align: start; font-weight: 400; color: var(--ink); font-size: 15px; vertical-align: middle; }
+.amt { text-align: end; border-inline-start: 1px solid var(--margin); }
+.tag { font-size: 12.5px; font-weight: 700; padding: 0 6px; border: 1px solid var(--accent); border-radius: 3px; color: var(--accent); white-space: nowrap; }
+.tag.del { border-color: var(--neg); color: var(--neg); }
+tr.gone td, tr.gone th { background: var(--neg-wash); color: var(--ink-2); }
+tr.gone .strike { text-decoration: line-through; text-decoration-color: var(--neg); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 2px 14px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.btn.pri { background: var(--accent); color: var(--on-accent); }
+.btn.danger { border-color: var(--neg); color: var(--neg); }
+.btn.danger.pri { background: var(--neg); color: var(--on-accent); }
+.btn.sm { min-height: 34px; padding: 0 10px; font-size: 14px; }
+.ico { width: 36px; height: 36px; display: inline-grid; place-items: center; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--accent); cursor: pointer; }
+.ico.bin { color: var(--neg); }
+.ico svg { width: 18px; height: 18px; }
+.ico:hover, .ico:focus-visible { border-color: currentcolor; background: var(--wash-2); }
+.acts { display: inline-flex; gap: 6px; }
+
+/* الجوال: بطاقات «سطر دفتر» */
+@container (width < 600px) {
+  thead { display: none; }
+  table, tbody { display: block; }
+  tbody tr { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 0; border-bottom: 1px solid var(--rule); position: relative; padding-inline-end: 0; }
+  tbody tr.corner { padding-inline-end: 88px; }
+  tbody tr.corner1 { padding-inline-end: 46px; }
+  tbody tr > * { display: block; border: 0; padding: 0; }
+  tr.gone { background: var(--neg-wash); }
+  .hide-m { display: none; }
+  .amt { border: 0; }
+  .m-desc { grid-column: 1 / -1; font-size: 13.5px; color: var(--ink-2); }
+  .m-corner { position: absolute; inset-inline-end: 0; top: 8px; }
+}
+@container (width >= 600px) { .m-only { display: none; } }
+@container (width < 600px) { .d-only { display: none !important; } }
+
+/* النوافذ: وسطى على الحاسوب، لوحة سفلية على الجوال */
+.scrim { position: absolute; inset: 0; background: var(--scrim); display: grid; place-items: center; padding: 16px; z-index: 5; }
+.dlg { width: min(100%, 560px); background: var(--surface); border-top: 4px solid var(--accent); border-radius: 8px; box-shadow: var(--shadow); padding: 16px 18px; display: grid; gap: 12px; }
+.dlg.danger { border-top-color: var(--neg); }
+.dlg h4 { margin: 0; font-size: 18px; }
+@container (width < 600px) {
+  .scrim { place-items: end stretch; padding: 0; }
+  .dlg { width: 100%; border-radius: 14px 14px 0 0; }
+}
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+@container (width < 600px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.fld { display: grid; gap: 2px; font-size: 13.5px; color: var(--ink-2); }
+.fld .v { min-height: 40px; display: flex; align-items: center; padding: 0 10px; background: var(--wash-2); border-bottom: 2px solid var(--rule); color: var(--ink); font-size: 15.5px; }
+.fld textarea { font: inherit; font-size: 15.5px; color: var(--ink); min-height: 64px; padding: 6px 10px; border: 0; border-bottom: 2px solid var(--neg); background: var(--wash-2); resize: vertical; }
+.fld textarea:focus { outline: none; background: var(--wash); }
+.err { color: var(--neg); font-weight: 700; font-size: 14px; }
+.sum { display: grid; gap: 2px; padding: 10px 12px; background: var(--neg-wash); border-inline-start: 4px solid var(--neg); font-size: 15px; }
+.foot { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; }
+.foot .end { display: flex; gap: 8px; }
+.danger-zone { border-top: 1px dashed var(--rule); padding-top: 10px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px; color: var(--ink-2); }
+.empty { padding: 18px; text-align: center; color: var(--ink-2); background: var(--surface); border: 1px dashed var(--rule); }
+.meta { font-size: 13.5px; color: var(--ink-2); }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 10px; }
+.qs b { color: var(--accent); }
+.qs .sub { color: var(--ink-2); font-size: 15px; }
+@media (prefers-reduced-motion: no-preference) { .dlg { animation: up .16s ease-out; } @keyframes up { from { transform: translateY(8px); opacity: .6; } } }
+</style>
+
+<div class="wrap">
+  <h1>الحذف الناعم للحركة واسترجاعها</h1>
+  <p class="lead">حسب ورقة الاتفاق: الحذف <b>للمالك وحده</b>، ناعم وقابل للاسترجاع. الإدارة ومدخل البيانات لا يرون زر الحذف. ثلاثة أشكال تفاعلية، كل منها بين الحاسوب والجوال. جرّب الحذف ثم الاسترجاع. البيانات وهمية<span class="eg">مثال</span>.</p>
+  <div class="common">في الأشكال الثلاثة:
+    <ul>
+      <li>تأكيد بنافذة تعرض الحركة ومبلغها وأثرها على الرصيد، مع <b>سبب إلزامي</b> يُحفظ في سجل التدقيق.</li>
+      <li>المحذوفة لا تدخل في الرصيد ولا التقارير ولا الفواتير، وتختفي عن مدخل البيانات.</li>
+      <li>الحركة في الفترة المقفلة لا تُحذف (يُرشد المالك إلى الفتح المؤقت كما في التعديل).</li>
+      <li>الاسترجاع بسبب إلزامي أيضاً، ويعيدها كما كانت.</li>
+    </ul>
+  </div>
+
+  <section class="opt" aria-labelledby="ha">
+    <div class="opt-head"><h2 id="ha">أ. «حذف» داخل نافذة التعديل، والاسترجاع من الكشف</h2><div class="seg" data-view="a"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">القلم يفتح نافذة التعديل المعتمدة، وفي أسفلها رابط «حذف الحركة» للمالك. خيار «إظهار المحذوف» في الكشف يعرض المحذوفات مشطوبة بزر «استرجاع».</p>
+    <ul class="pc"><li class="pro">لا عناصر جديدة في الجدول.</li><li class="pro">الحذف يحتاج خطوتين فيصعب بالخطأ.</li><li>أبطأ لحذف عدة حركات.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <div class="opt-head"><h2 id="hb">ب. أيقونة سلة بجانب القلم، والاسترجاع من الكشف</h2><div class="seg" data-view="b"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">للمالك أيقونة سلة حمراء بجانب القلم في كل صف (وفي زاوية البطاقة على الجوال) تفتح نافذة التأكيد مباشرة. الاسترجاع كما في أ.</p>
+    <ul class="pc"><li class="pro">الأسرع: نقرة ثم تأكيد.</li><li class="pro">واضح لمن يحذف كثيراً.</li><li>أيقونتان في كل صف تزحمان الجدول والبطاقة.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <div class="opt-head"><h2 id="hc">ج. «حذف» داخل نافذة التعديل، وشاشة «المحذوفات» مستقلة</h2><div class="seg" data-view="c"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">الحذف كما في أ، لكن المحذوف يختفي من الكشف تماماً. تبويب «المحذوفات» للمالك يجمع كل المحذوفات من كل الموردين بتاريخ الحذف وسببه، ومنه الاسترجاع.</p>
+    <ul class="pc"><li class="pro">الكشف نظيف دائماً.</li><li class="pro">مكان واحد لمراجعة كل ما حُذف.</li><li>تبويب جديد في الرأس.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الشكل:</b> أ أم ب أم ج؟</li>
+      <li><b>الرقم المرجعي للمحذوفة:</b> يبقى محجوزاً (إدخال الرقم نفسه لاحقاً يُظهر تحذير التكرار) أم يتحرر بالحذف (ويُفحص من جديد عند الاسترجاع)؟
+        <div class="sub">أقترح: يتحرر، لأن الحذف غالباً لحركة أُدخلت خطأً وسيُعاد إدخالها بالرقم نفسه.</div></li>
+      <li><b>حركة عليها ملاحظة في مركز المراجعة:</b> هل يُغلق حذفها الملاحظة تلقائياً (بوسم «حُذفت»)؟
+        <div class="sub">أقترح: نعم، وتعود مفتوحة إن استُرجعت.</div></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const ROWS = [
+    { d: "07/10/2026", k: "قيد", no: "MISC/2026/10/0502", desc: "سداد دفعة", dr: 120000, cr: 0 },
+    { d: "05/10/2026", k: "فاتورة", no: "P10003", desc: "فاتورة مشتريات (مكررة خطأً)", dr: 0, cr: 225075 },
+    { d: "02/10/2026", k: "فاتورة", no: "P10002", desc: "فاتورة مشتريات", dr: 0, cr: 250050 },
+    { d: "03/09/2026", k: "قيد", no: "MISC/2026/09/0501", desc: "سداد", dr: 250050, cr: 0 },
+  ];
+  const DELREASONS = ["أُدخلت مرتين", "أُدخلت لمورد خطأ", "حركة ملغاة"];
+  const money = (h) => (h / 100).toLocaleString("en-US", { minimumFractionDigits: 2 });
+  const pen = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M14 6l4 4"/></svg>`;
+  const bin = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>`;
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+  function build(id, mode) {
+    const el = document.getElementById(id);
+    const st = { rows: ROWS.map((r) => ({ ...r, gone: false, why: "", at: "" })), show: false, dlg: null, i: -1, reason: "", err: "", toast: "", tab: "st" };
+    const balances = () => { let b = 0; const out = []; for (let i = st.rows.length - 1; i >= 0; i--) { const r = st.rows[i]; if (!r.gone) b += r.dr - r.cr; out[i] = r.gone ? null : b; } return out; };
+
+    const table = () => {
+      const bal = balances();
+      const vis = st.rows.map((r, i) => [r, i]).filter(([r]) => !r.gone || (st.show && mode !== "c"));
+      const head = `<thead><tr><th>التاريخ</th><th class="hide-m">النوع</th><th class="hide-m">الرقم المرجعي</th><th class="hide-m">البيان</th><th class="amt">مدين</th><th class="amt">دائن</th><th class="amt">الرصيد</th><th class="d-only"><span style="position:absolute;width:1px;height:1px;overflow:hidden">إجراء</span></th></tr></thead>`;
+      const body = vis.map(([r, i]) => {
+        const tags = `<span class="tag">${r.k}</span>${r.gone ? ' <span class="tag del">محذوف</span>' : ""}`;
+        const acts = r.gone
+          ? `<button type="button" class="btn sm" data-restore="${i}">استرجاع</button>`
+          : `<span class="acts"><button type="button" class="ico" data-edit="${i}" aria-label="تعديل الحركة ${r.no}">${pen}</button>${mode === "b" ? `<button type="button" class="ico bin" data-del="${i}" aria-label="حذف الحركة ${r.no}">${bin}</button>` : ""}</span>`;
+        const corner = r.gone ? "corner" : mode === "b" ? "corner" : "corner1";
+        return `<tr class="${corner} ${r.gone ? "gone" : ""}">
+          <th scope="row"><span class="num strike">${r.d}</span></th>
+          <td class="hide-m">${tags}</td><td class="hide-m"><span class="num strike">${r.no}</span></td><td class="hide-m"><span class="strike">${r.desc}</span>${r.gone ? `<div class="meta">حُذفت: ${esc(r.why)}</div>` : ""}</td>
+          <td class="amt">${r.dr ? `<span class="num strike">${money(r.dr)}</span>` : ""}</td><td class="amt">${r.cr ? `<span class="num strike">${money(r.cr)}</span>` : ""}</td>
+          <td class="amt">${bal[i] === null ? "—" : `<b class="num">${money(bal[i])}</b>`}</td>
+          <td class="d-only">${acts}</td>
+          <td class="m-only m-desc">${tags} <span class="num">${r.no}</span> · ${r.desc}${r.gone ? ` · حُذفت: ${esc(r.why)}` : ""}</td>
+          <td class="m-only m-corner">${acts}</td>
+        </tr>`;
+      }).join("");
+      const count = st.rows.filter((r) => r.gone).length;
+      const tog = mode !== "c" ? `<label class="chk"><input type="checkbox" data-show ${st.show ? "checked" : ""}> إظهار المحذوف (${count})</label>` : "";
+      return `<div class="bar"><h3>المورد (أ)</h3>${tog}</div>${st.toast ? `<p class="toast" role="status">${st.toast}</p>` : ""}<table><caption style="position:absolute;width:1px;height:1px;overflow:hidden">حركات المورد</caption>${head}<tbody>${body}</tbody></table>`;
+    };
+
+    const trash = () => {
+      const list = st.rows.map((r, i) => [r, i]).filter(([r]) => r.gone);
+      const rows = list.map(([r, i]) => `<tr class="corner gone">
+        <th scope="row"><span class="num">${r.at}</span></th>
+        <td class="hide-m">المورد (أ)</td><td class="hide-m"><span class="tag">${r.k}</span> <span class="num">${r.no}</span></td>
+        <td class="hide-m">${esc(r.why)}</td>
+        <td class="amt"><span class="num">${money(r.dr || r.cr)}</span></td>
+        <td class="d-only"><button type="button" class="btn sm" data-restore="${i}">استرجاع</button></td>
+        <td class="m-only m-desc">المورد (أ) · <span class="num">${r.no}</span> · ${esc(r.why)}</td>
+        <td class="m-only m-corner"><button type="button" class="btn sm" data-restore="${i}">استرجاع</button></td></tr>`).join("");
+      return `<div class="bar"><h3>المحذوفات</h3><span class="meta">للمالك فقط · من كل الموردين</span></div>${st.toast ? `<p class="toast" role="status">${st.toast}</p>` : ""}${list.length ? `<table><thead><tr><th>حُذفت في</th><th class="hide-m">المورد</th><th class="hide-m">الحركة</th><th class="hide-m">السبب</th><th class="amt">المبلغ</th><th class="d-only"><span style="position:absolute;width:1px;height:1px;overflow:hidden">إجراء</span></th></tr></thead><tbody>${rows}</tbody></table>` : `<p class="empty">لا محذوفات. ما يحذفه المالك يظهر هنا ويُسترجع منه.</p>`}`;
+    };
+
+    const dialog = () => {
+      if (!st.dlg) return "";
+      const r = st.rows[st.i];
+      if (st.dlg === "edit") return `<div class="scrim"><div class="dlg" role="dialog" aria-modal="true" aria-label="تعديل الحركة"><h4>تعديل الحركة <span class="num">${r.no}</span></h4>
+        <div class="grid2"><div class="fld">التاريخ<span class="v num">${r.d}</span></div><div class="fld">المبلغ<span class="v num">${money(r.dr || r.cr)}</span></div><div class="fld" style="grid-column:1/-1">البيان<span class="v">${r.desc}</span></div></div>
+        <div class="foot"><span></span><span class="end"><button type="button" class="btn" data-close>إلغاء</button><button type="button" class="btn pri" data-close>حفظ التعديل</button></span></div>
+        <div class="danger-zone"><span>للمالك فقط: تُحذف ناعماً ويمكن استرجاعها.</span><button type="button" class="btn danger sm" data-del="${st.i}">حذف الحركة</button></div></div></div>`;
+      const verb = st.dlg === "del" ? "حذف" : "استرجاع";
+      const eff = (r.cr - r.dr) * (st.dlg === "del" ? 1 : -1);
+      const chips = st.dlg === "del" ? `<div class="acts" style="flex-wrap:wrap">${DELREASONS.map((x) => `<button type="button" class="btn sm" data-chip="${x}">${x}</button>`).join("")}</div>` : "";
+      return `<div class="scrim"><div class="dlg danger" role="dialog" aria-modal="true" aria-label="${verb} الحركة"><h4>${verb} الحركة <span class="num">${r.no}</span>؟</h4>
+        <div class="sum"><span>${r.k} · <span class="num">${r.d}</span> · ${r.desc}</span><span>المبلغ <b class="num">${money(r.dr || r.cr)}</b> ر.س · الرصيد ${eff >= 0 ? "يزيد" : "ينقص"} بـ <b class="num">${money(Math.abs(eff))}</b></span></div>
+        ${chips}
+        <label class="fld" for="${id}-why">سبب ${verb === "حذف" ? "الحذف" : "الاسترجاع"} (إلزامي، يُحفظ في سجل التدقيق)<textarea id="${id}-why" data-why maxlength="300">${esc(st.reason)}</textarea></label>
+        ${st.err ? `<p class="err" role="alert">${st.err}</p>` : ""}
+        <div class="foot"><span class="meta">${st.dlg === "del" ? "تبقى في النظام ويمكن استرجاعها." : "تعود كما كانت وتدخل في الرصيد."}</span><span class="end"><button type="button" class="btn" data-close>إلغاء</button><button type="button" class="btn ${st.dlg === "del" ? "danger pri" : "pri"}" data-ok>${verb}</button></span></div></div></div>`;
+    };
+
+    const draw = () => {
+      const tabs = mode === "c" ? `<nav class="tabs" aria-label="التبويبات"><button type="button" data-tab="st" ${st.tab === "st" ? 'aria-current="page"' : ""}>الكشف</button><button type="button" data-tab="tr" ${st.tab === "tr" ? 'aria-current="page"' : ""}>المحذوفات (${st.rows.filter((r) => r.gone).length})</button></nav>` : "";
+      el.innerHTML = `<div class="mast"><span class="brand">رصيد</span>${tabs}</div><div class="page">${st.tab === "tr" ? trash() : table()}</div>${dialog()}`;
+      el.querySelector("[data-why]")?.focus();
+    };
+    const open = (dlg, i) => { st.dlg = dlg; st.i = i; st.reason = ""; st.err = ""; draw(); };
+
+    el.addEventListener("input", (e) => { if (e.target.matches("[data-why]")) st.reason = e.target.value; });
+    el.addEventListener("change", (e) => { if (e.target.matches("[data-show]")) { st.show = e.target.checked; draw(); } });
+    el.addEventListener("click", (e) => {
+      const t = e.target.closest("button"); if (!t) return;
+      if (t.dataset.tab) { st.tab = t.dataset.tab; st.toast = ""; draw(); }
+      else if (t.dataset.edit) open(mode === "b" ? "edit" : "edit", +t.dataset.edit);
+      else if (t.dataset.del) open("del", +t.dataset.del);
+      else if (t.dataset.restore) open("res", +t.dataset.restore);
+      else if (t.dataset.chip) { st.reason = t.dataset.chip; draw(); }
+      else if ("close" in t.dataset) { st.dlg = null; draw(); }
+      else if ("ok" in t.dataset) {
+        const why = st.reason.trim();
+        if (!why) { st.err = "اكتب السبب: لا يُحفظ الحذف أو الاسترجاع بلا سبب."; draw(); return; }
+        const r = st.rows[st.i];
+        if (st.dlg === "del") {
+          r.gone = true; r.why = why; r.at = "11/10/2026";
+          st.toast = mode === "c"
+            ? `حُذفت ${r.no}. تجدها في <button type="button" class="link" data-tab="tr">المحذوفات</button>.`
+            : `حُذفت ${r.no} وخرجت من الرصيد.${st.show ? "" : " فعّل «إظهار المحذوف» لاسترجاعها."}`;
+        } else { r.gone = false; r.why = ""; st.toast = `استُرجعت ${r.no} وعادت إلى الرصيد.`; }
+        st.dlg = null; draw();
+      }
+    });
+    el.addEventListener("keydown", (e) => { if (e.key === "Escape" && st.dlg) { st.dlg = null; draw(); } });
+    draw();
+  }
+  build("sa", "a"); build("sb", "b"); build("sc", "c");
+  document.querySelectorAll(".seg[data-view]").forEach((g) => g.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.getElementById("s" + g.dataset.view).classList.toggle("phone", b.dataset.v === "phone");
+  }));
+})();
+</script>

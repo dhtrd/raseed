@@ -34,6 +34,11 @@ service cloud.firestore {
         && !exists(auditPath(aid))
         && a.entity == entity && a.entityId == id && a.actor == request.auth.uid;
     }
+    // سبب إلزامي مكتوب في سجل التدقيق المرفق (قفل الفترات، الحذف والاسترجاع)
+    function auditReasonOk() {
+      let a = getAfter(auditPath(request.resource.data.auditId)).data;
+      return a.reason is string && a.reason.size() > 0 && a.reason.size() <= 300;
+    }
 
     // ---------- المال والمرجع ----------
     function money(x) { return x is int && x >= 0 && x <= 9999999999; }
@@ -54,11 +59,13 @@ service cloud.firestore {
       return d.reversed is bool
         && (credit ? (d.credit > 0 && d.debit == 0) : (d.debit > 0 && d.credit == 0));
     }
-    // فهرس الرقم المرجعي يُكتب مع الحركة؛ التكرار مسموح بتأكيد وسبب (تحذير صارم غير حاجب)
+    // فهرس الرقم المرجعي يُكتب مع الحركة؛ التكرار مسموح بتأكيد وسبب (تحذير صارم غير حاجب).
+    // الفهرس الفارغ (حرّره تعديل أو حذف) لا يُعدّ تكراراً.
     function refIndexed(d, eid) {
       let key = refKey(d.refNo);
       return eid in getAfter(refPath(key)).data.ids
-        && (!exists(refPath(key)) || (d.dup is map && d.dup.reason is string && d.dup.reason.size() > 0 && d.dup.reason.size() <= 300));
+        && (!exists(refPath(key)) || get(refPath(key)).data.ids.removeAll([eid]).size() == 0
+            || (d.dup is map && d.dup.reason is string && d.dup.reason.size() > 0 && d.dup.reason.size() <= 300));
     }
 
     // ---------- حالة Odoo (للفواتير فقط) ----------
@@ -81,7 +88,7 @@ service cloud.firestore {
     // ---------- شكل الحركة ----------
     function entryKeys() {
       return ['supplierId', 'kind', 'date', 'mainRef', 'refNo', 'voucher', 'details', 'debit', 'credit', 'reversed',
-              'note', 'odoo', 'dup', 'needsManualFix', 'deleted', 'auditId', 'createdBy', 'createdAt', 'updatedAt'];
+              'note', 'odoo', 'dup', 'needsManualFix', 'deleted', 'deletion', 'auditId', 'createdBy', 'createdAt', 'updatedAt'];
     }
     function commonShapeOk(d) {
       return d.keys().hasOnly(entryKeys())
@@ -137,10 +144,6 @@ service cloud.firestore {
       function notFuture(d) {
         return timestamp.date(int(d[0:4]), int(d[5:7]), int(d[8:10])) <= request.time;
       }
-      function lockReasonOk() {
-        let a = getAfter(auditPath(request.resource.data.auditId)).data;
-        return a.reason is string && a.reason.size() > 0 && a.reason.size() <= 300;
-      }
       allow read: if isActive();
       allow write: if isOwner() && isIsoDate(request.resource.data.lockedThrough)
         && notFuture(request.resource.data.lockedThrough)
@@ -148,7 +151,7 @@ service cloud.firestore {
         && (!('tempFrom' in request.resource.data)
             || (isIsoDate(request.resource.data.tempFrom)
                 && request.resource.data.tempFrom > request.resource.data.lockedThrough))
-        && audited('settings', 'lock') && lockReasonOk();
+        && audited('settings', 'lock') && auditReasonOk();
     }
     // مدة الخمول قبل إنهاء الجلسة (دقائق): يضبطها المالك (DECISIONS 2026-10-10)
     match /settings/session {
@@ -208,8 +211,11 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time
         && audited('entries', eid);
 
-      // التعديل: المالك والإدارة فقط، خارج الفترة المقفلة، مع سجل تدقيق
+      // التعديل: المالك والإدارة فقط، خارج الفترة المقفلة، مع سجل تدقيق. المحذوفة لا تُعدَّل،
+      // والحذف والاسترجاع بقاعدتهما أدناه.
       allow update: if isManager()
+        && resource.data.deleted == false && request.resource.data.deleted == false
+        && !('deletion' in request.resource.data)
         && isOpenDate(resource.data.date) && isOpenDate(request.resource.data.date)
         && commonShapeOk(request.resource.data)
         && request.resource.data.supplierId == resource.data.supplierId
@@ -218,12 +224,33 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time
         && entryUpdateShapeOk(resource.data, request.resource.data, eid)
         && odooChangeOk(resource.data, request.resource.data)
-        && (request.resource.data.deleted == resource.data.deleted || isOwner())
         && audited('entries', eid);
+
+      // الحذف الناعم والاسترجاع (SPEC §1، DECISIONS 2026-10-11 الخيار أ): المالك وحده، خارج الفترة المقفلة،
+      // بسبب إلزامي في التدقيق. الحذف يحفظ من حذف ومتى ولماذا ولا يغيّر غير ذلك، ويُحرَّر رقمه المرجعي
+      // (قاعدة refs). الاسترجاع يعيده إلى فهرس رقمه، وبتأكيد وسبب إن كان الرقم قد استُعمل بعده.
+      function deletionOk(x) {
+        return x is map && x.keys().hasOnly(['by', 'at', 'reason'])
+          && x.by == request.auth.uid && x.at == request.time
+          && x.reason is string && x.reason.size() > 0 && x.reason.size() <= 300;
+      }
+      function hasRef(d) { return d.kind in ['inv', 'misc'] && d.get('refNo', '') != ''; }
+      allow update: if isOwner()
+        && isOpenDate(resource.data.date)
+        && request.resource.data.updatedAt == request.time
+        && audited('entries', eid) && auditReasonOk()
+        && ((resource.data.deleted == false && request.resource.data.deleted == true
+             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deleted', 'deletion', 'updatedAt', 'auditId'])
+             && deletionOk(request.resource.data.deletion))
+          || (resource.data.deleted == true && request.resource.data.deleted == false
+             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deleted', 'deletion', 'dup', 'updatedAt', 'auditId'])
+             && !('deletion' in request.resource.data)
+             && (!hasRef(request.resource.data) || refIndexed(request.resource.data, eid))));
 
       // استثناء الفترة المقفلة (DECISIONS 2026-10-10): المالك وحده يغيّر حالة Odoo لفاتورة مقفلة،
       // بسبب مكتوب إلزامي، ولا يتغير أي حقل آخر.
       allow update: if isOwner()
+        && resource.data.deleted == false
         && !isOpenDate(resource.data.date)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['odoo', 'updatedAt', 'auditId'])
         && request.resource.data.updatedAt == request.time
@@ -262,8 +289,8 @@ service cloud.firestore {
         && refKey(entryAfter(request.resource.data.ids[request.resource.data.ids.size() - 1]).refNo) == key
         && placeOk(request.resource.data.places[request.resource.data.places.size() - 1],
                    request.resource.data.ids[request.resource.data.ids.size() - 1]);
-      // تعديل الحركة (DECISIONS 2026-10-11): إن انتقلت إلى رقم آخر في الدفعة نفسها، تُزال من فهرس رقمها
-      // القديم وحدها (المالك والإدارة فقط، كما تعديل الحركة)، فلا يبقى تكرار وهمي.
+      // تعديل الحركة (DECISIONS 2026-10-11): إن انتقلت إلى رقم آخر في الدفعة نفسها، أو حُذفت، تُزال
+      // من فهرس رقمها وحدها (المالك والإدارة فقط؛ الحذف نفسه للمالك بقاعدته)، فلا يبقى تكرار وهمي.
       allow update: if isManager()
         && request.resource.data.keys().hasOnly(['ids', 'places'])
         && request.resource.data.ids.size() == resource.data.ids.size() - 1
@@ -273,7 +300,8 @@ service cloud.firestore {
         && resource.data.ids.removeAll(request.resource.data.ids).size() == 1
         && resource.data.places.removeAll(request.resource.data.places)[0].entryId
              == resource.data.ids.removeAll(request.resource.data.ids)[0]
-        && refKey(entryAfter(resource.data.ids.removeAll(request.resource.data.ids)[0]).refNo) != key;
+        && (refKey(entryAfter(resource.data.ids.removeAll(request.resource.data.ids)[0]).refNo) != key
+            || entryAfter(resource.data.ids.removeAll(request.resource.data.ids)[0]).deleted == true);
       allow delete: if false;
     }
 
@@ -284,7 +312,10 @@ service cloud.firestore {
       function resolutionOk(d) {
         return d.resolved is bool
           && d.resolvedBy == request.auth.uid && d.resolvedAt == request.time
-          && (d.resolved ? d.resolution in ['ignored', 'fixed'] : d.resolution == 'reopened')
+          && (d.resolved ? d.resolution in ['ignored', 'fixed', 'deleted'] : d.resolution == 'reopened')
+          // «حُذفت» تُغلق مع حذف حركتها في الدفعة نفسها فقط (DECISIONS 2026-10-11)
+          && (d.resolution != 'deleted'
+              || getAfter(/databases/$(database)/documents/entries/$(eid)).data.deleted == true)
           && d.resolutionNote is string && d.resolutionNote.size() <= 300;
       }
       allow read: if isManager();

@@ -128,9 +128,12 @@ async function writeEntries(tx: Tx, uid: string, list: NewEntry[]): Promise<stri
     auditRef: doc(collection(db, "auditLog")),
     refDoc: e.kind === "note" ? null : doc(db, "refs", refIndexKey(e.refNo)),
   }));
-  const exists = await Promise.all(plans.map(async (p) => (p.refDoc ? (await tx.get(p.refDoc)).exists() : false)));
+  // الفهرس قد يبقى فارغاً بعد تحرير رقمه (تعديل أو حذف)، فلا يُعدّ تكراراً
+  const snaps = await Promise.all(plans.map(async (p) => (p.refDoc ? await tx.get(p.refDoc) : null)));
   plans.forEach(({ e, entryRef, auditRef, refDoc }, i) => {
-    const refExists = exists[i] === true;
+    const snap = snaps[i];
+    const docExists = snap?.exists() === true;
+    const refExists = docExists && ((snap?.get("ids") as string[] | undefined) ?? []).length > 0;
     const common = {
       supplierId: e.supplierId,
       kind: e.kind,
@@ -189,7 +192,7 @@ async function writeEntries(tx: Tx, uid: string, list: NewEntry[]): Promise<stri
     });
     if (refDoc) {
       const place: RefPlace = { entryId: entryRef.id, supplierId: e.supplierId, supplierName: e.supplierName };
-      if (refExists) tx.update(refDoc, { ids: arrayUnion(entryRef.id), places: arrayUnion(place) });
+      if (docExists) tx.update(refDoc, { ids: arrayUnion(entryRef.id), places: arrayUnion(place) });
       else tx.set(refDoc, { ids: [entryRef.id], places: [place] });
     }
   });

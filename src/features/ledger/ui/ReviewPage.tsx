@@ -17,6 +17,7 @@ import {
 } from "../core/review";
 import { watchLockedThrough } from "../data/invoicesRepo";
 import { setResolution, watchEntriesByIds, watchOpenIssues } from "../data/reviewRepo";
+import { DeleteEntryDialog, type DeleteTarget } from "./DeleteEntryDialog";
 import { EditEntryDialog, type EditTarget } from "./EditEntryDialog";
 import { HeadSar } from "./Amount";
 import { ReasonText } from "./ReasonText";
@@ -67,6 +68,8 @@ export function ReviewPage() {
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [undoRow, setUndoRow] = useState<ReviewRow | null>(null);
   const [editing, setEditing] = useState<EditTarget | null>(null);
+  // حذف الحركة يغلق سجلها بوسم «حُذفت» (قرار المستخدم 2026-10-11)؛ للمالك وحده
+  const [deleting, setDeleting] = useState<DeleteTarget | null>(null);
   const lock = useKeyedWatch<string | null>("lock", watchLockedThrough, "قراءة تاريخ الإقفال");
   const lockedThrough = lock.status === "ready" ? lock.data : null;
 
@@ -258,11 +261,30 @@ export function ReviewPage() {
         uid={profile.uid}
         lockedThrough={lockedThrough}
         canUnlock={profile.role === "owner"}
+        onDelete={
+          profile.role === "owner"
+            ? (t) => {
+                setEditing(null);
+                setDeleting({ mode: "delete", entry: t.entry, supplierName: t.supplierName, deletion: null });
+              }
+            : undefined
+        }
         onClose={() => setEditing(null)}
         onSaved={(text) => {
           setEditing(null);
           setUndoRow(null);
           setOutcome({ tone: "ok", text });
+        }}
+      />
+      <DeleteEntryDialog
+        target={deleting}
+        uid={profile.uid}
+        lockedThrough={lockedThrough}
+        onClose={() => setDeleting(null)}
+        onDone={(text) => {
+          setDeleting(null);
+          setUndoRow(null);
+          setOutcome({ tone: "ok", text: `${text} أُغلق سجل المراجعة بوسم «حُذفت».` });
         }}
       />
 
