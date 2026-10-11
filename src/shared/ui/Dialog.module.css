@@ -18,6 +18,10 @@
   box-shadow: var(--shadow);
 }
 
+.wide {
+  inline-size: min(100%, 660px);
+}
+
 .warn {
   border-block-start-color: var(--neg);
 }

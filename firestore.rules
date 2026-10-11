@@ -248,6 +248,18 @@ service cloud.firestore {
         && refKey(entryAfter(request.resource.data.ids[request.resource.data.ids.size() - 1]).refNo) == key
         && placeOk(request.resource.data.places[request.resource.data.places.size() - 1],
                    request.resource.data.ids[request.resource.data.ids.size() - 1]);
+      // تعديل الحركة (DECISIONS 2026-10-11): إن انتقلت إلى رقم آخر في الدفعة نفسها، تُزال من فهرس رقمها
+      // القديم وحدها (المالك والإدارة فقط، كما تعديل الحركة)، فلا يبقى تكرار وهمي.
+      allow update: if isManager()
+        && request.resource.data.keys().hasOnly(['ids', 'places'])
+        && request.resource.data.ids.size() == resource.data.ids.size() - 1
+        && request.resource.data.places.size() == resource.data.places.size() - 1
+        && resource.data.ids.hasAll(request.resource.data.ids)
+        && resource.data.places.hasAll(request.resource.data.places)
+        && resource.data.ids.removeAll(request.resource.data.ids).size() == 1
+        && resource.data.places.removeAll(request.resource.data.places)[0].entryId
+             == resource.data.ids.removeAll(request.resource.data.ids)[0]
+        && refKey(entryAfter(resource.data.ids.removeAll(request.resource.data.ids)[0]).refNo) != key;
       allow delete: if false;
     }
 
