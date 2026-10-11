@@ -1,7 +1,8 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import s from "./Button.module.css";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+/** caution: إجراء استثنائي (كهرماني)، مثل استثناء الفترة المقفلة */
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "caution";
 
 export type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className"> & {
   variant?: ButtonVariant;

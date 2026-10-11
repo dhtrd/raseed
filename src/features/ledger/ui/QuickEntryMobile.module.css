@@ -108,10 +108,10 @@
 }
 
 .in:focus {
-  outline: 3px solid var(--accent);
-  outline-offset: 1px;
+  outline: none;
   border-color: var(--accent);
-  background: var(--surface);
+  border-block-end-width: 2.5px;
+  background: var(--wash);
 }
 
 .in:disabled {
@@ -318,7 +318,8 @@
 }
 
 .pz:focus {
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
+  outline: none;
+  border-style: solid;
   border-color: var(--accent);
+  background: var(--wash);
 }

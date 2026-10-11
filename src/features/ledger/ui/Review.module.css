@@ -206,9 +206,9 @@
 }
 
 .in:focus {
-  outline: 3px solid var(--accent);
-  outline-offset: 1px;
-  border-block-end-color: var(--accent);
+  outline: none;
+  border-block-end: 2.5px solid var(--accent);
+  background: var(--wash);
 }
 
 /* ≤ 600 جوال: شريط الأقسام، والجدول بطاقات */

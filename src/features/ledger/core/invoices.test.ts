@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterByOdoo, invoiceAmount, invoiceCounts, planOdooChange } from "./invoices";
+import { filterByOdoo, invoiceAmount, invoiceCounts, planOdooChange, validateLockReason } from "./invoices";
 import { parseEntry } from "./ledger";
 
 const inv = (id: string, d: Record<string, unknown>) =>
@@ -20,7 +20,14 @@ describe("فهرس الفواتير", () => {
 
   it("دخلت + لم تدخل = الإجمالي في كل فلتر", () => {
     const c = invoiceCounts(rows);
-    expect(c).toEqual({ total: 4, entered: 1, notEntered: 3, notEnteredAmount: 5000 - 2000 + 700 });
+    expect(c).toEqual({
+      total: 4,
+      entered: 1,
+      notEntered: 3,
+      notEnteredAmount: 5000 - 2000 + 700,
+      enteredAmount: 10000,
+      totalAmount: 10000 + 5000 - 2000 + 700,
+    });
     expect(filterByOdoo(rows, "in")).toHaveLength(c.entered);
     expect(filterByOdoo(rows, "out")).toHaveLength(c.notEntered);
     expect(filterByOdoo(rows, "all")).toHaveLength(c.total);
@@ -32,5 +39,18 @@ describe("فهرس الفواتير", () => {
     expect(p.locked.map((r) => r.id)).toEqual(["c"]);
     expect(p.change.map((r) => r.id)).toEqual(["b", "d"]);
     expect(planOdooChange(rows, false, null).change.map((r) => r.id)).toEqual(["a"]);
+  });
+});
+
+describe("استثناء الفترة المقفلة", () => {
+  it("السبب إلزامي وبحد 300", () => {
+    expect(validateLockReason("  ")).toBeTruthy();
+    expect(validateLockReason("x".repeat(301))).toBeTruthy();
+    expect(validateLockReason("أُدخلت قبل الإقفال")).toBeNull();
+  });
+  it("سبب الاستثناء يُقرأ من الفاتورة فقط", () => {
+    expect(inv("x", { odoo: { entered: true, lockReason: "سبب" } }).odooLockReason).toBe("سبب");
+    expect(inv("y", {}).odooLockReason).toBe("");
+    expect(parseEntry("z", { kind: "misc", odoo: { lockReason: "x" } }).odooLockReason).toBe("");
   });
 });

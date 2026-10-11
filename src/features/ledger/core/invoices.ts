@@ -5,6 +5,19 @@
 import type { IsoDate } from "../../../shared/fields/core/date";
 import type { LedgerEntry } from "./ledger";
 
+export const LOCK_REASON_MAX = 300;
+
+/**
+ * سبب استثناء الفترة المقفلة (المالك، الخيار أ المعتمد في proposals/2026-10-11-odoo-lock-exception.html):
+ * إلزامي حتى 300 حرف، والقواعد تفرض الشيء نفسه (odoo.lockReason).
+ */
+export function validateLockReason(text: string): string | null {
+  const t = text.trim();
+  if (!t) return "اكتب سبب الاستثناء: لا تتغير حالة فاتورة مقفلة بلا سبب.";
+  if (t.length > LOCK_REASON_MAX) return `السبب أطول من ${LOCK_REASON_MAX} حرف.`;
+  return null;
+}
+
 export type OdooFilter = "all" | "in" | "out";
 
 export interface InvoiceRow extends LedgerEntry {
@@ -29,16 +42,29 @@ export interface InvoiceCounts {
   notEntered: number;
   /** مجموع مبالغ «لم تدخل» (المرتجع يُطرح) */
   notEnteredAmount: number;
+  /** مجموع مبالغ «دخلت» والإجمالي (طلب المستخدم 2026-10-11)؛ دخلت + لم تدخل = الإجمالي */
+  enteredAmount: number;
+  totalAmount: number;
 }
 
 export function invoiceCounts(rows: Pick<LedgerEntry, "odooEntered" | "debit" | "credit">[]): InvoiceCounts {
   let entered = 0;
   let amount = 0;
+  let inAmount = 0;
   for (const r of rows) {
-    if (isEntered(r)) entered++;
-    else amount += invoiceAmount(r);
+    if (isEntered(r)) {
+      entered++;
+      inAmount += invoiceAmount(r);
+    } else amount += invoiceAmount(r);
   }
-  return { total: rows.length, entered, notEntered: rows.length - entered, notEnteredAmount: amount };
+  return {
+    total: rows.length,
+    entered,
+    notEntered: rows.length - entered,
+    notEnteredAmount: amount,
+    enteredAmount: inAmount,
+    totalAmount: inAmount + amount,
+  };
 }
 
 /**

@@ -1,0 +1,240 @@
+<title>رصيد · إدارة الموردين</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاثة خيارات لإضافة مورد وتعديل اسمه وأرشفته (المالك والإدارة حسب SPEC)، كل منها شاشة تفاعلية بين الحاسوب والجوال. الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --neg-wash: #f8e8e9; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --tab: #e2e8ee; --mark-acc: #b8752a;
+  --scrim: rgb(27 42 68 / 45%); --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.lead { color: var(--ink-2); max-width: 78ch; margin: 6px 0 16px; }
+.eg { display: inline-block; font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 6px; margin-inline-start: 6px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+
+.opt { margin-bottom: 34px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 82ch; }
+.opt ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; position: relative; width: 1100px; min-height: 520px; margin-inline: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.screen.phone { width: 360px; min-height: 700px; border-radius: 24px; }
+.mast { display: flex; flex-wrap: wrap; align-items: end; gap: 4px 14px; padding: 10px 16px 0; background: var(--tab); border-bottom: 1px solid var(--rule); font-weight: 700; }
+.mast .brand { font-family: var(--f-brand); font-size: 20px; padding-bottom: 8px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 2px; }
+.tabs span { font-size: 14px; color: var(--ink-2); padding: 4px 10px 8px; border-radius: 8px 8px 0 0; }
+.tabs span.on { background: var(--surface); color: var(--ink); box-shadow: inset 0 3px 0 var(--accent); }
+.page { padding: 16px 20px 22px; display: grid; gap: 12px; background: var(--surface); }
+@container (width < 600px) { .page { padding: 12px 14px 18px; } .tabs span:not(.on):nth-child(n+4) { display: none; } }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.head h3 { font-size: 22px; }
+.toast { padding: 8px 12px; background: var(--wash); border-inline-start: 4px solid var(--accent); font-size: 15px; }
+.split { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+@container (width < 600px) { .split { grid-template-columns: minmax(0, 1fr); } }
+
+table { width: 100%; border-collapse: collapse; border-top: 3px double var(--ink); font-size: 15px; }
+th { text-align: start; font-size: 13.5px; color: var(--ink-2); padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+td, tbody th { padding: 9px 8px; border-bottom: 1px solid var(--rule); text-align: start; font-weight: 400; vertical-align: middle; }
+tr.arch td, tr.arch th { color: var(--ink-2); background: var(--wash-2); }
+tr.sel td, tr.sel th { background: var(--wash); }
+.st { font-size: 12.5px; font-weight: 700; padding: 0 6px; border: 1px solid var(--accent); border-radius: 3px; color: var(--accent); white-space: nowrap; }
+.st.off { border-color: var(--ink-2); color: var(--ink-2); border-style: dashed; }
+.acts { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+@container (width < 600px) {
+  thead { display: none; }
+  table, tbody { display: block; }
+  tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  tbody tr > * { display: block; border: 0; padding: 0; background: none !important; }
+  tr.arch { background: var(--wash-2); }
+  .hide-m { display: none; }
+  .m-full { grid-column: 1 / -1; }
+  .acts { justify-content: flex-start; }
+}
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 2px 14px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.btn.pri { background: var(--accent); color: var(--on-accent); }
+.btn.sm { min-height: 34px; padding: 0 10px; font-size: 14px; }
+.btn.ghost { border-color: var(--rule); color: var(--ink); }
+.btn.plus::before { content: "+"; font-size: 20px; line-height: 1; }
+
+.panel { border: 1px solid var(--rule); border-top: 4px solid var(--accent); border-radius: 6px; padding: 14px; display: grid; gap: 10px; background: var(--surface); }
+.panel h4 { font-size: 17px; }
+.fld { display: grid; gap: 2px; font-size: 14.5px; font-weight: 700; }
+.fld input { font: inherit; font-weight: 400; font-size: 17px; color: var(--ink); min-height: 46px; padding: 0 10px; border: 0; border-bottom: 1.5px solid var(--rule); background: var(--wash-2); border-radius: 4px 4px 0 0; }
+.fld input:focus { outline: none; border-bottom: 2.5px solid var(--accent); background: var(--wash); }
+.err { color: var(--neg); font-weight: 700; font-size: 14px; }
+.warn { padding: 8px 10px; background: var(--neg-wash); border-inline-start: 4px solid var(--neg); font-size: 14.5px; }
+.hint { font-size: 13.5px; color: var(--ink-2); font-weight: 400; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.ix { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 460px; }
+@container (width < 600px) { .ix { grid-template-columns: minmax(0, 1fr); } .ix aside { display: none; } }
+.ix aside { background: var(--wash-2); border-inline-end: 1px solid var(--rule); padding: 12px; display: grid; align-content: start; gap: 4px; }
+.ix aside .item { padding: 6px 8px; border-radius: 4px; font-size: 15px; display: flex; justify-content: space-between; gap: 6px; }
+.ix aside .item.on { background: var(--surface); box-shadow: inset -3px 0 0 var(--accent); font-weight: 700; }
+.ix aside .item.arch { color: var(--ink-2); }
+.addrow { margin-top: 6px; }
+@container (width >= 600px) { .phone-add { display: none; } }
+
+.scrim { position: absolute; inset: 0; background: var(--scrim); display: grid; place-items: center; padding: 16px; z-index: 5; }
+.dlg { width: min(100%, 460px); background: var(--surface); border-top: 4px solid var(--accent); border-radius: 8px; box-shadow: var(--shadow); padding: 16px 18px; display: grid; gap: 12px; }
+@container (width < 600px) { .scrim { place-items: end stretch; padding: 0; } .dlg { width: 100%; border-radius: 14px 14px 0 0; } }
+.menu { position: relative; display: inline-block; }
+.menu .pop { position: absolute; inset-inline-end: 0; top: calc(100% + 4px); min-width: 180px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; box-shadow: var(--shadow); padding: 4px; display: grid; z-index: 3; }
+.menu .pop button { text-align: start; background: none; border: 0; font: inherit; font-size: 15px; padding: 8px 10px; border-radius: 4px; cursor: pointer; color: var(--ink); }
+.menu .pop button:hover { background: var(--wash); }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 10px; }
+.qs b { color: var(--accent); }
+.qs .sub { color: var(--ink-2); font-size: 15px; }
+@media (prefers-reduced-motion: no-preference) { .dlg, .panel { animation: up .16s ease-out; } @keyframes up { from { transform: translateY(6px); opacity: .7; } } }
+</style>
+
+<div class="wrap">
+  <h1>إدارة الموردين: الإضافة والتعديل والأرشفة</h1>
+  <p class="lead">حسب ورقة الاتفاق: إضافة مورد للمالك والإدارة، والأرشفة لهما أيضاً. مدخل البيانات لا يرى هذه الأدوات. ثلاثة أشكال تفاعلية، كل منها بين الحاسوب والجوال. جرّب الإضافة والأرشفة. الأسماء وهمية<span class="eg">مثال</span>.</p>
+  <div class="common">في الأشكال الثلاثة:
+    <ul>
+      <li>الاسم إلزامي حتى 100 حرف، ويظهر تحذير إن كان قريباً جداً من اسم موجود (مثلاً يختلف بهمزة أو مسافة).</li>
+      <li>المؤرشف يختفي من القوائم والإسناد والإدخال، ويبقى كشفه وأرصدته، ويمكن إعادة تنشيطه.</li>
+      <li>كل إضافة أو تعديل أو أرشفة تُسجَّل في التدقيق (القواعد موجودة).</li>
+    </ul>
+  </div>
+
+  <section class="opt" aria-labelledby="ha">
+    <div class="opt-head"><h2 id="ha">أ. تبويب «الموردون»: جدول ولوحة جانبية</h2><div class="seg" data-view="a"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">تبويب جديد بجانب «المستخدمون» و«الإسناد» بالنمط نفسه: جدول الموردين بحالتهم وعدد حركاتهم، وزر «مورد جديد». النقر على مورد يفتح لوحة جانبية لتعديل الاسم أو الأرشفة. على الجوال تصبح اللوحة صفحة.</p>
+    <ul class="pc"><li class="pro">مكان واحد واضح لكل ما يخص الموردين.</li><li class="pro">مطابق لشاشة المستخدمين المعتمدة.</li><li>تبويب إضافي في الرأس.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <div class="opt-head"><h2 id="hb">ب. من فهرس الموردين الجانبي</h2><div class="seg" data-view="b"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">زر «+ مورد جديد» أسفل الفهرس الجانبي في الأرصدة والكشف يفتح نافذة صغيرة. التعديل والأرشفة من قائمة «⋯» في رأس كشف المورد. على الجوال الزر أعلى القائمة.</p>
+    <ul class="pc"><li class="pro">بلا تبويب جديد؛ الإضافة حيث تعمل.</li><li class="pro">سريع لمورد واحد.</li><li>لا مكان يجمع المؤرشفين؛ إعادة التنشيط من كشف المورد.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <div class="opt-head"><h2 id="hc">ج. داخل شاشة «الإسناد»</h2><div class="seg" data-view="c"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">قسم «الموردون» في أعلى شاشة الإسناد الحالية: إضافة سطرية بحقل وزر، وبجانب كل مورد «تعديل» و«أرشفة»، ثم يُسند المورد الجديد مباشرة لمدخل البيانات.</p>
+    <ul class="pc"><li class="pro">الإضافة والإسناد في خطوة واحدة.</li><li class="pro">بلا تبويب جديد.</li><li>شاشة الإسناد تطول، ومعناها يتسع لغير الإسناد.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الشكل:</b> أ أم ب أم ج؟</li>
+      <li><b>الاسم المكرر أو المتشابه:</b> تحذير يسمح بالمتابعة بتأكيد، أم منع؟
+        <div class="sub">أقترح: منع الاسم المطابق تماماً (بعد توحيد الهمزات والمسافات)، وتحذير للمتشابه.</div></li>
+      <li><b>تعديل اسم المورد:</b> مسموح للمالك والإدارة؟ الاسم القديم يبقى في سجل التدقيق.</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const BASE = [
+    { n: "المورد (أ)", c: 412, arch: false },
+    { n: "المورد (ب)", c: 233, arch: false },
+    { n: "المورد (ج)", c: 158, arch: false },
+    { n: "مؤسسة الإسمنت", c: 97, arch: false },
+    { n: "المورد (ق)", c: 12, arch: true },
+  ];
+  const norm = (s) => s.replace(/[أإآ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").replace(/\s+/g, " ").trim();
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const mast = (on) => `<div class="mast"><span class="brand">رصيد</span><nav class="tabs" aria-label="الأقسام">${["الأرصدة", "كشف الحساب", "الفواتير", "إضافة حركة", "المستخدمون", "الإسناد", "الموردون"].filter((t) => t !== "الموردون" || on === "الموردون").map((t) => `<span class="${t === on ? "on" : ""}">${t}</span>`).join("")}</nav></div>`;
+
+  function build(id, mode) {
+    const el = document.getElementById(id);
+    const st = { rows: BASE.map((r) => ({ ...r })), sel: -1, add: false, name: "", err: "", warn: "", toast: "", menu: false, edit: -1 };
+    const check = (name, except = -1) => {
+      const t = name.trim();
+      if (!t) return { err: "اكتب اسم المورد." };
+      if (t.length > 100) return { err: "الاسم أطول من 100 حرف." };
+      const same = st.rows.findIndex((r, i) => i !== except && norm(r.n) === norm(t));
+      if (same >= 0) return { err: `يوجد مورد بهذا الاسم: «${st.rows[same].n}»${st.rows[same].arch ? " (مؤرشف، يمكنك إعادة تنشيطه)" : ""}.` };
+      return {};
+    };
+    const save = () => {
+      const r = check(st.name, st.edit);
+      if (r.err) { st.err = r.err; draw(); return false; }
+      if (st.edit >= 0) { st.toast = `عُدّل الاسم إلى «${esc(st.name.trim())}» وسُجّل في التدقيق.`; st.rows[st.edit].n = st.name.trim(); }
+      else { st.rows.push({ n: st.name.trim(), c: 0, arch: false }); st.sel = st.rows.length - 1; st.toast = `أُضيف «${esc(st.name.trim())}». ${mode === "c" ? "أسنده لمدخل البيانات أدناه." : "يظهر الآن في القوائم والإدخال."}`; }
+      st.add = false; st.edit = -1; st.name = ""; st.err = ""; return true;
+    };
+    const archive = (i) => { const r = st.rows[i]; r.arch = !r.arch; st.toast = r.arch ? `أُرشف «${esc(r.n)}»: اختفى من القوائم والإسناد، وبقي كشفه.` : `أُعيد تنشيط «${esc(r.n)}».`; st.menu = false; };
+    const form = (title) => `<div class="fld"><label for="${id}-n">اسم المورد <span class="hint">(إلزامي)</span></label><input id="${id}-n" data-name maxlength="100" value="${esc(st.name)}" placeholder="مثال: مؤسسة النخيل للتجارة"></div>${st.err ? `<p class="err" role="alert">${st.err}</p>` : ""}<div class="row"><button type="button" class="btn pri" data-save>${title}</button><button type="button" class="btn ghost" data-cancel>إلغاء</button></div>`;
+
+    const table = (actions) => `<table><caption style="position:absolute;width:1px;height:1px;overflow:hidden">الموردون</caption><thead><tr><th>المورد</th><th class="hide-m">الحالة</th><th class="hide-m">الحركات</th>${actions ? "<th><span style='position:absolute;width:1px;height:1px;overflow:hidden'>إجراءات</span></th>" : ""}</tr></thead><tbody>${st.rows.map((r, i) => `<tr class="${r.arch ? "arch" : ""} ${i === st.sel ? "sel" : ""}" ${actions ? "" : `data-pick="${i}" style="cursor:pointer"`}>
+      <th scope="row">${esc(r.n)}</th><td class="hide-m"><span class="st ${r.arch ? "off" : ""}">${r.arch ? "مؤرشف" : "نشط"}</span></td><td class="hide-m"><span class="num">${r.c}</span></td>
+      ${actions ? `<td class="m-full"><span class="acts"><button type="button" class="btn sm ghost" data-edit="${i}">تعديل</button><button type="button" class="btn sm ghost" data-arch="${i}">${r.arch ? "إعادة تنشيط" : "أرشفة"}</button></span></td>` : ""}</tr>`).join("")}</tbody></table>`;
+
+    const draw = () => {
+      let body = "";
+      if (mode === "a") {
+        const r = st.rows[st.sel];
+        const panel = st.add ? `<div class="panel"><h4>مورد جديد</h4>${form("إضافة المورد")}</div>`
+          : st.edit >= 0 ? `<div class="panel"><h4>تعديل الاسم</h4>${form("حفظ الاسم")}</div>`
+          : r ? `<div class="panel"><h4>${esc(r.n)}</h4><p><span class="st ${r.arch ? "off" : ""}">${r.arch ? "مؤرشف" : "نشط"}</span> · <span class="num">${r.c}</span> حركة</p><div class="row"><button type="button" class="btn ghost" data-edit="${st.sel}">تعديل الاسم</button><button type="button" class="btn ghost" data-arch="${st.sel}">${r.arch ? "إعادة تنشيط" : "أرشفة"}</button></div><p class="hint">${r.arch ? "مؤرشف: لا يظهر في القوائم والإسناد، وكشفه باقٍ." : "الأرشفة تخفيه من القوائم والإسناد والإدخال، وتُبقي كشفه."}</p></div>`
+          : `<div class="panel"><h4>اختر مورداً</h4><p class="hint">انقر مورداً لتعديل اسمه أو أرشفته، أو أضف مورداً جديداً.</p></div>`;
+        body = `<div class="page"><div class="head"><h3>الموردون</h3><button type="button" class="btn pri plus" data-add>مورد جديد</button></div>${st.toast ? `<p class="toast" role="status">${st.toast}</p>` : ""}<div class="split"><div>${table(false)}</div>${panel}</div></div>`;
+        el.innerHTML = mast("الموردون") + body;
+      } else if (mode === "b") {
+        const cur = st.rows[st.sel >= 0 ? st.sel : 0];
+        const items = st.rows.map((r, i) => (r.arch ? "" : `<div class="item ${i === (st.sel >= 0 ? st.sel : 0) ? "on" : ""}" data-pick="${i}" style="cursor:pointer"><span>${esc(r.n)}</span></div>`)).join("");
+        const dlg = st.add || st.edit >= 0 ? `<div class="scrim"><div class="dlg" role="dialog" aria-modal="true" aria-label="${st.add ? "مورد جديد" : "تعديل الاسم"}"><h4>${st.add ? "مورد جديد" : "تعديل اسم المورد"}</h4>${form(st.add ? "إضافة المورد" : "حفظ الاسم")}</div></div>` : "";
+        body = `<div class="ix"><aside aria-label="فهرس الموردين"><button type="button" class="btn sm plus addrow" data-add>مورد جديد</button>${items}</aside><div class="page"><div class="head"><h3>${esc(cur.n)}${cur.arch ? ' <span class="st off">مؤرشف</span>' : ""}</h3><span class="row"><span class="menu"><button type="button" class="btn sm ghost" data-menu aria-expanded="${st.menu}" aria-label="إجراءات المورد">⋯</button>${st.menu ? `<span class="pop" role="menu"><button type="button" role="menuitem" data-edit="${st.sel >= 0 ? st.sel : 0}">تعديل الاسم</button><button type="button" role="menuitem" data-arch="${st.sel >= 0 ? st.sel : 0}">${cur.arch ? "إعادة تنشيط" : "أرشفة المورد"}</button></span>` : ""}</span></span></div>${st.toast ? `<p class="toast" role="status">${st.toast}</p>` : ""}<p class="hint">كشف الحساب كما هو. على الجوال: «+ مورد جديد» أعلى قائمة اختيار المورد.</p><div class="row phone-add"><button type="button" class="btn sm plus" data-add>مورد جديد</button></div></div></div>${dlg}`;
+        el.innerHTML = mast("كشف الحساب") + body;
+      } else {
+        const add = st.edit >= 0 ? `<div class="panel"><h4>تعديل اسم «${esc(st.rows[st.edit].n)}»</h4>${form("حفظ الاسم")}</div>` : `<div class="panel"><h4>إضافة مورد</h4>${form("إضافة المورد")}</div>`;
+        body = `<div class="page"><div class="head"><h3>الإسناد</h3></div>${st.toast ? `<p class="toast" role="status">${st.toast}</p>` : ""}<h4>الموردون</h4>${add}${table(true)}<h4>إسناد الموردين لمدخلي البيانات</h4><p class="hint">(قسم الإسناد الحالي كما هو)</p></div>`;
+        el.innerHTML = mast("الإسناد") + body;
+      }
+    };
+
+    el.addEventListener("input", (e) => { if (e.target.matches("[data-name]")) { st.name = e.target.value; if (st.err) { st.err = ""; } } });
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches("[data-name]")) { e.preventDefault(); if (save()) draw(); } if (e.key === "Escape") { st.add = false; st.edit = -1; st.menu = false; draw(); } });
+    el.addEventListener("click", (e) => {
+      const t = e.target.closest("[data-add],[data-save],[data-cancel],[data-edit],[data-arch],[data-pick],[data-menu]"); if (!t) return;
+      if ("add" in t.dataset) { st.add = true; st.edit = -1; st.name = ""; st.err = ""; st.toast = ""; draw(); el.querySelector("[data-name]")?.focus(); }
+      else if ("save" in t.dataset) { if (save()) draw(); else el.querySelector("[data-name]")?.focus(); }
+      else if ("cancel" in t.dataset) { st.add = false; st.edit = -1; st.name = ""; st.err = ""; draw(); }
+      else if (t.dataset.edit) { const i = +t.dataset.edit; st.edit = i; st.add = false; st.name = st.rows[i].n; st.err = ""; st.menu = false; draw(); el.querySelector("[data-name]")?.focus(); }
+      else if (t.dataset.arch) { archive(+t.dataset.arch); draw(); }
+      else if (t.dataset.pick) { st.sel = +t.dataset.pick; st.add = false; st.edit = -1; st.toast = ""; draw(); }
+      else if ("menu" in t.dataset) { st.menu = !st.menu; draw(); }
+    });
+    draw();
+  }
+  build("sa", "a"); build("sb", "b"); build("sc", "c");
+  document.querySelectorAll(".seg[data-view]").forEach((g) => g.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.getElementById("s" + g.dataset.view).classList.toggle("phone", b.dataset.v === "phone");
+  }));
+})();
+</script>

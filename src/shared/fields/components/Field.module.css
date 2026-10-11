@@ -45,10 +45,15 @@
   border-start-end-radius: var(--r-sm);
 }
 
+/* التركيز (CHOSEN §الحقل): بلا إطار، الخط السفلي يصبح كحلياً أعرض والخلفية أوضح */
 .box:focus-within {
-  border-block-end-color: var(--accent);
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
+  border-block-end: 2.5px solid var(--accent);
+  background: var(--wash);
+}
+
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: none;
 }
 
 .input,

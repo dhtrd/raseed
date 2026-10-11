@@ -111,9 +111,10 @@
 }
 
 .pz:focus {
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
+  outline: none;
+  border-style: solid;
   border-color: var(--accent);
+  background: var(--wash);
 }
 
 .preview {
@@ -250,10 +251,10 @@
 }
 
 .cell:focus {
-  background: var(--wash-2);
+  background: var(--wash);
   border-block-end-color: var(--accent);
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  box-shadow: inset 0 -2px 0 var(--accent);
+  outline: none;
 }
 
 .cell:disabled {
