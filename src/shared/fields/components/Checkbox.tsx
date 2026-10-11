@@ -5,7 +5,8 @@ import s from "./Checkbox.module.css";
 export type CheckboxProps = {
   /** «mixed» لتحديد جزئي (مثل «تحديد الظاهر» حين يُحدَّد بعضه) */
   checked: boolean | "mixed";
-  onChange: (checked: boolean) => void;
+  /** `shift`: نُقر مع Shift (للتحديد بالمدى في القوائم) */
+  onChange: (checked: boolean, mods: { shift: boolean }) => void;
   children: ReactNode;
   disabled?: boolean;
   danger?: boolean;
@@ -27,8 +28,12 @@ export function Checkbox(p: CheckboxProps) {
       aria-disabled={p.disabled || undefined}
       aria-invalid={p.invalid || undefined}
       aria-describedby={p.describedBy}
-      onClick={() => {
-        if (!p.disabled) p.onChange(p.checked !== true);
+      // Shift+نقر لا يظلّل النص بين المربعات
+      onMouseDown={(e) => {
+        if (e.shiftKey) e.preventDefault();
+      }}
+      onClick={(e) => {
+        if (!p.disabled) p.onChange(p.checked !== true, { shift: e.shiftKey });
       }}
     >
       <span className={s.box}>
