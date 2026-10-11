@@ -31,6 +31,7 @@ CLAUDE.md ← DECISIONS.md ← PROGRESS.md ← هذا الملف ← SPEC.md (v1
 6. **نماذج ناقصة قبل بنائها** (2–3 خيارات واعتماد): فهرس القيود، قفل الفترات، التدقيق، الإشعارات، التحميل والفراغ، والبحث داخل الكشف.
 
 ## صفحات مرجعية (Artifacts)
+- نموذج موضع «تعديل» في كشف المورد (بانتظار الاختيار): https://claude.ai/artifact/5MDY3dYSyxPTZDwAB2WmcP
 - نموذج شاشة قفل الفترات (اختير ب): https://claude.ai/artifact/5DzaZDQ5aKdGv3DnhatDxf
 - نموذج نافذة تعديل الحركة (اختير أ): https://claude.ai/artifact/Mfm4sagPcN1AfY4LypSSzf
 - نموذج بطاقة الإدخال السريع على الجوال (اختير ج): https://claude.ai/artifact/4wKpL3YreNN65WemWG7Dfd
