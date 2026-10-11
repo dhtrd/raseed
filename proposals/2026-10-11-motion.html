@@ -1,0 +1,262 @@
+<title>رصيد · الحركة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* نماذج الحركة: الشعار (تحميل، فتح التطبيق، مستمر)، الأيقونات (مرور وضغط)، وظهور الصفحات والعناصر. ألوان CHOSEN.md، نهاري كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9; --wash: #e3eaf4; --wash-2: #f5f8fb;
+  --mark-ink: #1e4634; --mark-acc: #b8752a; --brand-panel: #1e4634; --brand-on: #d7eae1; --brand-acc: #c9822b;
+  --shadow: 0 8px 22px rgb(27 42 68 / 18%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { direction: rtl; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.75; padding-inline: 16px; }
+.wrap { max-width: 1120px; margin-inline: auto; padding-block: 24px 64px; }
+h1 { margin: 0; font-size: 26px; line-height: 1.35; text-wrap: balance; }
+h2 { margin: 0; font-size: 20px; line-height: 1.4; }
+p { margin: 0; }
+.lead { color: var(--ink-2); max-width: 80ch; margin: 6px 0 14px; }
+.common { margin: 0 0 26px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 18px; }
+.chk { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; cursor: pointer; user-select: none; }
+.chk input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+section.area { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; margin-bottom: 26px; overflow: hidden; }
+.area-head { padding: 14px 18px 10px; border-bottom: 3px double var(--ink); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: end; }
+.area-head .why { color: var(--ink-2); font-size: 15px; max-width: 70ch; }
+.num { font-family: var(--f-brand); color: var(--mark-acc); margin-inline-end: 6px; }
+.opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.opt { padding: 14px 16px 16px; border-inline-start: 1px solid var(--rule); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.opt:first-child { border-inline-start: 0; }
+.opt h3 { margin: 0; font-size: 17px; }
+.opt .desc { font-size: 14.5px; color: var(--ink-2); }
+.opt .pc { font-size: 13.5px; color: var(--ink-2); margin: 0; padding-inline-start: 16px; }
+.opt .pc li.pro { color: var(--ink); }
+.stage { position: relative; height: 190px; border: 1px solid var(--rule); border-radius: 8px; background: var(--wash-2); overflow: hidden; display: grid; place-items: center; }
+.replay { align-self: flex-start; min-height: 38px; padding: 0 14px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: 700 14px var(--f-text); cursor: pointer; }
+.replay:hover { background: var(--wash); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (width <= 860px) {
+  .opts { grid-template-columns: 1fr; }
+  .opt { border-inline-start: 0; border-top: 1px solid var(--rule); }
+  .opt:first-child { border-top: 0; }
+}
+
+/* الشعار: شريطا «علامة التوازن» */
+.mark { width: 96px; height: 96px; overflow: visible; }
+.mark .top { fill: var(--mark-ink); }
+.mark .bot { fill: var(--mark-acc); }
+.mark rect { transform-box: fill-box; }
+
+/* ===== 1. التحميل ===== */
+.ruled { position: absolute; inset: 0; background: repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px); opacity: .55; }
+.ruled::before { content: ""; position: absolute; inset-block: 0; inset-inline-end: 22%; width: 1px; background: var(--margin); }
+.load-wrap { position: relative; display: grid; justify-items: center; gap: 6px; font-size: 14px; color: var(--ink-2); }
+.L-a .top { animation: la-top 1.6s var(--ease) infinite; }
+.L-a .bot { animation: la-bot 1.6s var(--ease) infinite; }
+@keyframes la-top { 0%,100% { transform: translateX(0); } 50% { transform: translateX(-16px); } }
+@keyframes la-bot { 0%,100% { transform: translateX(0); } 50% { transform: translateX(16px); } }
+.L-b .top { transform-origin: right center; animation: lb 1.8s var(--ease) infinite; }
+.L-b .bot { transform-origin: right center; animation: lb 1.8s var(--ease) .25s infinite; }
+@keyframes lb { 0% { transform: scaleX(0); } 45%,60% { transform: scaleX(1); } 100% { transform: scaleX(0); transform-origin: left center; } }
+.L-c .top { animation: lc 1.2s ease-in-out infinite; }
+.L-c .bot { animation: lc 1.2s ease-in-out .2s infinite; }
+@keyframes lc { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+/* ===== 2. فتح التطبيق ===== */
+.splash { position: absolute; inset: 0; display: grid; place-items: center; }
+.word { font-family: var(--f-brand); font-weight: 600; font-size: 30px; line-height: 1; color: var(--mark-ink); }
+.brandrow { display: flex; align-items: center; gap: 12px; }
+.brandrow .mark { width: 64px; height: 64px; }
+.app-ghost { position: absolute; inset: 0; padding: 14px; display: grid; grid-template-columns: 1fr 70px; gap: 10px; opacity: 0; }
+.app-ghost .main { display: grid; gap: 8px; align-content: start; }
+.app-ghost .main i, .app-ghost .side i { display: block; height: 10px; border-radius: 3px; background: var(--rule); }
+.app-ghost .side { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 8px; display: grid; gap: 8px; align-content: start; }
+/* أ: الشريطان ينزلقان من الجهتين ويتوازنان */
+.S-a.play .top { animation: sa-top .7s var(--ease) both; }
+.S-a.play .bot { animation: sa-bot .7s var(--ease) .08s both; }
+.S-a.play .word { animation: fade-in .4s ease .55s both; }
+.S-a.play .splash { animation: fade-out .3s ease 1.25s both; }
+.S-a.play .app-ghost { animation: fade-in .35s ease 1.3s both; }
+@keyframes sa-top { from { transform: translateX(-90px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes sa-bot { from { transform: translateX(90px); opacity: 0; } to { transform: none; opacity: 1; } }
+/* ب: اللوح الأخضر يرتفع ثم ينكمش إلى مكان الشعار في القائمة */
+.S-b .panel { position: absolute; inset: 0; background: var(--brand-panel); display: grid; place-items: center; }
+.S-b .panel .top { fill: var(--brand-on); } .S-b .panel .bot { fill: var(--brand-acc); }
+.S-b .panel .word { color: var(--brand-on); }
+.S-b.play .panel { animation: sb-panel 1.3s var(--ease) both; }
+.S-b.play .panel .brandrow { animation: fade-in .35s ease .1s both; }
+.S-b.play .app-ghost { animation: fade-in .3s ease .95s both; }
+@keyframes sb-panel { 0% { clip-path: inset(100% 0 0 0); } 35%,62% { clip-path: inset(0 0 0 0); } 100% { clip-path: inset(0 0 calc(100% - 46px) calc(100% - 70px) round 6px); } }
+/* ج: رسم الشريطين ثم خط الهامش */
+.S-c.play .top { transform-origin: right center; animation: draw .55s var(--ease) both; }
+.S-c.play .bot { transform-origin: right center; animation: draw .55s var(--ease) .18s both; }
+.S-c.play .word { animation: fade-in .35s ease .6s both; }
+.S-c .rule-line { position: absolute; bottom: 50px; height: 2px; width: 140px; background: var(--mark-acc); transform: scaleX(0); transform-origin: right; }
+.S-c.play .rule-line { animation: draw .5s var(--ease) .75s both; }
+.S-c.play .splash { animation: fade-out .3s ease 1.4s both; }
+.S-c.play .app-ghost { animation: fade-in .35s ease 1.45s both; }
+@keyframes draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-out { to { opacity: 0; visibility: hidden; } }
+
+/* ===== 3. الشعار المستمر في القائمة ===== */
+.navmock { width: 220px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 10px; display: grid; gap: 6px; }
+.navbrand { display: flex; align-items: center; gap: 8px; padding: 4px 6px 10px; border-bottom: 1px solid var(--rule); cursor: default; }
+.navbrand .mark { width: 30px; height: 30px; }
+.navbrand .word { font-size: 20px; }
+.navmock .item { display: flex; align-items: center; gap: 8px; height: 30px; padding-inline: 6px; font-size: 14px; color: var(--ink-2); border-radius: 5px; }
+.navmock .item svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.C-a .top { animation: ca-top 7s ease-in-out infinite; }
+.C-a .bot { animation: ca-bot 7s ease-in-out infinite; }
+@keyframes ca-top { 0%,86%,100% { transform: none; } 92% { transform: translateX(-6px); } }
+@keyframes ca-bot { 0%,86%,100% { transform: none; } 92% { transform: translateX(6px); } }
+.C-b .navbrand:hover .top { animation: la-top 1s var(--ease); }
+.C-b .navbrand:hover .bot { animation: la-bot 1s var(--ease); }
+.C-c .top { animation: cc 3.2s ease-in-out infinite; }
+.C-c .bot { animation: cc 3.2s ease-in-out 1.6s infinite; }
+@keyframes cc { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+.hint { font-size: 13px; color: var(--ink-2); position: absolute; bottom: 4px; inset-inline: 0; text-align: center; }
+.C-b .navmock { margin-top: -22px; }
+
+/* ===== 4. الأيقونات ===== */
+.iconrow { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.ib { width: 64px; height: 64px; border: 1.5px solid var(--rule); border-radius: 10px; background: var(--surface); color: var(--ink-2); display: grid; place-items: center; cursor: pointer; padding: 0; position: relative; }
+.ib svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ib span { position: absolute; bottom: -20px; font: 12.5px var(--f-text); color: var(--ink-2); white-space: nowrap; }
+.iconrow.pad { padding-bottom: 20px; }
+/* أ: رفع وتلوين */
+.I-a .ib { transition: transform .18s var(--ease), color .18s, border-color .18s, box-shadow .18s; }
+.I-a .ib:hover { transform: translateY(-3px); color: var(--accent); border-color: var(--accent); box-shadow: var(--shadow); }
+.I-a .ib:active { transform: translateY(0); box-shadow: none; transition-duration: .06s; }
+/* ب: رسم الخط من جديد */
+.I-b .ib:hover { color: var(--accent); border-color: var(--accent); }
+.I-b .ib:hover path { stroke-dasharray: 80; animation: redraw .6s var(--ease); }
+.I-b .ib:active { background: var(--wash); }
+@keyframes redraw { from { stroke-dashoffset: 80; } to { stroke-dashoffset: 0; } }
+/* ج: ضغطة نابضة */
+.I-c .ib { transition: color .15s, border-color .15s, background .15s; }
+.I-c .ib:hover { color: var(--accent); border-color: var(--accent); background: var(--wash-2); }
+.I-c .ib:hover svg { animation: nudge .35s var(--ease); }
+.I-c .ib:active { animation: press .28s var(--ease); }
+@keyframes nudge { 50% { transform: translateY(-2px) rotate(-4deg); } }
+@keyframes press { 0% { transform: scale(1); } 40% { transform: scale(.9); } 100% { transform: scale(1); } }
+
+/* ===== 5. ظهور الصفحات والعناصر ===== */
+.page { position: absolute; inset: 12px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 12px; display: grid; gap: 7px; align-content: start; }
+.page .ttl { height: 14px; width: 45%; background: var(--ink); border-radius: 3px; opacity: .85; }
+.page .row { height: 18px; border-bottom: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.page .row i { display: block; height: 8px; border-radius: 2px; background: var(--rule); }
+.page .row i:first-child { width: 40%; } .page .row i:last-child { width: 18%; background: var(--wash); outline: 1px solid var(--rule); }
+.page .tot { height: 4px; border-top: 3px double var(--ink); margin-top: 2px; }
+.P-a.play .page { animation: pa .35s var(--ease) both; }
+.P-a.play .page > * { animation: pa .3s var(--ease) both; animation-delay: calc(.1s + var(--i) * 35ms); }
+@keyframes pa { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.P-b.play .page { animation: fade-in .2s ease both; }
+.P-b.play .page > * { animation: ink .4s var(--ease) both; animation-delay: calc(.08s + var(--i) * 55ms); }
+@keyframes ink { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0 0 0 0); } }
+.P-c.play .page { animation: pc .38s var(--ease) both; }
+@keyframes pc { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
+.P-c.play .page > * { animation: none; }
+.P-c.play .page .tot { animation: draw .35s var(--ease) .3s both; transform-origin: right; }
+
+/* تقليل الحركة: من النظام أو من المربع أعلى الصفحة */
+@media (prefers-reduced-motion: reduce) { .stage *, .stage *::before { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+body.reduce .stage *, body.reduce .stage *::before { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+</style>
+
+<div class="wrap">
+  <h1>الحركة في «رصيد» — نماذج للاختيار</h1>
+  <p class="lead">خمسة مواضع، في كل منها ثلاثة خيارات بشعار «علامة التوازن» الحقيقي وألوان النظام. اضغط «إعادة» لتشغيل الحركة مرة أخرى، ومرّر الفأرة أو اضغط على الأيقونات.</p>
+  <div class="common">
+    <b>مشترك بين كل الخيارات:</b>
+    <ul>
+      <li>من يفعّل «تقليل الحركة» في جهازه لا يرى أي حركة (يظهر كل شيء ثابتاً فوراً). جرّبه من المربع تحت.</li>
+      <li>المدد قصيرة (0.2–0.7 ثانية للانتقالات) كي لا تبطئ العمل اليومي، وشاشة الفتح مرة واحدة في الجلسة لا عند كل تنقّل.</li>
+      <li>الحركة بـ transform وopacity فقط، فتبقى سلسة على الجوال.</li>
+    </ul>
+  </div>
+  <div class="toolbar"><label class="chk"><input type="checkbox" id="reduce"> محاكاة «تقليل الحركة»</label></div>
+
+  <section class="area" data-area="L">
+    <div class="area-head"><h2><span class="num">١</span>شعار التحميل</h2><p class="why">يظهر داخل صفحة الدفتر المسطّرة المعتمدة (الخيار ج) أثناء جلب البيانات.</p></div>
+    <div class="opts">
+      <div class="opt"><h3>أ. الكفّتان</h3><p class="desc">الشريطان يتباعدان ويعودان كميزان يبحث عن توازنه.</p><div class="stage L-a"><div class="ruled"></div><div class="load-wrap"><svg class="mark" viewBox="0 0 120 120"><rect class="top" x="30" y="36" width="76" height="16" rx="8"/><rect class="bot" x="14" y="68" width="76" height="16" rx="8"/></svg>جارٍ تحميل الكشف…</div></div><ul class="pc"><li class="pro">معنى «الرصيد» بوضوح</li><li>حركة أفقية أكثر من غيرها</li></ul></div>
+      <div class="opt"><h3>ب. القلم</h3><p class="desc">الشريطان يُرسمان من اليمين كسطرين يُكتبان ثم يُمحيان.</p><div class="stage L-b"><div class="ruled"></div><div class="load-wrap"><svg class="mark" viewBox="0 0 120 120"><rect class="top" x="30" y="36" width="76" height="16" rx="8"/><rect class="bot" x="14" y="68" width="76" height="16" rx="8"/></svg>جارٍ تحميل الكشف…</div></div><ul class="pc"><li class="pro">يناسب فكرة الدفتر المكتوب</li><li>الشعار لا يكتمل إلا لحظات</li></ul></div>
+      <div class="opt"><h3>ج. النبض (الحالي)</h3><p class="desc">ما بُني فعلاً: الشريطان يخفتان ويعودان بالتناوب.</p><div class="stage L-c"><div class="ruled"></div><div class="load-wrap"><svg class="mark" viewBox="0 0 120 120"><rect class="top" x="30" y="36" width="76" height="16" rx="8"/><rect class="bot" x="14" y="68" width="76" height="16" rx="8"/></svg>جارٍ تحميل الكشف…</div></div><ul class="pc"><li class="pro">الأهدأ، ولا تغيير مطلوب</li><li>الأقل تميّزاً</li></ul></div>
+    </div>
+  </section>
+
+  <section class="area" data-area="S">
+    <div class="area-head"><h2><span class="num">٢</span>فتح التطبيق</h2><p class="why">مرة واحدة عند فتح «رصيد» أو بعد الدخول، ثم تظهر الشاشة الرئيسية (المستطيلات الرمادية تمثّلها).</p></div>
+    <div class="opts">
+      <div class="opt"><h3>أ. التوازن</h3><p class="desc">الشريطان يدخلان من الجهتين ويستقران متوازنين، ثم الاسم، ثم الشاشة. نحو 1.3 ثانية.</p><div class="stage S-a"><div class="app-ghost"><div class="main"><i style="width:50%"></i><i></i><i></i><i style="width:70%"></i></div><div class="side"><i></i><i></i><i></i></div></div><div class="splash"><div class="brandrow"><svg class="mark" viewBox="0 0 120 120"><rect class="top" x="30" y="36" width="76" height="16" rx="8"/><rect class="bot" x="14" y="68" width="76" height="16" rx="8"/></svg><span class="word">رصيد</span></div></div></div><button class="replay" type="button">إعادة ↺</button></div>
+      <div class="opt"><h3>ب. اللوح الأخضر</h3><p class="desc">لوح «نخلة وتمر» يرتفع بالشعار، ثم ينكمش إلى مكانه في القائمة الجانبية. نحو 1.3 ثانية.</p><div class="stage S-b"><div class="app-ghost"><div class="main"><i style="width:50%"></i><i></i><i></i><i style="width:70%"></i></div><div class="side"><i></i><i></i><i></i></div></div><div class="panel"><div class="brandrow"><svg class="mark" viewBox="0 0 120 120"><rect class="top" x="30" y="36" width="76" height="16" rx="8"/><rect class="bot" x="14" y="68" width="76" height="16" rx="8"/></svg><span class="word">رصيد</span></div></div></div><button class="replay" type="button">إعادة ↺</button></div>
+      <div class="opt"><h3>ج. التوقيع</h3><p class="desc">الشريطان يُرسمان، ثم الاسم، ثم خط كهرماني تحته كتوقيع. نحو 1.4 ثانية.</p><div class="stage S-c"><div class="app-ghost"><div class="main"><i style="width:50%"></i><i></i><i></i><i style="width:70%"></i></div><div class="side"><i></i><i></i><i></i></div></div><div class="splash"><div class="brandrow"><svg class="mark" viewBox="0 0 120 120"><rect class="top" x="30" y="36" width="76" height="16" rx="8"/><rect class="bot" x="14" y="68" width="76" height="16" rx="8"/></svg><span class="word">رصيد</span></div><span class="rule-line"></span></div></div><button class="replay" type="button">إعادة ↺</button></div>
+    </div>
+  </section>
+
+  <section class="area" data-area="C">
+    <div class="area-head"><h2><span class="num">٣</span>الشعار المتحرك المستمر</h2><p class="why">الشعار في رأس القائمة الجانبية (ورأس الجوال) أثناء العمل.</p></div>
+    <div class="opts">
+      <div class="opt"><h3>أ. لمحة كل 7 ثوانٍ</h3><p class="desc">ثابت معظم الوقت، ثم يتحرك الشريطان حركة توازن خفيفة لحظة واحدة.</p><div class="stage C-a"><div class="navmock"><div class="navbrand"><svg class="mark" viewBox="0 0 120 120"><rect class="top" x="30" y="36" width="76" height="16" rx="8"/><rect class="bot" x="14" y="68" width="76" height="16" rx="8"/></svg><span class="word">رصيد</span></div><div class="item"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"/></svg>الأرصدة</div><div class="item"><svg viewBox="0 0 24 24"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h3"/></svg>كشف الحساب</div></div></div><ul class="pc"><li class="pro">حيّ دون أن يشتت</li><li>انتظر 7 ثوانٍ لتراه</li></ul></div>
+      <div class="opt"><h3>ب. عند المرور فقط</h3><p class="desc">ثابت دائماً، ويتحرك حين تمرر الفأرة عليه.</p><div class="stage C-b"><div class="navmock"><div class="navbrand"><svg class="mark" viewBox="0 0 120 120"><rect class="top" x="30" y="36" width="76" height="16" rx="8"/><rect class="bot" x="14" y="68" width="76" height="16" rx="8"/></svg><span class="word">رصيد</span></div><div class="item"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"/></svg>الأرصدة</div><div class="item"><svg viewBox="0 0 24 24"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h3"/></svg>كشف الحساب</div></div><span class="hint">مرّر الفأرة على الشعار</span></div><ul class="pc"><li class="pro">صفر تشتيت أثناء العمل</li><li>لا يُرى على الجوال (لا مرور)</li></ul></div>
+      <div class="opt"><h3>ج. تنفّس مستمر</h3><p class="desc">الشريطان يخفتان ببطء شديد بالتناوب، دون توقف.</p><div class="stage C-c"><div class="navmock"><div class="navbrand"><svg class="mark" viewBox="0 0 120 120"><rect class="top" x="30" y="36" width="76" height="16" rx="8"/><rect class="bot" x="14" y="68" width="76" height="16" rx="8"/></svg><span class="word">رصيد</span></div><div class="item"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"/></svg>الأرصدة</div><div class="item"><svg viewBox="0 0 24 24"><path d="M6 3h12v18H6zM9 8h6M9 12h6M9 16h3"/></svg>كشف الحساب</div></div></div><ul class="pc"><li class="pro">مستمر كما طلبت</li><li>قد يلفت العين أثناء مراجعة الأرقام</li></ul></div>
+    </div>
+  </section>
+
+  <section class="area" data-area="I">
+    <div class="area-head"><h2><span class="num">٤</span>الأيقونات عند المرور والضغط</h2><p class="why">أيقونات القائمة والأزرار. مرّر الفأرة، ثم اضغط مطوّلاً لترى حالة الضغط.</p></div>
+    <div class="opts">
+      <div class="opt"><h3>أ. رفع وتلوين</h3><p class="desc">ترتفع قليلاً بظل وتأخذ لون النظام، وتهبط عند الضغط.</p><div class="stage I-a"><div class="iconrow pad"><button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"/></svg><span>الأرصدة</span></button><button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg><span>الفواتير</span></button><button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>إضافة</span></button></div></div><ul class="pc"><li class="pro">مألوف وواضح</li><li>الأقل خصوصية بالهوية</li></ul></div>
+      <div class="opt"><h3>ب. رسم الخط</h3><p class="desc">خطوط الأيقونة تُعاد رسماً كالقلم عند المرور.</p><div class="stage I-b"><div class="iconrow pad"><button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"/></svg><span>الأرصدة</span></button><button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg><span>الفواتير</span></button><button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>إضافة</span></button></div></div><ul class="pc"><li class="pro">يربط الأيقونات بفكرة الدفتر</li><li>أبطأ قليلاً للعين</li></ul></div>
+      <div class="opt"><h3>ج. ميلان وضغطة</h3><p class="desc">تميل الأيقونة قليلاً عند المرور، وتنضغط وترتد عند النقر.</p><div class="stage I-c"><div class="iconrow pad"><button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"/></svg><span>الأرصدة</span></button><button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg><span>الفواتير</span></button><button class="ib" type="button"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>إضافة</span></button></div></div><ul class="pc"><li class="pro">إحساس لمسي واضح على الجوال</li><li>الأكثر «حيوية»</li></ul></div>
+    </div>
+  </section>
+
+  <section class="area" data-area="P">
+    <div class="area-head"><h2><span class="num">٥</span>ظهور الصفحات والعناصر</h2><p class="why">عند الانتقال بين الصفحات، وعند وصول صفوف الجدول.</p></div>
+    <div class="opts">
+      <div class="opt"><h3>أ. صعود متتابع</h3><p class="desc">الصفحة تظهر بتلاشٍ وصعود خفيف، والصفوف تتبعها واحداً بعد الآخر.</p><div class="stage P-a"><div class="page"></div></div><button class="replay" type="button">إعادة ↺</button></div>
+      <div class="opt"><h3>ب. الحبر</h3><p class="desc">كل سطر يُكشف من اليمين لليسار كأنه يُكتب في الدفتر.</p><div class="stage P-b"><div class="page"></div></div><button class="replay" type="button">إعادة ↺</button></div>
+      <div class="opt"><h3>ج. انزلاق الصفحة</h3><p class="desc">الصفحة كاملة تنزلق من جهة التنقل، ثم يُرسم خط الإجمالي المزدوج.</p><div class="stage P-c"><div class="page"></div></div><button class="replay" type="button">إعادة ↺</button></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  // صفحة وهمية للقسم الخامس
+  document.querySelectorAll(".page").forEach((p) => {
+    let html = '<div class="ttl" style="--i:0"></div>';
+    for (let i = 1; i <= 6; i++) html += `<div class="row" style="--i:${i}"><i></i><i></i></div>`;
+    html += '<div class="tot" style="--i:7"></div>';
+    p.innerHTML = html;
+  });
+  const replay = (stage) => {
+    stage.classList.remove("play");
+    void stage.offsetWidth;
+    stage.classList.add("play");
+  };
+  document.querySelectorAll(".replay").forEach((b) => {
+    const stage = b.parentElement.querySelector(".stage");
+    b.addEventListener("click", () => replay(stage));
+  });
+  // تشغيل أول عند ظهور القسم
+  const io = "IntersectionObserver" in window
+    ? new IntersectionObserver((es) => es.forEach((e) => {
+        if (e.isIntersecting) { e.target.querySelectorAll(".stage").forEach((s) => s.matches(".S-a,.S-b,.S-c,.P-a,.P-b,.P-c") && replay(s)); io.unobserve(e.target); }
+      }), { threshold: .3 })
+    : null;
+  document.querySelectorAll('[data-area="S"],[data-area="P"]').forEach((a) => io ? io.observe(a) : a.querySelectorAll(".stage").forEach(replay));
+  const r = document.getElementById("reduce");
+  r.addEventListener("change", () => document.body.classList.toggle("reduce", r.checked));
+})();
+</script>
