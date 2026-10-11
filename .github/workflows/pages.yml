@@ -1,0 +1,56 @@
+name: Deploy Pages
+
+# ينشر الواجهة على GitHub Pages بعد الدمج في main (CI يشترط الأخضر قبل الدمج).
+# إعدادات تطبيق الويب من أسرار المستودع VITE_FIREBASE_* (ليست أسراراً حقيقية، لكنها خارج git).
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["**.md", "proposals/**", "rased-mockups/**", "reports/**", "docs/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: Build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+        run: |
+          # لا نشر بإعدادات ناقصة: تظهر للمستخدم شاشة «إعدادات Firebase ناقصة» بدل النظام
+          for v in VITE_FIREBASE_API_KEY VITE_FIREBASE_AUTH_DOMAIN VITE_FIREBASE_PROJECT_ID VITE_FIREBASE_APP_ID VITE_FIREBASE_MESSAGING_SENDER_ID; do
+            if [ -z "${!v}" ]; then echo "::error::السر $v غير موجود في إعدادات المستودع."; exit 1; fi
+          done
+          if [ "$VITE_FIREBASE_PROJECT_ID" != "raseed-dhtrd" ]; then echo "::error::VITE_FIREBASE_PROJECT_ID ليس raseed-dhtrd."; exit 1; fi
+          npm run build
+      - uses: actions/upload-pages-artifact@v3 # TODO: تثبيت بالبصمة (SHA)
+        with: { path: dist }
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4 # TODO: تثبيت بالبصمة (SHA)

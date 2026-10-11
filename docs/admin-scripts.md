@@ -11,7 +11,18 @@
    - Keys ← Add key ← JSON. احفظ الملف **خارج مجلد المستودع** (المستودع عام)، مثلاً `~/keys/raseed-owner.json`.
    - احذف المفتاح من Console إن لم تعد تحتاجه، وأنشئ غيره عند الحاجة.
 
-## إنشاء حساب المالك (مرة واحدة قبل أول دخول)
+## بديل بلا مفتاح: إنشاء المالك من Firebase Console
+1. Authentication ← Users ← **Add user**: البريد وكلمة مرور قوية (12 حرفاً والأنواع الأربعة، وإلا رفضها Firebase عند الدخول). انسخ **User UID**.
+2. Firestore ← **Start collection** `users` (أو افتحها) ← **Add document** ومعرّفه = الـ UID نفسه، بالحقول:
+   - `displayName` (string): الاسم الظاهر · `login` (string): البريد نفسه
+   - `role` (string): `owner` · `active` (boolean): `true` · `mustChangePassword` (boolean): `false`
+   - `assigned` (array): فارغة · `auditId` (string): `console`
+   - `createdAt` و`updatedAt` (timestamp): الآن
+3. ادخل من صفحة «رصيد» بالبريد وكلمة المرور.
+
+الكونسول يتجاوز القواعد، فاكتب القيم حرفياً كما هنا. المفتاح يبقى لازماً فقط لإعادة كلمة مرور أصحاب أسماء المستخدمين (بلا بريد).
+
+## إنشاء حساب المالك بالسكربت (مرة واحدة قبل أول دخول)
 ```
 RASEED_PROJECT_ID=raseed-dhtrd GOOGLE_APPLICATION_CREDENTIALS=~/keys/raseed-owner.json npm run admin:create-owner
 ```
