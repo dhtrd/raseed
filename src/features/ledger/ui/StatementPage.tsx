@@ -8,6 +8,7 @@ import { SupplierCombobox } from "../../../shared/fields/components/SupplierComb
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
+import { useToast } from "../../../shared/ui/Toast";
 import { Icon, RIYAL_PATH } from "../../../shared/ui/Icon";
 import { useProfile } from "../../auth/session/SessionProvider";
 import { SupplierDialog, type SupplierAction } from "../../suppliers/ui/SupplierDialog";
@@ -66,7 +67,9 @@ export function StatementPage() {
   // التعديل من الكشف (DECISIONS 2026-10-11، الخيار ب): للمالك والإدارة فقط، والقواعد تفرض ذلك
   const canEdit = isManager(profile.role);
   const [editing, setEditing] = useState<EditTarget | null>(null);
-  const [saved, setSaved] = useState<string | null>(null);
+  // نتائج الحفظ إشعار عائم (DECISIONS 2026-10-11، الخيار ج)
+  const toast = useToast();
+  const setSaved = (text: string) => toast({ tone: "ok", text });
   const canDelete = profile.role === "owner";
   const [deleting, setDeleting] = useState<DeleteTarget | null>(null);
   // إدارة الموردين (DECISIONS 2026-10-11، الخيار ب): المالك والإدارة
@@ -299,11 +302,6 @@ export function StatementPage() {
             </Banner>
           </div>
         ) : null}
-        {saved ? (
-          <div className={s.err}>
-            <Banner tone="ok">{saved}</Banner>
-          </div>
-        ) : null}
 
         <p className={l.status} role="status" aria-live="polite">
           {loading ? "جارٍ تحميل الكشف…" : ""}
@@ -398,7 +396,6 @@ export function StatementPage() {
                       onRestore={
                         canDelete && r.deleted
                           ? () => {
-                              setSaved(null);
                               setDeleting({
                                 mode: "restore",
                                 entry: r,
@@ -411,7 +408,6 @@ export function StatementPage() {
                       onEdit={
                         canEdit
                           ? () => {
-                              setSaved(null);
                               setEditing({
                                 entry: r,
                                 supplierName: supplier.name,

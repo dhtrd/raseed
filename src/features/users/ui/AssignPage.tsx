@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useBlocker, useParams } from "react-router";
 import { Checkbox, SearchField } from "../../../shared/fields";
 import { Banner } from "../../../shared/ui/Banner";
+import { useToast } from "../../../shared/ui/Toast";
 import { Button } from "../../../shared/ui/Button";
 import { Dialog, dialogStyles as d } from "../../../shared/ui/Dialog";
 import { useProfile } from "../../auth/session/SessionProvider";
@@ -26,6 +27,8 @@ export function AssignPage() {
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ tone: "ok" | "err"; text: string } | null>(null);
+  // النجاح إشعار عائم، والخطأ يبقى بجانب النموذج (DECISIONS 2026-10-11)
+  const toast = useToast();
 
   const entries = useMemo(
     () => (users.status === "ready" ? users.data.filter((u) => u.role === "entry") : []),
@@ -78,7 +81,7 @@ export function AssignPage() {
     try {
       await saveAssignments(pending, viewer.uid);
       setDrafts(new Map());
-      setMsg({ tone: "ok", text: "حُفظ الإسناد في عملية واحدة مع سجل تدقيق لكل مستخدم تغيّر." });
+      toast({ tone: "ok", text: "حُفظ الإسناد في عملية واحدة مع سجل تدقيق لكل مستخدم تغيّر." });
     } catch (e) {
       console.error(e);
       setMsg({ tone: "err", text: errorText(e) });

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Segment } from "../../../shared/fields";
 import { Banner } from "../../../shared/ui/Banner";
+import { useToast } from "../../../shared/ui/Toast";
 import { Button } from "../../../shared/ui/Button";
 import { Dialog, dialogStyles as d } from "../../../shared/ui/Dialog";
 import { Switch } from "../../../shared/ui/Switch";
@@ -24,6 +25,8 @@ export function UserPane({ target }: { target: UserProfile }) {
   const names = useRoleNames();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ tone: "ok" | "err"; text: string } | null>(null);
+  // النجاح إشعار عائم، والخطأ يبقى بجانب النموذج (DECISIONS 2026-10-11)
+  const toast = useToast();
   const [ask, setAsk] = useState<Ask>(null);
 
   const editable = canEditUser(viewer, target);
@@ -35,7 +38,7 @@ export function UserPane({ target }: { target: UserProfile }) {
     setMsg(null);
     try {
       await fn();
-      setMsg({ tone: "ok", text: ok });
+      toast({ tone: "ok", text: ok });
     } catch (e) {
       console.error(e);
       setMsg({ tone: "err", text: errorText(e) });
@@ -172,7 +175,7 @@ export function UserPane({ target }: { target: UserProfile }) {
               if (!e.ok) return setMsg({ tone: "err", text: e.error });
               setBusy(true);
               sendResetLinkTo(e.email)
-                .then(() => setMsg({ tone: "ok", text: "أُرسل الرابط إلى بريده." }))
+                .then(() => toast({ tone: "ok", text: "أُرسل الرابط إلى بريده." }))
                 .catch((x: unknown) => setMsg({ tone: "err", text: authErrorMessage(x) }))
                 .finally(() => setBusy(false));
             }}

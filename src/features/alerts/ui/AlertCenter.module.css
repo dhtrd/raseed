@@ -1,0 +1,162 @@
+/* مركز الإشعارات (الخيار ج، proposals/2026-10-11-notifications.html): جرس في الرأس ولوحة */
+.bell {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--touch);
+  block-size: var(--touch);
+  padding: 0;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.bell:hover,
+.bell:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ic {
+  inline-size: 20px;
+  block-size: 20px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.badge {
+  position: absolute;
+  inset-block-start: -7px;
+  inset-inline-start: -7px;
+  display: grid;
+  place-items: center;
+  min-inline-size: 20px;
+  block-size: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--neg);
+  color: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: start end;
+  padding: 64px 16px 16px;
+  background: var(--scrim);
+}
+
+.modal {
+  inline-size: min(100%, 400px);
+  max-block-size: calc(100dvh - 96px);
+  overflow: auto;
+  background: var(--surface);
+  border-block-start: 3px solid var(--accent);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+}
+
+.dialog {
+  outline: none;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-block-end: 1px solid var(--rule);
+}
+
+.title {
+  margin: 0;
+  font-size: 17px;
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 40px;
+  padding: 0 12px;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  gap: 2px;
+  padding: 10px 14px;
+  border-block-end: 1px solid var(--rule);
+  border-inline-start: 4px solid var(--accent);
+  font-size: 15px;
+}
+
+.err {
+  border-inline-start-color: var(--neg);
+}
+
+.warn {
+  border-inline-start-color: var(--mark-acc);
+}
+
+.go {
+  justify-self: start;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.empty {
+  margin: 0;
+  padding: 18px 14px;
+  color: var(--ink-2);
+}
+
+p.err {
+  margin: 0;
+  padding: 10px 14px;
+  border: 0;
+  color: var(--neg);
+  font-weight: 700;
+}
+
+@media (width <= 600px) {
+  .overlay {
+    padding: 0;
+  }
+
+  .modal {
+    inline-size: 100%;
+    block-size: 100dvh;
+    max-block-size: none;
+    border-radius: 0;
+  }
+
+  .dialog {
+    min-block-size: 100%;
+  }
+
+  .head {
+    padding-block-start: calc(10px + env(safe-area-inset-top, 0px));
+  }
+}

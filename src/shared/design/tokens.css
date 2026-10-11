@@ -12,6 +12,9 @@
   --wash: #e3eaf4;
   --wash-2: #f5f8fb;
   --neg-wash: #f8e8e9;
+
+  /* النجاح في الإشعارات (DECISIONS 2026-10-11) */
+  --ok: #2f6b45;
   --tab: #e2e8ee;
   --mark-ink: #1e4634;
   --mark-acc: #b8752a;
@@ -52,6 +55,7 @@
     --wash: #243452;
     --wash-2: #202b3b;
     --neg-wash: #3a2530;
+    --ok: #7cc79a;
     --tab: #18202c;
     --mark-ink: #d7eae1;
     --mark-acc: #c9822b;
@@ -75,6 +79,7 @@
   --wash: #243452;
   --wash-2: #202b3b;
   --neg-wash: #3a2530;
+  --ok: #7cc79a;
   --tab: #18202c;
   --mark-ink: #d7eae1;
   --mark-acc: #c9822b;

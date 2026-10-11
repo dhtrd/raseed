@@ -982,3 +982,15 @@ describe("تعديل الحركة: نقلها بين فهارس الأرقام (
     await assertFails(move("owner"));
   });
 });
+
+describe("حالة النسخ الاحتياطي (DECISIONS 2026-10-11)", () => {
+  it("يقرؤها المالك والإدارة فقط، ولا يكتبها أحد من التطبيق", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(asDb(ctx.firestore()), "settings/backup"), { lastStatus: "ok" });
+    });
+    await assertSucceeds(getDoc(doc(as("owner"), "settings/backup")));
+    await assertSucceeds(getDoc(doc(as("admin"), "settings/backup")));
+    await assertFails(getDoc(doc(as("entry"), "settings/backup")));
+    await assertFails(setDoc(doc(as("owner"), "settings/backup"), { lastStatus: "ok" }));
+  });
+});
