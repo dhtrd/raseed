@@ -1,0 +1,80 @@
+/* حالتا التحميل والفراغ (الخيار ج، proposals/2026-10-11-loading-empty.html): صفحة دفتر مسطّرة */
+.ledger {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-block-size: 260px;
+  padding: 24px 16px;
+  border-block-start: 3px double var(--ink);
+  background: repeating-linear-gradient(to bottom, transparent 0 43px, var(--rule) 43px 44px);
+}
+
+/* هامش الدفتر الأحمر */
+.ledger::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 22%;
+  border-inline-start: 1px solid var(--margin);
+}
+
+.empty {
+  background: repeating-linear-gradient(to bottom, var(--surface) 0 43px, var(--wash-2) 43px 44px);
+}
+
+.center {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-inline-size: 46ch;
+  padding: 12px 18px;
+  text-align: center;
+  color: var(--ink-2);
+  font-size: 15.5px;
+  background: var(--surface);
+  border-radius: var(--r-md);
+}
+
+.mark {
+  inline-size: 52px;
+  block-size: 52px;
+}
+
+.mark rect {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.mark rect:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  color: var(--ink);
+}
+
+.text {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-block-start: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark rect {
+    animation: none;
+  }
+}

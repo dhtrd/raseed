@@ -55,6 +55,16 @@ test("المالك: كل القيود، والوسم، والمورد، والت
   await expect(page.getByRole("dialog", { name: "تعديل الحركة" })).toContainText("المورد (ب)");
   await page.getByRole("dialog", { name: "تعديل الحركة" }).getByRole("button", { name: "إلغاء" }).click();
 
+  // الفراغ (الخيار ج): السبب وزر يعيد الفلتر
+  await page.goto("/journals/s1");
+  await page.getByRole("radio", { name: "استرداد", exact: true }).click();
+  const empty = page.getByRole("status").filter({ hasText: "لا قيود بهذا الفلتر" });
+  await expect(empty).toBeVisible();
+  await expect(page.locator("main table")).toHaveCount(0);
+  await page.screenshot({ path: "test-results/empty-1440.png" });
+  await empty.getByRole("button", { name: "عرض كل القيود" }).click();
+  await expect(rows(page)).toHaveCount(2);
+
   await page.goto("/journals/s2");
   await page.getByRole("radio", { name: "كل الفترات" }).click();
   await expect(rows(page)).toHaveCount(2);

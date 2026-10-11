@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { Banner } from "../../../shared/ui/Banner";
+import { LoadingLedger } from "../../../shared/ui/LedgerState";
 import { Button } from "../../../shared/ui/Button";
 import { useProfile } from "../../auth/session/SessionProvider";
 import type { UserProfile } from "../core/users";
@@ -21,7 +22,12 @@ export function UsersPage() {
   const navigate = useNavigate();
   const [adding, setAdding] = useState(false);
 
-  if (users.status === "loading") return <p className={s.state}>جارٍ تحميل المستخدمين…</p>;
+  if (users.status === "loading")
+    return (
+      <div className={s.state}>
+        <LoadingLedger label="جارٍ تحميل المستخدمين…" />
+      </div>
+    );
   if (users.status === "error")
     return (
       <div className={s.state}>

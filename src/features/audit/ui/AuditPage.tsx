@@ -5,6 +5,7 @@ import { Segment } from "../../../shared/fields/components/Segment";
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
+import { EmptyLedger, LoadingLedger } from "../../../shared/ui/LedgerState";
 import { useProfile } from "../../auth/session/SessionProvider";
 import { riyadhStamp, safeFileName } from "../../ledger/core/exportModel";
 import { currentQuarter } from "../../ledger/core/ledger";
@@ -220,9 +221,7 @@ export function AuditPage() {
           </div>
         </div>
 
-        <p className={l.status} role="status" aria-live="polite">
-          {first.status === "loading" ? "جارٍ تحميل السجل…" : ""}
-        </p>
+        {first.status === "loading" ? <LoadingLedger label="جارٍ تحميل السجل…" /> : null}
         {first.status === "error" ? <Banner tone="err">{first.message}</Banner> : null}
         {users.status === "error" ? <Banner tone="err">{users.message}</Banner> : null}
 
@@ -249,7 +248,27 @@ export function AuditPage() {
               ))}
             </ol>
           ) : (
-            <p className={s.empty}>لا سجلات بهذا الفلتر.</p>
+            <EmptyLedger
+              title="لا سجلات بهذا الفلتر"
+              actions={
+                actor !== null || kind !== "all" || scope !== "latest" ? (
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setActor(null);
+                      setKind("all");
+                      setScope("latest");
+                    }}
+                  >
+                    عرض أحدث السجلات
+                  </Button>
+                ) : null
+              }
+            >
+              {actor !== null || kind !== "all" || scope !== "latest"
+                ? "غيّر المستخدم أو النوع أو الفترة، أو اعرض الأحدث من الجميع."
+                : "لم تُسجَّل أي عملية بعد. كل إضافة أو تعديل أو حذف يظهر هنا."}
+            </EmptyLedger>
           )
         ) : null}
         {moreError ? <Banner tone="err">{moreError}</Banner> : null}

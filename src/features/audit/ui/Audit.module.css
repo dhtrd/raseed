@@ -155,13 +155,6 @@
   text-decoration: none;
 }
 
-.empty {
-  padding: 18px;
-  text-align: center;
-  color: var(--ink-2);
-  border: 1px dashed var(--rule);
-}
-
 .more {
   margin-block-start: 14px;
 }

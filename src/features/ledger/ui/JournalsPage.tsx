@@ -5,6 +5,7 @@ import { Segment } from "../../../shared/fields/components/Segment";
 import { SupplierCombobox } from "../../../shared/fields/components/SupplierCombobox";
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
 import { Banner } from "../../../shared/ui/Banner";
+import { EmptyLedger, LoadingLedger } from "../../../shared/ui/LedgerState";
 import { Button } from "../../../shared/ui/Button";
 import { useToast } from "../../../shared/ui/Toast";
 import { Icon, RIYAL_PATH } from "../../../shared/ui/Icon";
@@ -134,7 +135,6 @@ export function JournalsPage() {
   const error =
     suppliers.status === "error" ? suppliers.message : journals.status === "error" ? journals.message : null;
   const loading = !error && journals.status === "loading";
-  const cols = manager ? 7 : 6;
 
   return (
     <div className={`${l.sheet} ${idx.collapsed ? l.collapsed : ""}`}>
@@ -232,16 +232,36 @@ export function JournalsPage() {
           />
         </div>
 
-        <p className={l.status} role="status" aria-live="polite">
-          {loading ? "جارٍ تحميل القيود…" : ""}
-        </p>
+        {loading ? <LoadingLedger label="جارٍ تحميل القيود…" /> : null}
         {error ? <Banner tone="err">{error}</Banner> : null}
         {exportError ? <Banner tone="err">{exportError}</Banner> : null}
         {sid && suppliers.status === "ready" && !supplier ? (
           <Banner tone="err">هذا المورد غير موجود أو غير مسند إليك.</Banner>
         ) : null}
 
-        {journals.status === "ready" ? (
+        {journals.status === "ready" && rows.length === 0 ? (
+          <EmptyLedger
+            title="لا قيود بهذا الفلتر"
+            actions={
+              scope === "period" || tag !== "all" ? (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setScope("all");
+                    setTag("all");
+                  }}
+                >
+                  عرض كل القيود
+                </Button>
+              ) : null
+            }
+          >
+            {scope === "period" || tag !== "all"
+              ? "جرّب فترة أوسع أو نوعاً آخر، أو اعرض الكل."
+              : "لم يُسجَّل أي قيد بعد. القيود تُضاف من «إضافة حركة»."}
+          </EmptyLedger>
+        ) : null}
+        {journals.status === "ready" && rows.length > 0 ? (
           <>
             <MobileSort
               sort={sort}
@@ -284,11 +304,6 @@ export function JournalsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.length === 0 ? (
-                    <tr className={l.more}>
-                      <td colSpan={cols}>لا قيود بهذا الفلتر.</td>
-                    </tr>
-                  ) : null}
                   {rows.map((r) => (
                     <tr key={r.id} className={`${s.row} ${manager ? s.withEdit : ""}`} data-entry={r.id}>
                       <th scope="row" className={s.cDate}>

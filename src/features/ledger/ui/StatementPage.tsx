@@ -8,6 +8,7 @@ import { SupplierCombobox } from "../../../shared/fields/components/SupplierComb
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
+import { EmptyLedger, LoadingLedger } from "../../../shared/ui/LedgerState";
 import { useToast } from "../../../shared/ui/Toast";
 import { Icon, RIYAL_PATH } from "../../../shared/ui/Icon";
 import { useProfile } from "../../auth/session/SessionProvider";
@@ -303,9 +304,7 @@ export function StatementPage() {
           </div>
         ) : null}
 
-        <p className={l.status} role="status" aria-live="polite">
-          {loading ? "جارٍ تحميل الكشف…" : ""}
-        </p>
+        {loading ? <LoadingLedger label="جارٍ تحميل الكشف…" /> : null}
         {error ? (
           <div className={s.err}>
             <Banner tone="err">{error}</Banner>
@@ -318,14 +317,43 @@ export function StatementPage() {
           <Banner tone="err">هذا المورد غير موجود أو غير مسند إليك. اختر مورداً من القائمة.</Banner>
         ) : null}
 
-        {st && supplier ? (
+        {st && supplier && range ? (
+          <p className={s.opening}>
+            الرصيد الافتتاحي قبل <span className="num">{formatDate(range.from)}</span>:{" "}
+            <Amount h={st.opening} />
+          </p>
+        ) : null}
+        {st && supplier && rows.length === 0 ? (
+          range ? (
+            <EmptyLedger
+              title="لا حركات في هذه الفترة"
+              actions={
+                <Button size="sm" onClick={() => setScope("all")}>
+                  عرض كل الحركات
+                </Button>
+              }
+            >
+              غيّر الفترة، أو اعرض كل حركات {supplier.name}.
+            </EmptyLedger>
+          ) : canEdit && deletedList.length > 0 && !showDeleted ? (
+            <EmptyLedger title="كل حركات هذا المورد محذوفة">
+              فعّل «إظهار المحذوف» لرؤيتها واسترجاعها؛ المحذوف لا يدخل في الرصيد.
+            </EmptyLedger>
+          ) : (
+            <EmptyLedger
+              title="لا حركات لهذا المورد بعد"
+              actions={
+                <Link className={l.linkBtn} to={`/add/${supplier.id}`}>
+                  إضافة حركة
+                </Link>
+              }
+            >
+              أول فاتورة أو قيد أو ملاحظة تضيفها لـ{supplier.name} تظهر هنا برصيدها الجاري.
+            </EmptyLedger>
+          )
+        ) : null}
+        {st && supplier && rows.length > 0 ? (
           <>
-            {range ? (
-              <p className={s.opening}>
-                الرصيد الافتتاحي قبل <span className="num">{formatDate(range.from)}</span>:{" "}
-                <Amount h={st.opening} />
-              </p>
-            ) : null}
             <MobileSort
               sort={sort}
               onSort={setSort}
@@ -380,13 +408,6 @@ export function StatementPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.length === 0 ? (
-                    <tr className={l.more}>
-                      <td colSpan={cols}>
-                        {range ? "لا حركات في هذه الفترة." : "لا حركات لهذا المورد بعد."}
-                      </td>
-                    </tr>
-                  ) : null}
                   {rows.map((r) => (
                     <EntryRow
                       key={r.id}
