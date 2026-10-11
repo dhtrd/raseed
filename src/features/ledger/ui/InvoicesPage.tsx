@@ -26,7 +26,7 @@ import {
 import { currentQuarter, kindLabel, type LedgerEntry } from "../core/ledger";
 import { sortRows, type SortState } from "../core/sort";
 import { setOdooStatus, watchInvoices, watchLockedThrough, type OdooChange } from "../data/invoicesRepo";
-import { downloadNotEnteredXlsx } from "../export/invoicesXlsx";
+import { downloadInvoicesXlsx, downloadNotEnteredXlsx } from "../export/invoicesXlsx";
 import { LockExceptionDialog, type LockException } from "./LockExceptionDialog";
 import { Amount, HeadSar, Money } from "./Amount";
 import { MobileSort, SortTh } from "./Sorting";
@@ -227,6 +227,32 @@ export function InvoicesPage() {
       res.done.forEach((id) => n.delete(id));
       return n;
     });
+  };
+
+  const STATUS_LABEL: Record<OdooFilter, string> = { all: "كل الحالات", in: "دخلت", out: "لم تدخل" };
+  const exportShown = async () => {
+    setXlsxBusy(true);
+    try {
+      // الملف بالترتيب الزمني من الأقدم أياً كان ترتيب الشاشة
+      const ordered = [...rows].sort(
+        (a, b) => a.date.localeCompare(b.date) || a.refNo.localeCompare(b.refNo),
+      );
+      await downloadInvoicesXlsx(
+        ordered,
+        {
+          scopeLabel,
+          statusLabel: STATUS_LABEL[status],
+          printedAt: riyadhStamp(new Date(), today),
+          fileBase: safeFileName(`الفواتير-${STATUS_LABEL[status]}-${supplier?.name ?? "الكل"}-${today}`),
+        },
+        RIYAL_PATH,
+      );
+    } catch (e) {
+      console.error("تعذّر إنشاء ملف Excel", e);
+      setOutcome({ tone: "err", lines: ["تعذّر إنشاء ملف Excel. أعد المحاولة، وإن تكرر فأبلغ المالك."] });
+    } finally {
+      setXlsxBusy(false);
+    }
   };
 
   const exportReport = async () => {
@@ -533,7 +559,24 @@ export function InvoicesPage() {
         ) : null}
       </main>
 
-      <aside className={l.side} aria-label="تقرير الفواتير التي لم تدخل">
+      <aside className={l.side} aria-label="تصدير الفواتير">
+        <section aria-labelledby="ix-h">
+          <h2 id="ix-h">تصدير الفواتير</h2>
+          <p>
+            ملف Excel بالفواتير المعروضة (<span className="num">{rows.length.toLocaleString("en-US")}</span>)
+            من الأقدم إلى الأحدث، بعمود «حالة Odoo» وإجمالي المبالغ · {scopeLabel} · {STATUS_LABEL[status]}
+          </p>
+          <div className={s.repBtn}>
+            <Button
+              variant="ghost"
+              busy={xlsxBusy}
+              disabled={invoices.status !== "ready" || !rows.length}
+              onClick={() => void exportShown()}
+            >
+              تصدير Excel
+            </Button>
+          </div>
+        </section>
         <section aria-labelledby="rep-h">
           <h2 id="rep-h">تقرير الفواتير التي لم تدخل</h2>
           <p>
