@@ -1,0 +1,202 @@
+<title>رصيد · فهرس القيود</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Source+Serif+4:wght@400;600;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* التخطيط: ثلاثة خيارات لفهرس القيود (SPEC §الشاشات)، كل منها شاشة تفاعلية بين الحاسوب والجوال. الألوان والخطوط من CHOSEN.md، نهاري دائماً كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --neg: #a3242b; --neg-wash: #f8e8e9; --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9;
+  --wash: #e3eaf4; --wash-2: #f5f8fb; --tab: #e2e8ee; --mark-acc: #b8752a;
+  --shadow: 0 8px 22px rgb(27 42 68 / 22%);
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-num: "Source Serif 4", georgia, "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.7; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 22px 60px; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.4; text-wrap: balance; }
+p { margin: 0; }
+.num { direction: ltr; unicode-bidi: isolate; font-family: var(--f-num); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.lead { color: var(--ink-2); max-width: 78ch; margin: 6px 0 16px; }
+.eg { display: inline-block; font-size: 12.5px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 6px; margin-inline-start: 6px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.common { margin: 0 0 24px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+.opt { margin-bottom: 34px; }
+.opt-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+.opt h2 { font-size: 20px; }
+.opt .why { color: var(--ink-2); font-size: 15px; margin: 4px 0 6px; max-width: 82ch; }
+.opt ul.pc { margin: 0 0 12px; padding-inline-start: 18px; font-size: 14.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 26px; }
+.opt li.pro { color: var(--ink); }
+.seg { display: inline-flex; border: 1.5px solid var(--accent); border-radius: 6px; overflow: hidden; }
+.seg button { min-height: 40px; padding: 0 14px; border: 0; background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+.seg button + button { border-inline-start: 1.5px solid var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+.screen-wrap { overflow-x: auto; padding-block: 4px 10px; }
+.screen { container-type: inline-size; position: relative; width: 1100px; min-height: 520px; margin-inline: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.screen.phone { width: 360px; border-radius: 24px; }
+.mast { display: flex; align-items: end; gap: 14px; padding: 10px 16px 0; background: var(--tab); border-bottom: 1px solid var(--rule); font-weight: 700; }
+.mast .brand { font-family: var(--f-brand); font-size: 20px; padding-bottom: 8px; }
+.mast .tab { font-size: 14px; padding: 4px 12px 8px; background: var(--surface); border-radius: 8px 8px 0 0; box-shadow: inset 0 3px 0 var(--accent); }
+.page { padding: 16px 20px 22px; display: grid; gap: 12px; }
+@container (width < 600px) { .page { padding: 12px 14px 18px; } }
+.head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+.head h3 { font-size: 24px; }
+.head .sub { color: var(--ink-2); font-size: 14.5px; }
+.counters { display: flex; border: 1px solid var(--rule); border-radius: 6px; margin: 0; }
+.counters div { padding: 6px 16px; min-width: 7.5em; }
+.counters div + div { border-inline-start: 1px solid var(--rule); }
+.counters dt { font-size: 13.5px; color: var(--ink-2); }
+.counters dd { margin: 0; font-size: 20px; font-weight: 700; }
+@container (width < 600px) { .counters { width: 100%; } .counters div { flex: 1; min-width: 0; padding: 6px 8px; } .counters dd { font-size: 15px; } }
+.filters { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.chip { min-height: 38px; padding: 0 14px; border: 1.5px solid var(--accent); border-radius: 19px; background: var(--surface); color: var(--accent); font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.pick { min-height: 40px; display: inline-flex; align-items: center; padding: 0 12px; background: var(--wash-2); border-bottom: 1.5px solid var(--rule); border-radius: 4px 4px 0 0; font-size: 15px; }
+
+table { width: 100%; border-collapse: collapse; border-top: 3px double var(--ink); font-size: 15px; }
+th { text-align: start; font-size: 13.5px; color: var(--ink-2); padding: 6px 8px; border-bottom: 1px solid var(--rule); }
+td, tbody th { padding: 9px 8px; border-bottom: 1px solid var(--rule); text-align: start; font-weight: 400; vertical-align: middle; }
+.amt { text-align: end; border-inline-start: 1px solid var(--margin); }
+.neg { color: var(--neg); }
+.tag { font-size: 12.5px; font-weight: 700; padding: 0 6px; border: 1px solid var(--accent); border-radius: 3px; color: var(--accent); white-space: nowrap; margin-inline-start: 6px; }
+.tag.warn { border-color: var(--neg); color: var(--neg); }
+tfoot td, tfoot th { font-weight: 700; border-top: 1px solid var(--ink); }
+tfoot .amt .num { border-bottom: 4px double var(--ink); }
+@container (width < 600px) {
+  thead { display: none; }
+  table, tbody, tfoot { display: block; }
+  tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  tr > * { display: block; border: 0 !important; padding: 0; }
+  .hide-m { display: none; }
+  .m-sub { grid-column: 1 / -1; font-size: 13.5px; color: var(--ink-2); }
+}
+@container (width >= 600px) { .m-sub { display: none; } }
+
+.group { border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.group + .group { margin-top: 10px; }
+.ghead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; padding: 8px 12px; background: var(--wash-2); border-bottom: 1px solid var(--rule); cursor: pointer; width: 100%; border: 0; font: inherit; text-align: start; color: var(--ink); }
+.ghead[aria-expanded="true"] { background: var(--wash); }
+.ghead b { font-size: 16px; }
+.gbody table { border-top: 0; }
+.mbar { display: grid; grid-template-columns: 80px minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 14.5px; }
+.mbar .track { height: 10px; background: var(--wash-2); border: 1px solid var(--rule); border-radius: 5px; overflow: hidden; }
+.mbar .fill { height: 100%; background: var(--accent); }
+
+.qs { margin-top: 10px; padding-top: 18px; border-top: 3px double var(--ink); }
+.qs h2 { font-size: 20px; margin-bottom: 10px; }
+.qs ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 10px; }
+.qs b { color: var(--accent); }
+.qs .sub { color: var(--ink-2); font-size: 15px; }
+</style>
+
+<div class="wrap">
+  <h1>فهرس القيود</h1>
+  <p class="lead">القيود (السداد والاسترداد) لكل الموردين أو لمورد واحد، بفلترة الفترة كبقية النظام. ثلاثة أشكال تفاعلية، كل منها بين الحاسوب والجوال. المبالغ والأسماء وهمية<span class="eg">مثال</span>.</p>
+  <div class="common">في الأشكال الثلاثة:
+    <ul>
+      <li>الفلاتر: المورد (أو كل الموردين)، والفترة (سنة/ربع/شهر/مخصصة أو كل الفترات)، والوسم (الكل / سداد / استرداد).</li>
+      <li>عدّادات: عدد القيود، ومجموع المدين (السداد)، ومجموع الدائن (الاسترداد)، والصافي.</li>
+      <li>المالك والإدارة يعدّلون القيد بالقلم كما في الكشف؛ مدخل البيانات يرى قيود موردِيه فقط.</li>
+    </ul>
+  </div>
+
+  <section class="opt" aria-labelledby="ha">
+    <div class="opt-head"><h2 id="ha">أ. جدول واحد كفهرس الفواتير</h2><div class="seg" data-view="a"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">كل قيد في سطر: التاريخ، الرقم المرجعي، السند، المورد، البيان، المبلغ. الأحدث أولاً وترتيب الأعمدة كالبقية، والإجمالي أسفل الجدول.</p>
+    <ul class="pc"><li class="pro">مألوف: نمط فهرس الفواتير نفسه.</li><li class="pro">أسرع للبحث عن قيد بعينه.</li><li>لا يُظهر علاقة القيود ببعضها (سند واحد لأكثر من مورد).</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sa"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hb">
+    <div class="opt-head"><h2 id="hb">ب. مجمّع بالسند</h2><div class="seg" data-view="b"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">كل سند في بطاقة قابلة للفتح بمجموعه وعدد قيوده وموردِيه، وتحتها قيوده. وسم «لأكثر من مورد» أو «بأكثر من رقم» يكشف حالات مثل السند 6227 و6080.</p>
+    <ul class="pc"><li class="pro">يطابق طريقة الصرف الفعلية (سند صرف واحد).</li><li class="pro">يكشف الحالات الشاذة فوراً.</li><li>القيود بلا سند تُجمع في بطاقة واحدة.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sb"></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="hc">
+    <div class="opt-head"><h2 id="hc">ج. مجمّع بالشهر</h2><div class="seg" data-view="c"><button type="button" data-v="desk" aria-pressed="true">حاسوب</button><button type="button" data-v="phone" aria-pressed="false">جوال</button></div></div>
+    <p class="why">شريط لكل شهر بمجموع السداد فيه (طول الشريط بنسبة الشهر الأعلى)، والنقر يفتح قيود الشهر. مناسب لمتابعة حجم المدفوعات.</p>
+    <ul class="pc"><li class="pro">صورة سريعة لحركة السداد عبر الأشهر.</li><li class="pro">يتماشى مع ترقيم القيود بالشهر (MISC/السنة/الشهر).</li><li>البحث عن قيد بعينه يحتاج فتح شهره.</li></ul>
+    <div class="screen-wrap"><div class="screen" id="sc"></div></div>
+  </section>
+
+  <section class="qs" aria-labelledby="qs-h">
+    <h2 id="qs-h">المطلوب منك</h2>
+    <ol>
+      <li><b>الشكل:</b> أ أم ب أم ج؟</li>
+      <li><b>مكانه:</b> تبويب «القيود» جديد بجانب «الفواتير»؟
+        <div class="sub">أقترح: نعم على الحاسوب واللوحي؛ وعلى الجوال يكون في الألسنة العلوية (التنقل السفلي يبقى خمساً).</div></li>
+      <li><b>تصدير Excel</b> للقيود المعروضة كتقرير الفواتير؟</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(() => {
+  const J = [
+    { d: "09/10/2026", m: "2026-10", no: "MISC/2026/10/0603", v: "6301", sup: "المورد (ب)", desc: "سداد دفعة", dr: 150000, cr: 0 },
+    { d: "07/10/2026", m: "2026-10", no: "MISC/2026/10/0502", v: "6227", sup: "المورد (أ)", desc: "سداد", dr: 120000, cr: 0 },
+    { d: "07/10/2026", m: "2026-10", no: "MISC/2026/10/0601", v: "6227", sup: "المورد (ب)", desc: "سداد", dr: 80000, cr: 0 },
+    { d: "05/10/2026", m: "2026-10", no: "MISC/2026/10/0602", v: "", sup: "المورد (ب)", desc: "استرداد خصم", dr: 0, cr: 20000 },
+    { d: "18/09/2026", m: "2026-09", no: "MISC/2026/09/0501", v: "6080", sup: "المورد (أ)", desc: "سداد فاتورتين", dr: 250050, cr: 0 },
+    { d: "18/09/2026", m: "2026-09", no: "MISC/2026/09/0502", v: "6080", sup: "المورد (أ)", desc: "سداد فاتورتين", dr: 30000, cr: 0 },
+    { d: "02/09/2026", m: "2026-09", no: "MISC/2026/09/0701", v: "6011", sup: "المورد (ج)", desc: "دفعة مقدمة", dr: 99990, cr: 0 },
+    { d: "14/08/2026", m: "2026-08", no: "MISC/2026/08/0480", v: "5990", sup: "المورد (ج)", desc: "سداد", dr: 45000, cr: 0 },
+  ];
+  const MONTHS = { "2026-10": "أكتوبر 2026", "2026-09": "سبتمبر 2026", "2026-08": "أغسطس 2026" };
+  const money = (h) => (h / 100).toLocaleString("en-US", { minimumFractionDigits: 2 });
+  const sum = (rows, k) => rows.reduce((a, r) => a + r[k], 0);
+
+  function build(id, mode) {
+    const el = document.getElementById(id);
+    const st = { f: "all", open: new Set([0]) };
+    const rowsOf = () => J.filter((r) => (st.f === "all" ? true : st.f === "pay" ? r.dr > 0 : r.cr > 0));
+    const counters = (rows) => `<dl class="counters"><div><dt>القيود</dt><dd class="num">${rows.length}</dd></div><div><dt>السداد (مدين)</dt><dd class="num">${money(sum(rows, "dr"))}</dd></div><div><dt>الاسترداد (دائن)</dt><dd class="num neg">${money(sum(rows, "cr"))}</dd></div><div><dt>الصافي</dt><dd class="num">${money(sum(rows, "dr") - sum(rows, "cr"))}</dd></div></dl>`;
+    const line = (r, withV = true, withSup = true) => `<tr><th scope="row"><span class="num">${r.d}</span></th><td class="hide-m"><span class="num">${r.no}</span>${r.cr ? '<span class="tag">استرداد</span>' : ""}</td>${withV ? `<td class="hide-m"><span class="num">${r.v || "—"}</span></td>` : ""}${withSup ? `<td class="hide-m">${r.sup}</td>` : ""}<td class="hide-m">${r.desc}</td><td class="amt"><span class="num ${r.cr ? "neg" : ""}">${money(r.dr || r.cr)}</span></td><td class="m-sub"><span class="num">${r.no}</span> · ${withSup ? r.sup + " · " : ""}${r.v ? "سند " + r.v : "بلا سند"}${r.cr ? " · استرداد" : ""}</td></tr>`;
+    const thead = (withV = true, withSup = true) => `<thead><tr><th>التاريخ</th><th class="hide-m">الرقم المرجعي</th>${withV ? '<th class="hide-m">السند</th>' : ""}${withSup ? '<th class="hide-m">المورد</th>' : ""}<th class="hide-m">البيان</th><th class="amt">المبلغ ر.س</th></tr></thead>`;
+
+    const draw = () => {
+      const rows = rowsOf();
+      let body = "";
+      if (mode === "a") {
+        body = `<table>${thead()}<tbody>${rows.map((r) => line(r)).join("")}</tbody><tfoot><tr><th scope="row">الصافي</th><td class="hide-m"></td><td class="hide-m"></td><td class="hide-m"></td><td class="hide-m"></td><td class="amt"><span class="num">${money(sum(rows, "dr") - sum(rows, "cr"))}</span></td></tr></tfoot></table>`;
+      } else if (mode === "b") {
+        const groups = [];
+        for (const r of rows) { const k = r.v || "—"; let g = groups.find((x) => x.k === k); if (!g) groups.push((g = { k, rows: [] })); g.rows.push(r); }
+        body = groups.map((g, i) => {
+          const sups = [...new Set(g.rows.map((r) => r.sup))];
+          const tags = (sups.length > 1 ? '<span class="tag warn">لأكثر من مورد</span>' : "") + (g.rows.length > 1 && sups.length === 1 ? '<span class="tag warn">بأكثر من رقم</span>' : "");
+          const open = st.open.has(i);
+          return `<div class="group"><button type="button" class="ghead" aria-expanded="${open}" data-g="${i}"><span><b>${g.k === "—" ? "بلا سند" : `سند <span class="num">${g.k}</span>`}</b>${tags}<br><span class="sub" style="font-size:13.5px;color:var(--ink-2)">${g.rows.length} قيد · ${sups.join("، ")} · <span class="num">${g.rows[0].d}</span></span></span><b class="num">${money(sum(g.rows, "dr") - sum(g.rows, "cr"))}</b></button>${open ? `<div class="gbody"><table>${thead(false)}<tbody>${g.rows.map((r) => line(r, false)).join("")}</tbody></table></div>` : ""}</div>`;
+        }).join("");
+      } else {
+        const months = Object.keys(MONTHS).map((m) => ({ m, rows: rows.filter((r) => r.m === m) })).filter((x) => x.rows.length);
+        const max = Math.max(...months.map((x) => sum(x.rows, "dr")), 1);
+        body = months.map((x, i) => {
+          const open = st.open.has(i);
+          return `<div class="group"><button type="button" class="ghead" aria-expanded="${open}" data-g="${i}"><span class="mbar" style="width:100%"><b>${MONTHS[x.m]}</b><span class="track" aria-hidden="true"><span class="fill" style="display:block;width:${Math.round((sum(x.rows, "dr") / max) * 100)}%"></span></span><b class="num">${money(sum(x.rows, "dr") - sum(x.rows, "cr"))}</b></span></button>${open ? `<div class="gbody"><table>${thead()}<tbody>${x.rows.map((r) => line(r)).join("")}</tbody></table></div>` : ""}</div>`;
+        }).join("");
+      }
+      el.innerHTML = `<div class="mast"><span class="brand">رصيد</span><span class="tab">القيود</span></div><div class="page"><div class="head"><div><h3>فهرس القيود</h3><p class="sub">كل الموردين · كل الفترات</p></div>${counters(rows)}</div>
+        <div class="filters"><span class="pick">المورد: كل الموردين ▾</span><span class="pick">الفترة: كل الفترات ▾</span><span role="group" aria-label="الوسم" style="display:flex;gap:6px">${[["all", "الكل"], ["pay", "سداد"], ["ref", "استرداد"]].map(([k, t]) => `<button type="button" class="chip" aria-pressed="${st.f === k}" data-f="${k}">${t}</button>`).join("")}</span></div>${body}</div>`;
+    };
+    el.addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      if (b.dataset.f) { st.f = b.dataset.f; st.open = new Set([0]); draw(); }
+      else if (b.dataset.g) { const i = +b.dataset.g; st.open.has(i) ? st.open.delete(i) : st.open.add(i); draw(); }
+    });
+    draw();
+  }
+  build("sa", "a"); build("sb", "b"); build("sc", "c");
+  document.querySelectorAll(".seg[data-view]").forEach((g) => g.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    document.getElementById("s" + g.dataset.view).classList.toggle("phone", b.dataset.v === "phone");
+  }));
+})();
+</script>
