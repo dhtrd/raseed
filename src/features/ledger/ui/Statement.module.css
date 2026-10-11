@@ -1,0 +1,290 @@
+/* كشف حساب مورد (direction-1/statement.html، CHOSEN §3.2) */
+
+.balanceBox {
+  text-align: end;
+}
+
+.bbL,
+.bbN,
+.bbS {
+  margin: 0;
+}
+
+.bbL {
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.bbN {
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.bbN > span {
+  border-block-end: 5px double currentcolor;
+  padding-block-end: 2px;
+}
+
+.bbS {
+  margin-block-start: 6px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px 24px;
+  margin-block-end: 18px;
+}
+
+.pickSup {
+  inline-size: min(100%, 340px);
+}
+
+.pickSup:empty {
+  display: none;
+}
+
+.range {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 16px;
+}
+
+.err {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-block-end: 16px;
+}
+
+.opening {
+  margin: 0 0 10px;
+  color: var(--ink-2);
+  font-size: 15.5px;
+}
+
+.opening :global(.num) {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.stmt .cDesc {
+  min-inline-size: 14em;
+}
+
+.stmt td.cDesc {
+  font-size: 15.5px;
+}
+
+.bal {
+  font-weight: 700;
+}
+
+.noteRow td.cDesc {
+  font-style: italic;
+  color: var(--ink-2);
+}
+
+.mInline {
+  display: none;
+}
+
+/* ---------- الوسوم ---------- */
+.tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.typeTag {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.7;
+  padding: 0 8px;
+  border-radius: var(--r-xs);
+  background: var(--wash);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.inv {
+  background: var(--neg-wash);
+  color: var(--neg);
+}
+
+.note {
+  background: var(--wash-2);
+  color: var(--ink-2);
+  border: 1px solid var(--rule);
+}
+
+.untyped {
+  background: transparent;
+  color: var(--ink-2);
+  border: 1px dashed var(--ink-2);
+}
+
+.flag {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+  padding: 0 7px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.review {
+  border: 1.5px dashed var(--neg);
+  color: var(--neg);
+}
+
+/* ---------- ملخص الكشف ---------- */
+.stats {
+  margin: 0;
+}
+
+.stats div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 7px 0;
+  border-block-end: 1px solid var(--rule);
+}
+
+.stats dt {
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+.stats dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* =====================================================================
+   ≤ 600 جوال: كل حركة بطاقة (التاريخ والنوع، المرجع والسند، البيان، المبلغ والرصيد)
+   ===================================================================== */
+@media (width <= 600px) {
+  .balanceBox {
+    text-align: start;
+    inline-size: 100%;
+    padding-block-start: 12px;
+    border-block-start: 1px solid var(--rule);
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pickSup {
+    inline-size: 100%;
+  }
+
+  .stmt tbody tr {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "date type" "refno v" "desc desc" "amt bal";
+    gap: 4px 12px;
+    padding: 14px 0;
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .cDate {
+    grid-area: date;
+  }
+
+  .cType {
+    grid-area: type;
+    text-align: end;
+  }
+
+  .cRef {
+    display: none !important;
+  }
+
+  .cRefno {
+    grid-area: refno;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+
+  .cV {
+    grid-area: v;
+    font-size: 14.5px;
+    color: var(--ink-2);
+    text-align: end;
+  }
+
+  .cV:empty,
+  .cDesc:empty,
+  .cDr:empty,
+  .cCr:empty {
+    display: none !important;
+  }
+
+  .stmt .cDesc {
+    grid-area: desc;
+    min-inline-size: 0;
+  }
+
+  .cDr,
+  .cCr {
+    grid-area: amt;
+    font-size: 19px;
+    font-weight: 600;
+  }
+
+  .stmt .cDr,
+  .stmt .cCr {
+    text-align: start;
+  }
+
+  .bal {
+    grid-area: bal;
+    font-size: 19px;
+  }
+
+  .stmt .bal {
+    text-align: end;
+  }
+
+  .mInline {
+    display: inline;
+  }
+
+  .stmt tfoot tr {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "lbl bal";
+    padding: 16px 0 6px;
+    border-block-start: 2px solid var(--ink);
+  }
+
+  .stmt tfoot th {
+    grid-area: lbl;
+  }
+
+  .stmt tfoot td:not(.bal) {
+    display: none;
+  }
+
+  .stmt tfoot .bal {
+    font-size: 22px;
+  }
+}
+
+/* اللوحي: الفهرس يختار المورد، فلا حاجة لقائمة الاختيار */
+@media (width >= 601px) and (width <= 1279px) {
+  .pickSup {
+    display: none;
+  }
+}

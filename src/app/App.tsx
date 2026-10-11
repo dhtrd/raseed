@@ -6,8 +6,9 @@ import { SessionProvider, useSession } from "../features/auth/session/SessionPro
 import { isManager } from "../features/users/core/users";
 import { UsersPage } from "../features/users/ui/UsersPage";
 import { AssignPage } from "../features/users/ui/AssignPage";
+import { DashboardPage } from "../features/ledger/ui/DashboardPage";
+import { StatementPage } from "../features/ledger/ui/StatementPage";
 import { AppShell } from "./AppShell";
-import { Home } from "./Home";
 import { ErrorScreen, LoadingScreen, RouteError } from "./Screens";
 
 // معرض الحقول للتطوير فقط: لا يدخل نسخة الإنتاج (DECISIONS 2026-10-10)
@@ -81,7 +82,8 @@ const router = createBrowserRouter(
             {
               element: <AppShell />,
               children: [
-                { index: true, element: <Home /> },
+                { index: true, element: <DashboardPage /> },
+                { path: "statement/:sid?", element: <StatementPage /> },
                 {
                   path: "users/:uid?",
                   element: (

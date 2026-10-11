@@ -108,3 +108,46 @@ export function parseEntry(id: string, d: Record<string, unknown>): LedgerEntry 
     odooEntered: kind === "inv" ? odoo?.entered === true : null,
   };
 }
+
+export interface StatementRow extends LedgerEntry {
+  balance: number;
+}
+
+export interface Statement {
+  opening: number;
+  rows: StatementRow[];
+  debit: number;
+  credit: number;
+  closing: number;
+  /** الحركات المالية فقط (الملاحظات لا تُعدّ ولا تؤثر على الرصيد) */
+  financialCount: number;
+  noteCount: number;
+  reviewCount: number;
+  lastDate: IsoDate | null;
+}
+
+/** الكشف: الرصيد الجاري من الأقدم إلى الأحدث بدءاً من الافتتاحي، ثم يُعرض بأي ترتيب. */
+export function buildStatement(opening: number, ascending: LedgerEntry[]): Statement {
+  const rows = withRunningBalance(opening, ascending);
+  let debit = 0;
+  let credit = 0;
+  let notes = 0;
+  let review = 0;
+  for (const r of rows) {
+    debit += r.debit;
+    credit += r.credit;
+    if (r.kind === "note") notes++;
+    if (r.needsManualFix) review++;
+  }
+  return {
+    opening,
+    rows,
+    debit,
+    credit,
+    closing: opening + debit - credit,
+    financialCount: rows.length - notes,
+    noteCount: notes,
+    reviewCount: review,
+    lastDate: rows.length ? (rows[rows.length - 1]?.date ?? null) : null,
+  };
+}

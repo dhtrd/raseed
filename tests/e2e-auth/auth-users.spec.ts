@@ -38,7 +38,7 @@ test("الدخول: الساعة، ورسالة عامة للبيانات الخ
 
 test("المالك ينشئ مدخل بيانات بكلمة مؤقتة مولّدة", async ({ page }) => {
   await loginOk(page, OWNER.email, OWNER.password);
-  await expect(page.getByRole("heading", { name: `مرحباً ${OWNER.name}` })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "أرصدة الموردين" })).toBeVisible();
   await page.getByRole("link", { name: "المستخدمون" }).click();
   await expect(page.getByRole("heading", { name: /المستخدمون/ })).toBeVisible();
   await page.getByRole("button", { name: "إضافة مستخدم" }).click();
@@ -103,7 +103,7 @@ test("مدة الخمول: المالك يضبطها ضمن 5–120", async ({ p
   await expect(page.getByText("حُفظت مدة الخمول 45 دقيقة")).toBeVisible();
 });
 
-test("أول دخول: تغيير الكلمة المؤقتة إلزامي، ثم يرى مدخل البيانات الرئيسية فقط", async ({ page }) => {
+test("أول دخول: تغيير الكلمة المؤقتة إلزامي، ثم يرى مدخل البيانات الأرصدة فقط", async ({ page }) => {
   await loginOk(page, "fahad@example.com", tempPassword);
   await expect(page).toHaveURL(/\/first-login$/);
   await page.goto("/users");
@@ -116,13 +116,13 @@ test("أول دخول: تغيير الكلمة المؤقتة إلزامي، ث�
   await page.getByRole("textbox", { name: "أعد كتابتها مطلوب" }).fill(NEW_PW);
   await page.getByRole("button", { name: "حفظ والمتابعة" }).click();
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole("heading", { name: "مرحباً فهد" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "أرصدة الموردين" })).toBeVisible();
   await expect(page.getByRole("link", { name: "المستخدمون" })).toHaveCount(0);
   await page.goto("/users");
   await expect(page).toHaveURL(/\/$/);
   await logout(page);
   await loginOk(page, "fahad@example.com", NEW_PW);
-  await expect(page.getByRole("heading", { name: "مرحباً فهد" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "أرصدة الموردين" })).toBeVisible();
 });
 
 test("الإدارة ترى حساب المالك محمياً، وتوقف مدخل البيانات", async ({ page }) => {
