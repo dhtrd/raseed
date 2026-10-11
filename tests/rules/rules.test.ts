@@ -13,6 +13,8 @@ import {
   getDoc,
   getDocs,
   collection,
+  limit,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -252,6 +254,21 @@ describe("§3-ب: مدخل البيانات", () => {
       ),
     );
     await assertFails(getDocs(collection(as("entry"), "entries")));
+  });
+  it("إشارة الأرصدة التلقائية: آخر حركة معدّلة لمورده فقط", async () => {
+    const latest = (sid: string) =>
+      query(
+        collection(as("entry"), "entries"),
+        where("supplierId", "==", sid),
+        where("deleted", "==", false),
+        orderBy("updatedAt", "desc"),
+        limit(1),
+      );
+    await assertSucceeds(getDocs(latest("s1")));
+    await assertFails(getDocs(latest("s2")));
+    await assertFails(
+      getDocs(query(collection(as("entry"), "entries"), orderBy("updatedAt", "desc"), limit(1))),
+    );
   });
   it("يضيف حركة لمورده", () =>
     assertSucceeds(createEntry(as("entry"), "entry", "n1", invoice("s1", "12292"))));

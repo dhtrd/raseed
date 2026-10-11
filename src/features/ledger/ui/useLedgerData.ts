@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { UserProfile } from "../../users/core/users";
-import { listVisibleSuppliers, type SupplierRef } from "../data/ledgerRepo";
+import { listVisibleSuppliers, watchLedgerChanges, type SupplierRef } from "../data/ledgerRepo";
 
 export type Loadable<T> =
   { status: "loading" } | { status: "error"; message: string } | { status: "ready"; data: T };
@@ -16,27 +16,41 @@ export function readError(e: unknown, what: string): string {
   return `تعذّر ${what}. أعد المحاولة، وإن تكرر فأبلغ المالك بالنص: ${code || String(e)}`;
 }
 
-type Keyed<T> = { key: string; value: Loadable<T> };
+type Keyed<T> = { key: string; group: string | null; value: Loadable<T> };
 const LOADING = { status: "loading" } as const;
 
 /**
  * نتيجة طلب مرتبطة بمفتاحه: تغيّر المفتاح يعني «جارٍ التحميل» فوراً دون setState داخل الأثر،
  * ونتيجة طلب قديم لا تُعرض لمفتاح أحدث. `key = null` يعني لا طلب.
+ * `group`: إن بقيت المجموعة نفسها (مثلاً الفترة نفسها والتغيّر تحديث تلقائي فقط) تبقى الأرقام السابقة
+ * ظاهرة حتى تصل الجديدة، فلا تومض الصفحة؛ وتغيّر المجموعة (فترة أخرى) يُظهر «جارٍ التحميل» كي لا تُنسب
+ * أرقام فترة إلى أخرى.
  */
-export function useKeyedLoad<T>(key: string | null, load: () => Promise<T>, what: string): Loadable<T> {
+export function useKeyedLoad<T>(
+  key: string | null,
+  load: () => Promise<T>,
+  what: string,
+  group: string | null = null,
+): Loadable<T> & { stale?: boolean } {
   const [st, setSt] = useState<Keyed<T> | null>(null);
   useEffect(() => {
     if (key === null) return;
     let live = true;
     load()
-      .then((data) => live && setSt({ key, value: { status: "ready", data } }))
-      .catch((e: unknown) => live && setSt({ key, value: { status: "error", message: readError(e, what) } }));
+      .then((data) => live && setSt({ key, group, value: { status: "ready", data } }))
+      .catch(
+        (e: unknown) =>
+          live && setSt({ key, group, value: { status: "error", message: readError(e, what) } }),
+      );
     return () => {
       live = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- المفتاح يلخّص مدخلات الطلب
   }, [key]);
-  return st && st.key === key ? st.value : LOADING;
+  if (st && st.key === key) return st.value;
+  if (st && group !== null && st.group === group && st.value.status === "ready")
+    return { ...st.value, stale: true };
+  return LOADING;
 }
 
 /** مثل useKeyedLoad لمستمع مباشر (onSnapshot): يعيد الاشتراك عند تغيّر المفتاح. */
@@ -49,8 +63,8 @@ export function useKeyedWatch<T>(
   useEffect(() => {
     if (key === null) return;
     return watch(
-      (data) => setSt({ key, value: { status: "ready", data } }),
-      (e) => setSt({ key, value: { status: "error", message: readError(e, what) } }),
+      (data) => setSt({ key, group: null, value: { status: "ready", data } }),
+      (e) => setSt({ key, group: null, value: { status: "error", message: readError(e, what) } }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps -- كما أعلاه
   }, [key]);
@@ -64,4 +78,52 @@ export function useVisibleSuppliers(profile: UserProfile, reloadKey = 0): Loadab
     () => listVisibleSuppliers(profile),
     "قراءة الموردين",
   );
+}
+
+/** مهلة تجميع التغييرات: دفعة إدخال سريع (عشرات الحركات) تُعيد الحساب مرة واحدة لا مرة لكل حركة. */
+export const AUTO_REFRESH_DELAY_MS = 1200;
+
+/**
+ * الأرصدة التلقائية (قرار المستخدم 2026-10-11): رقم إصدار يزيد بعد كل تغيّر في الحركات،
+ * يُضاف إلى مفتاح الطلب فتُعاد التجميعات وحدها. `scope`: "all" لكل الحركات، أو معرّفات الموردين؛ null = لا مراقبة.
+ */
+export function useLedgerVersion(scope: "all" | string[] | null): { version: number; error: string | null } {
+  const scopeKey = scope === null ? null : scope === "all" ? "all" : `ids:${scope.join(",")}`;
+  const [state, setState] = useState<{ key: string | null; version: number; error: string | null }>({
+    key: null,
+    version: 0,
+    error: null,
+  });
+  useEffect(() => {
+    if (scopeKey === null) return;
+    let first: string | null = null;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const unsub = watchLedgerChanges(
+      scopeKey === "all" ? { all: true } : { supplierIds: scopeKey.slice(4).split(",").filter(Boolean) },
+      (v) => {
+        if (first === null) {
+          first = v;
+          return;
+        }
+        clearTimeout(timer);
+        timer = setTimeout(
+          () =>
+            setState((s) => ({
+              key: scopeKey,
+              version: (s.key === scopeKey ? s.version : 0) + 1,
+              error: null,
+            })),
+          AUTO_REFRESH_DELAY_MS,
+        );
+      },
+      (e) => setState({ key: scopeKey, version: 0, error: readError(e, "متابعة التحديثات التلقائية") }),
+    );
+    return () => {
+      clearTimeout(timer);
+      unsub();
+    };
+  }, [scopeKey]);
+  return state.key === scopeKey
+    ? { version: state.version, error: state.error }
+    : { version: 0, error: null };
 }

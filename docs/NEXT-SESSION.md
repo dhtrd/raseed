@@ -23,7 +23,7 @@ CLAUDE.md ← DECISIONS.md ← PROGRESS.md ← هذا الملف ← SPEC.md (v1
 - بانتظار مراجعة المستخدم: انظر آخر قيد في DECISIONS.md (التواريخ يوم/شهر/سنة، الأحدث أولاً، إلخ).
 
 ## المرحلة 4 — الخطوة التالية مباشرة
-1. تصدير الكشف Excel (ExcelJS، رمز الريال صورة في رأس العمود) وPDF بطباعة A4، من الأقدم للأحدث.
+1. تصدير الكشف Excel (ExcelJS، رمز الريال صورة في رأس العمود) وPDF بطباعة A4، من الأقدم للأحدث. النماذج بانتظار اختيار المستخدم: `proposals/2026-10-11-statement-export.html` (https://claude.ai/artifact/HW1mbhy6a3d2aTSjMrz6WQ) — طباعة أ/ب/ج، وExcel أ/ب، و3 أسئلة (الملاحظات، وسم «للمراجعة» في المُرسل، التوقيع واسم من طبع).
 2. فهرس الفواتير وحالة Odoo (`invoices.html`) مع الإرجاع بسبب إلزامي.
 3. إضافة حركة والإدخال السريع (`add-entry.html` + لسان 4 في نماذج الحقول).
 4. مركز المراجعة (`review.html`)، ثم تحويل تنبيهات اللوحة إلى روابط إليه.
@@ -31,6 +31,7 @@ CLAUDE.md ← DECISIONS.md ← PROGRESS.md ← هذا الملف ← SPEC.md (v1
 6. **نماذج ناقصة قبل بنائها** (2–3 خيارات واعتماد): فهرس القيود، قفل الفترات، التدقيق، الإشعارات، التحميل والفراغ، بطاقة الإدخال السريع على الجوال، والبحث داخل الكشف.
 
 ## صفحات مرجعية (Artifacts)
+- نماذج تصدير الكشف (بانتظار الاختيار): https://claude.ai/artifact/HW1mbhy6a3d2aTSjMrz6WQ
 - نماذج المرحلة 2 المعتمدة: https://claude.ai/artifact/2GHbnzdf9UoxUVpkWZNPab
 - دليل مفتاح المالك: https://claude.ai/artifact/18DkupUkhDZmrF8nuhrCCP
 - نماذج الحقول والإدخال السريع: https://claude.ai/artifact/81fL5SCNcWciRxQgnSQoti

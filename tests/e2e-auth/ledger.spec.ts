@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import { getApps, initializeApp } from "firebase-admin/app";
+import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { ENTRY, OWNER } from "./seed";
 
 /**
@@ -155,4 +157,51 @@ test("الجوال: «ترتيب حسب» بشرائح بدل رؤوس الأع�
   await sort.getByRole("button", { name: /التاريخ/ }).click();
   await expect(sort.getByRole("button", { name: "التاريخ، تصاعدي" })).toBeVisible();
   await expect(page.locator("tbody tr").first()).toContainText("20/06/2026");
+});
+
+/** كتابة مباشرة في المحاكي (كأن مستخدماً آخر أضاف حركة) لاختبار التحديث التلقائي. */
+function adminDb() {
+  if (!getApps().length) initializeApp({ projectId: "demo-raseed" });
+  return getFirestore();
+}
+
+test("الأرصدة تتحدث تلقائياً بعد إضافة حركة وحذفها، دون زر التحديث", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await loginOk(page, OWNER.email, OWNER.password);
+  await pickQ4(page);
+  const totals = page.locator("tfoot td");
+  await expect(totals.last()).toHaveText("-4,410.76");
+  await expect(page.getByText(/^تتحدث تلقائياً/)).toBeVisible();
+  const ref = adminDb().doc("entries/e-live");
+  await ref.set({
+    supplierId: "s3",
+    kind: "inv",
+    date: "2026-10-10",
+    mainRef: "30002",
+    refNo: "P30002",
+    voucher: "",
+    details: "",
+    note: "",
+    debit: 0,
+    credit: 10000,
+    reversed: false,
+    needsManualFix: false,
+    deleted: false,
+    odoo: { entered: false },
+    auditId: "seed",
+    createdBy: "seed",
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  });
+  try {
+    await expect(totals.last()).toHaveText("-4,510.76", { timeout: 15_000 });
+    await expect(
+      rowOf(page, /المورد \(ج\)/)
+        .locator("td")
+        .last(),
+    ).toContainText("-850.00");
+  } finally {
+    await ref.delete();
+  }
+  await expect(totals.last()).toHaveText("-4,410.76", { timeout: 15_000 });
 });

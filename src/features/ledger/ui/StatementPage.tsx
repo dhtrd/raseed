@@ -20,7 +20,7 @@ import { openingBalance, watchStatement } from "../data/ledgerRepo";
 import { Amount, HeadSar, Money } from "./Amount";
 import { MobileSort, SortTh } from "./Sorting";
 import { SupplierIndex, useIndexCollapse } from "./SupplierIndex";
-import { useKeyedLoad, useKeyedWatch, useVisibleSuppliers } from "./useLedgerData";
+import { useKeyedLoad, useKeyedWatch, useLedgerVersion, useVisibleSuppliers } from "./useLedgerData";
 import l from "./Ledger.module.css";
 import s from "./Statement.module.css";
 
@@ -52,10 +52,13 @@ export function StatementPage() {
     (onData, onError) => watchStatement(supplier?.id ?? "", range, onData, onError),
     "قراءة حركات المورد",
   );
+  // الحركات مباشرة؛ والرصيد الافتتاحي (للفترة فقط) يُعاد حسابه تلقائياً بعد أي تغيير لحركات المورد
+  const live = useLedgerVersion(supplier && range ? [supplier.id] : null);
   const opening = useKeyedLoad(
-    supplier ? `${supplier.id}|${range?.from ?? ""}|${retry}` : null,
+    supplier ? `${supplier.id}|${range?.from ?? ""}|${retry}.${live.version}` : null,
     () => openingBalance(supplier?.id ?? "", range?.from ?? null),
     "حساب الرصيد الافتتاحي",
+    supplier ? `${supplier.id}|${range?.from ?? ""}` : null,
   );
 
   const st = useMemo(
