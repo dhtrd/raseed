@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { PeriodFilter, type Period } from "../../../shared/fields/components/PeriodFilter";
 import { formatDate, todayInRiyadh } from "../../../shared/fields/core/date";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
 import { useProfile } from "../../auth/session/SessionProvider";
+import { SupplierDialog } from "../../suppliers/ui/SupplierDialog";
 import { isManager } from "../../users/core/users";
 import { balanceState, currentQuarter, sumBalances, type SupplierBalance } from "../core/ledger";
 import { sortRows, type SortState } from "../core/sort";
@@ -40,6 +41,9 @@ export function DashboardPage() {
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [flash, setFlash] = useState<string | null>(null);
   const idx = useIndexCollapse();
+  const navigate = useNavigate();
+  // «+ مورد جديد» أسفل الفهرس (DECISIONS 2026-10-11، الخيار ب)؛ المورد الجديد يفتح كشفه
+  const [adding, setAdding] = useState(false);
 
   const suppliers = useVisibleSuppliers(profile, reload);
   const watchIds = suppliers.status === "ready" ? suppliers.data.map((x) => x.id) : null;
@@ -124,7 +128,22 @@ export function DashboardPage() {
         ) : (
           <p className={l.ixNote}>{loading ? "جارٍ التحميل…" : "لا بيانات."}</p>
         )}
+        {manager && suppliers.status === "ready" ? (
+          <button type="button" className={l.ixAdd} onClick={() => setAdding(true)}>
+            + مورد جديد
+          </button>
+        ) : null}
       </SupplierIndex>
+      <SupplierDialog
+        action={adding ? { kind: "add" } : null}
+        uid={profile.uid}
+        all={suppliers.status === "ready" ? suppliers.data : []}
+        onClose={() => setAdding(false)}
+        onDone={(_text, id) => {
+          setAdding(false);
+          navigate(`/statement/${id}`);
+        }}
+      />
 
       <main className={`${l.main} ${s.main}`} id="main">
         <div className={`${l.pageHead} ${s.head}`}>

@@ -1,0 +1,19 @@
+/* نافذة المورد (الخيار ب، proposals/2026-10-11-suppliers.html) */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.similar {
+  margin: 0;
+  padding: 8px 12px;
+  background: var(--neg-wash);
+  border-inline-start: 4px solid var(--neg);
+  border-radius: var(--r-sm);
+  font-size: 14.5px;
+}
+
+.similar b {
+  color: var(--neg);
+}

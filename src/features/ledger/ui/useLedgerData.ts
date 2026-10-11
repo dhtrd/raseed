@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import type { UserProfile } from "../../users/core/users";
+import { subscribeSuppliers, suppliersVersion } from "../../suppliers/data/suppliersRepo";
 import { listVisibleSuppliers, watchLedgerChanges, type SupplierRef } from "../data/ledgerRepo";
 
 export type Loadable<T> =
@@ -73,10 +74,14 @@ export function useKeyedWatch<T>(
 
 /** الموردون المرئيون للمستخدم (الكل للمالك والإدارة، المسنَدون لمدخل البيانات). */
 export function useVisibleSuppliers(profile: UserProfile, reloadKey = 0): Loadable<SupplierRef[]> {
+  // تُعاد القراءة بعد أي إضافة أو تعديل أو أرشفة لمورد من هذه الصفحة
+  const changed = useSyncExternalStore(subscribeSuppliers, suppliersVersion);
   return useKeyedLoad(
-    `${profile.uid}|${profile.role}|${profile.assigned.join(",")}|${reloadKey}`,
+    `${profile.uid}|${profile.role}|${profile.assigned.join(",")}|${reloadKey}.${changed}`,
     () => listVisibleSuppliers(profile),
     "قراءة الموردين",
+    // القائمة السابقة تبقى ظاهرة أثناء إعادة القراءة بعد تغيير
+    `${profile.uid}|${profile.role}|${profile.assigned.join(",")}|${reloadKey}`,
   );
 }
 
