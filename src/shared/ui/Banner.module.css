@@ -1,0 +1,23 @@
+.banner {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.title {
+  display: block;
+}
+
+.err {
+  background: var(--neg-wash);
+  border-inline-start: 4px solid var(--neg);
+}
+
+.info,
+.ok {
+  background: var(--wash);
+  border-inline-start: 4px solid var(--accent);
+}

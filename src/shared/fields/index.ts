@@ -16,3 +16,4 @@ export { PeriodFilter, periodFor, type Period } from "./components/PeriodFilter"
 export { SearchField } from "./components/SearchField";
 export { IdentifierField, PasswordField } from "./components/LoginFields";
 export { useEnterToNext } from "./useEnterToNext";
+export { TextField } from "./components/TextField";

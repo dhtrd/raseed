@@ -65,6 +65,31 @@ jobs:
             test-results/
           retention-days: 14
 
+  e2e-auth:
+    name: e2e auth (emulator · Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
+        with: { distribution: temurin, java-version: 21 }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # الدخول والمستخدمون والإسناد على محاكي Auth وFirestore بالقواعد الحقيقية وبيانات وهمية
+      - run: npm run test:e2e:auth
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-report-auth
+          path: |
+            playwright-report-auth/
+            test-results/
+          retention-days: 14
+
   security:
     name: security (npm audit · gitleaks)
     runs-on: ubuntu-latest

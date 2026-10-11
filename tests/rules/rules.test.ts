@@ -594,3 +594,108 @@ describe("مكان التكرار لكل المستخدمين", () => {
   it("اسم مورد مزيف في الفهرس مرفوض", () =>
     assertFails(createEntry(as("owner"), "owner", "p2", invoice("s1", "30002"), { wrongName: true })));
 });
+
+describe("أول دخول بكلمة مؤقتة (DECISIONS 2026-10-10)", () => {
+  const newUser = (role: string, must?: boolean) => ({
+    displayName: "مستخدم جديد",
+    login: "new@users.raseed.internal",
+    role,
+    assigned: [],
+    active: true,
+    ...(must === undefined ? {} : { mustChangePassword: must }),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+  const seedPending = () =>
+    env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(asDb(ctx.firestore()), "users/pending"), {
+        ...newUser("entry", true),
+        assigned: ["s1"],
+        auditId: "seed",
+      });
+    });
+  const clearFlag = (db: Firestore, uid: string, action = "passwordChanged", extra = {}) => {
+    const b = writeBatch(db);
+    const aid = newAuditId();
+    b.update(doc(db, `users/${uid}`), {
+      mustChangePassword: false,
+      updatedAt: new Date(),
+      auditId: aid,
+      ...extra,
+    });
+    b.set(doc(db, `auditLog/${aid}`), {
+      actor: uid,
+      at: serverTimestamp(),
+      action,
+      entity: "users",
+      entityId: uid,
+    });
+    return b.commit();
+  };
+
+  it("الإدارة تنشئ مستخدماً جديداً بعلم التغيير فقط", async () => {
+    await assertSucceeds(
+      writeWithAudit(as("admin"), "admin", "users/n1", "users", "n1", newUser("entry", true)),
+    );
+    await assertFails(
+      writeWithAudit(as("admin"), "admin", "users/n2", "users", "n2", newUser("entry", false)),
+    );
+    await assertFails(writeWithAudit(as("admin"), "admin", "users/n3", "users", "n3", newUser("entry")));
+  });
+  it("الإدارة تنشئ «إدارة» أخرى وتعدّلها", async () => {
+    await assertSucceeds(
+      writeWithAudit(as("admin"), "admin", "users/n4", "users", "n4", newUser("admin", true)),
+    );
+    await assertSucceeds(
+      writeWithAudit(as("admin"), "admin", "users/n4", "users", "n4", { active: false }, "update"),
+    );
+  });
+  it("قبل التغيير لا يصل لأي بيانات", async () => {
+    await seedPending();
+    await assertFails(getDoc(doc(as("pending"), "suppliers/s1")));
+    await assertFails(getDoc(doc(as("pending"), "settings/lock")));
+    await assertSucceeds(getDoc(doc(as("pending"), "users/pending")));
+  });
+  it("يزيل العلم عن نفسه بسجل تدقيق، ثم يصل لموردينه", async () => {
+    await seedPending();
+    await assertSucceeds(clearFlag(as("pending"), "pending"));
+    await assertSucceeds(getDoc(doc(as("pending"), "suppliers/s1")));
+  });
+  it("لا يغيّر غير العلم ولا يعيده", async () => {
+    await seedPending();
+    await assertFails(clearFlag(as("pending"), "pending", "passwordChanged", { assigned: ["s1", "s2"] }));
+    await assertFails(clearFlag(as("pending"), "pending", "update"));
+    await assertSucceeds(clearFlag(as("pending"), "pending"));
+    await assertFails(clearFlag(as("pending"), "pending"));
+  });
+  it("لا يزيل العلم عن غيره", async () => {
+    await seedPending();
+    await assertFails(clearFlag(as("entry"), "pending"));
+  });
+  it("الموقوف لا يزيل العلم", async () => {
+    await seedPending();
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await updateDoc(doc(asDb(ctx.firestore()), "users/pending"), { active: false });
+    });
+    await assertFails(clearFlag(as("pending"), "pending"));
+  });
+});
+
+describe("مدة الخمول (DECISIONS 2026-10-10)", () => {
+  const put = (uid: string, idleMinutes: unknown) =>
+    writeWithAudit(as(uid), uid, "settings/session", "settings", "session", { idleMinutes });
+  it("المالك فقط، من 5 إلى 120 دقيقة عدداً صحيحاً", async () => {
+    await assertFails(put("admin", 30));
+    await assertSucceeds(put("owner", 30));
+    await assertSucceeds(put("owner", 5));
+    await assertSucceeds(put("owner", 120));
+    await assertFails(put("owner", 4));
+    await assertFails(put("owner", 121));
+    await assertFails(put("owner", 30.5));
+    await assertFails(put("owner", "30"));
+  });
+  it("يقرؤها كل مستخدم نشط", async () => {
+    await assertSucceeds(getDoc(doc(as("entry"), "settings/session")));
+    await assertFails(getDoc(doc(as("inactive"), "settings/session")));
+  });
+});

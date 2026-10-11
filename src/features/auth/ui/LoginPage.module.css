@@ -1,0 +1,176 @@
+/* الخيار «ب. مقسومة» المعتمد: لوح أخضر بالشعار والساعة، والنموذج بجانبه. على الجوال شريط علوي. */
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  min-block-size: 100dvh;
+}
+
+.side {
+  background: var(--brand-panel);
+  color: var(--brand-on);
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mark {
+  inline-size: 120px;
+  block-size: 120px;
+}
+
+.word {
+  margin: 0;
+  font-family: var(--f-brand);
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.tag {
+  margin: 0;
+  max-inline-size: 32ch;
+  font-size: 16px;
+  opacity: 0.85;
+}
+
+.clock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 1.2;
+}
+
+.time {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 52px;
+  font-weight: 600;
+}
+
+.time small {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.date {
+  font-size: 16px;
+  opacity: 0.85;
+}
+
+.main {
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  padding: 40px clamp(16px, 5vw, 64px);
+}
+
+.form {
+  inline-size: 100%;
+  max-inline-size: 420px;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.4;
+}
+
+.sub {
+  margin: 4px 0 18px;
+  color: var(--ink-2);
+  font-size: 15.5px;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.link {
+  min-block-size: 40px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.note {
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+@media (width <= 760px) {
+  .page {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .side {
+    flex-direction: row;
+    align-items: center;
+    padding: 14px 16px;
+  }
+
+  .brand {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mark {
+    inline-size: 44px;
+    block-size: 44px;
+  }
+
+  .word {
+    font-size: 26px;
+  }
+
+  .tag {
+    display: none;
+  }
+
+  .clock {
+    align-items: flex-end;
+  }
+
+  .time {
+    font-size: 24px;
+  }
+
+  .time small {
+    font-size: 14px;
+  }
+
+  .date {
+    font-size: 12.5px;
+  }
+
+  .main {
+    align-items: flex-start;
+    padding: 24px 16px 40px;
+  }
+}

@@ -5,9 +5,16 @@ import { FieldShell } from "./Field";
 import f from "./Field.module.css";
 import s from "./LoginFields.module.css";
 
-export function IdentifierField(p: { value: string; onChange: (v: string) => void; error?: string | null }) {
+export function IdentifierField(p: {
+  value: string;
+  onChange: (v: string) => void;
+  onBlur?: () => void;
+  error?: string | null;
+  label?: string;
+  hint?: string;
+}) {
   return (
-    <FieldShell label="البريد أو اسم المستخدم" required error={p.error ?? null}>
+    <FieldShell label={p.label ?? "البريد أو اسم المستخدم"} required error={p.error ?? null} hint={p.hint}>
       {(ids) => (
         <div className={f.box}>
           <input
@@ -21,6 +28,7 @@ export function IdentifierField(p: { value: string; onChange: (v: string) => voi
             aria-invalid={ids.invalid || undefined}
             aria-describedby={ids.describedBy}
             onChange={(e) => p.onChange(e.target.value)}
+            onBlur={p.onBlur}
           />
         </div>
       )}
@@ -36,6 +44,7 @@ export type PasswordFieldProps = {
   label?: string;
   context?: string[];
   error?: string | null;
+  hint?: string;
 };
 
 /** زر إظهار/إخفاء، ومؤشر قوة بالمستوى فقط دون كشف القواعد. */
@@ -43,7 +52,7 @@ export function PasswordField(p: PasswordFieldProps) {
   const [shown, setShown] = useState(false);
   const strength = p.mode === "set" ? passwordStrength(p.value, p.context) : 0;
   return (
-    <FieldShell label={p.label ?? "كلمة المرور"} required error={p.error ?? null}>
+    <FieldShell label={p.label ?? "كلمة المرور"} required error={p.error ?? null} hint={p.hint}>
       {(ids) => (
         <>
           <div className={f.box}>

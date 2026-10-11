@@ -1,0 +1,221 @@
+.page {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-block-size: 100%;
+}
+
+.state {
+  padding: 28px clamp(16px, 3vw, 34px);
+  color: var(--ink-2);
+}
+
+.who {
+  background: var(--paper);
+  border-inline-end: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  padding-block-end: 16px;
+}
+
+.grp {
+  margin: 0;
+  padding: 16px 14px 6px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.it {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 50px;
+  padding: 4px 14px;
+  color: var(--ink);
+  text-decoration: none;
+  border-inline-start: 4px solid transparent;
+}
+
+.it:hover {
+  background: var(--wash-2);
+}
+
+.it[aria-current="page"] {
+  background: var(--surface);
+  border-inline-start-color: var(--accent);
+  font-weight: 700;
+}
+
+.it:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.it .num {
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.off {
+  margin-inline-start: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--neg);
+  border: 1.5px dashed var(--neg);
+  border-radius: var(--r-sm);
+  padding: 0 6px;
+}
+
+.dot {
+  display: inline-block;
+  inline-size: 8px;
+  block-size: 8px;
+  margin-inline-start: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: middle;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px clamp(16px, 2.4vw, 26px) 24px;
+  min-inline-size: 0;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px 14px;
+  flex-wrap: wrap;
+  padding-block-end: 8px;
+  border-block-end: 3px double var(--ink);
+}
+
+.title {
+  flex: 1;
+  min-inline-size: 0;
+  margin: 0;
+  font-size: clamp(20px, 2vw, 24px);
+  line-height: 1.4;
+}
+
+.back {
+  display: none;
+  align-items: center;
+  min-block-size: var(--touch);
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.toUser {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 40px;
+  color: var(--accent);
+  font-size: 15px;
+  text-underline-offset: 3px;
+}
+
+.tools {
+  display: flex;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.search {
+  flex: 1;
+  min-inline-size: 200px;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  border-block-start: 1px solid var(--rule);
+}
+
+.list > button {
+  inline-size: 100%;
+  min-block-size: 48px;
+  border-block-end: 1px solid var(--rule);
+  padding-inline: 6px;
+}
+
+.empty,
+.muted {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+.empty {
+  padding: 18px 14px;
+}
+
+.savebar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-block-start: 6px;
+  padding-block: 10px;
+  border-block-start: 1px solid var(--ink);
+  border-block-end: 4px double var(--ink);
+}
+
+.diff {
+  flex: 1;
+  min-inline-size: 200px;
+  font-size: 15px;
+}
+
+.plus {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.minus {
+  color: var(--neg);
+  font-weight: 700;
+}
+
+.parts {
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+/* الجوال: القائمة أولاً، ثم الموردون بزر رجوع (النسخة 2 المعتمدة) */
+@media (width <= 720px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
+  .who {
+    border-inline-end: 0;
+  }
+
+  .it {
+    border-inline-start: 0;
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .it[aria-current="page"] {
+    background: transparent;
+    font-weight: 400;
+  }
+
+  .page:not(.open) .body {
+    display: none;
+  }
+
+  .open .who {
+    display: none;
+  }
+
+  .back {
+    display: inline-flex;
+  }
+}

@@ -1,36 +1,42 @@
 .page {
-  min-block-size: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 24px 16px;
+  padding: 28px clamp(16px, 3vw, 34px) 40px;
+  max-inline-size: 760px;
 }
 
-.card {
-  background: var(--surface);
-  border-inline-start: 4px double var(--margin);
-  padding: 28px 30px;
-  max-inline-size: 520px;
-  inline-size: 100%;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.brand svg {
-  inline-size: 48px;
-  block-size: 48px;
-}
-
-.name {
-  font-family: var(--f-brand);
-  font-size: 30px;
-  margin: 0;
+.title {
+  margin: 0 0 8px;
+  font-size: clamp(25px, 2.3vw, 32px);
+  line-height: 1.4;
+  padding-block-end: 12px;
+  border-block-end: 3px double var(--ink);
 }
 
 .note {
   color: var(--ink-2);
-  margin-block: 12px 0;
+  margin: 12px 0 18px;
+}
+
+.links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block-start: 1px solid var(--rule);
+}
+
+.links li {
+  border-block-end: 1px solid var(--rule);
+}
+
+.links a {
+  display: flex;
+  align-items: center;
+  min-block-size: 56px;
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.links a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

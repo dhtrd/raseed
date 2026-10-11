@@ -5,13 +5,18 @@
 
 | المجموعة | المعرّف | الحقول | من يقرأ | من يكتب |
 |---|---|---|---|---|
-| `users` | uid من Firebase Auth | `displayName`, `login`, `role` (owner/admin/entry), `assigned[]`, `active`, `auditId`, `createdAt`, `updatedAt` | صاحبه، والمالك والإدارة | المالك والإدارة (عدا حساب المالك). دور «المالك» لا يُمنح من التطبيق؛ يُنشأ بسكربت الإعداد |
+| `users` | uid من Firebase Auth | `displayName`, `login`, `role` (owner/admin/entry), `assigned[]`, `active`, `mustChangePassword`, `auditId`, `createdAt`, `updatedAt` | صاحبه، والمالك والإدارة | المالك والإدارة (عدا حساب المالك)، والإنشاء بـ `mustChangePassword=true` إلزاماً. صاحب الحساب يزيل العلم عن نفسه فقط بسجل `passwordChanged`. دور «المالك» لا يُمنح من التطبيق؛ يُنشأ بـ `tools/admin/create-owner.ts` |
 | `suppliers` | تلقائي | `name` (≤100), `status` (active/archived), `auditId` | المالك والإدارة؛ المدخل لمسنَديه فقط | المالك والإدارة |
 | `entries` | تلقائي | `supplierId`, `kind` (inv/misc/note؛ untyped للمنقول فقط), `date` (YYYY-MM-DD), `mainRef`, `refNo`, `voucher`, `details`, `debit`, `credit` (هللات، عدد صحيح), `reversed`, `note`, `odoo` {entered, by, at, reason, reasonText} للفواتير فقط, `dup` {reason}, `needsManualFix`, `deleted`, `auditId`, `createdBy`, `createdAt`, `updatedAt` | المالك والإدارة؛ المدخل لمسنَديه وغير المحذوف | الإضافة للجميع (المدخل لمسنَديه)؛ التعديل للمالك والإدارة؛ الحذف الناعم للمالك؛ لا حذف نهائي |
 | `refs` | الرقم المرجعي مع استبدال `/` بـ `|` | `ids[]` معرّفات الحركات بهذا الرقم، و`places[]` {entryId, supplierId, supplierName} لعرض مكان التكرار لكل مستخدم | كل مستخدم نشط (لفحص التكرار) | يُكتب مع الحركة في الدفعة نفسها |
 | `settings/lock` | ثابت | `lockedThrough` (YYYY-MM-DD), `auditId` | كل مستخدم نشط | المالك فقط |
+| `settings/session` | ثابت | `idleMinutes` (عدد صحيح 5–120، الافتراضي 30 إن غاب) | كل مستخدم نشط | المالك فقط |
 | `settings/roleNames` | ثابت | `owner`, `admin`, `entry` (≤40) | كل مستخدم نشط | المالك فقط |
 | `auditLog` | تلقائي | `actor`, `at`, `action`, `entity`, `entityId`, `before?`, `after?`, `reason?` | المالك والإدارة | إضافة فقط باسم الكاتب نفسه؛ لا تعديل ولا حذف |
+
+## الحساب النشط
+- **نشط** = مستند `users` موجود و`active=true` و`mustChangePassword` ليس `true`. من عليه تغيير الكلمة المؤقتة يقرأ مستنده فقط ولا يصل لأي بيانات حتى يغيّرها (DECISIONS 2026-10-10).
+- **ملاحظة:** القواعد لا ترى Firebase Auth، فلا تتحقق أن الكلمة تغيّرت فعلاً؛ الواجهة تزيل العلم بعد نجاح `updatePassword` مباشرة.
 
 ## ما تفرضه القواعد على الحركة
 - **الاتجاه:** الفاتورة دائن والقيد مدين؛ `reversed=true` فقط يعكسه (مرتجع/استرداد). لا مدين ودائن معاً، ولا صفر، ولا كسور هللات.

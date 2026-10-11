@@ -1,0 +1,7 @@
+.count {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--neg);
+}

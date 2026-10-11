@@ -3,7 +3,8 @@ import { Icon } from "../../ui/Icon";
 import s from "./Checkbox.module.css";
 
 export type CheckboxProps = {
-  checked: boolean;
+  /** «mixed» لتحديد جزئي (مثل «تحديد الظاهر» حين يُحدَّد بعضه) */
+  checked: boolean | "mixed";
   onChange: (checked: boolean) => void;
   children: ReactNode;
   disabled?: boolean;
@@ -27,7 +28,7 @@ export function Checkbox(p: CheckboxProps) {
       aria-invalid={p.invalid || undefined}
       aria-describedby={p.describedBy}
       onClick={() => {
-        if (!p.disabled) p.onChange(!p.checked);
+        if (!p.disabled) p.onChange(p.checked !== true);
       }}
     >
       <span className={s.box}>
