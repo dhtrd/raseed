@@ -11,11 +11,13 @@ import { normalizeRef } from "../../../shared/fields/core/ref";
 import { Banner } from "../../../shared/ui/Banner";
 import { Button } from "../../../shared/ui/Button";
 import { Dialog, dialogStyles as d } from "../../../shared/ui/Dialog";
+import { useMediaQuery } from "../../../shared/ui/useMediaQuery";
 import { useProfile } from "../../auth/session/SessionProvider";
 import {
   batchSummary,
   blankRow,
   checkRows,
+  cleanTypedAmount,
   fillSequence,
   FIELD_ORDER,
   isBlank,
@@ -33,6 +35,7 @@ import {
   type NewEntry,
 } from "../data/entriesRepo";
 import { watchLockedThrough } from "../data/invoicesRepo";
+import { QuickEntryMobile } from "./QuickEntryMobile";
 import { useKeyedLoad, useKeyedWatch, useVisibleSuppliers } from "./useLedgerData";
 import l from "./Ledger.module.css";
 import s from "./QuickEntry.module.css";
@@ -49,12 +52,16 @@ const LABEL: Record<CellField, string> = {
   amount: "المبلغ",
 };
 
-/** الإدخال السريع (لسان 4 المعتمد): دفعة لمورد واحد بالطرق الثلاث على جدول واحد، للحاسوب واللوحي. */
+/**
+ * الإدخال السريع (لسان 4 المعتمد): دفعة لمورد واحد بالطرق الثلاث على جدول واحد للحاسوب واللوحي،
+ * وعلى الجوال «خطوة لكل صف» (الخيار ج) بلا تعبئة تسلسلية (DECISIONS 2026-10-11).
+ */
 export function QuickEntryPage() {
   const profile = useProfile();
   const { sid } = useParams();
   const navigate = useNavigate();
   const today = todayInRiyadh();
+  const phone = useMediaQuery("(width <= 600px)");
   const suppliers = useVisibleSuppliers(profile);
   const list = useMemo(
     () => (suppliers.status === "ready" ? suppliers.data.filter((x) => !x.archived) : []),
@@ -211,6 +218,9 @@ export function QuickEntryPage() {
     setFocusNext(`${target}:date`);
   };
 
+  const removeRow = (key: string) =>
+    setRows((rs) => (rs.length > 1 ? rs.filter((x) => x.key !== key) : [blankRow()]));
+
   const commitDate = (i: number) => {
     const r = view[i];
     const c = checks[i];
@@ -225,12 +235,16 @@ export function QuickEntryPage() {
     touch(r.key, "amount");
   };
 
-  const save = async () => {
-    if (!supplier || progress) return;
+  /** يعيد true إن حُفظت الدفعة كلها. */
+  const save = async (): Promise<boolean> => {
+    if (!supplier || progress) return false;
     setShowAll(true);
     setOutcome(null);
     const idx = view.map((r, i) => (isBlank(r) ? -1 : i)).filter((i) => i >= 0);
-    if (!idx.length) return setOutcome({ tone: "info", text: "الدفعة فارغة: أضف صفاً واحداً على الأقل." });
+    if (!idx.length) {
+      setOutcome({ tone: "info", text: "الدفعة فارغة: أضف صفاً واحداً على الأقل." });
+      return false;
+    }
     // كل رقم يُفحص مقابل المحفوظ قبل الحفظ، ولو لم يكتمل فحصه بعد
     const missing = [...new Set(idx.map((i) => checks[i]?.refNo ?? "").filter((r) => r && !saved.has(r)))];
     let savedNow = saved;
@@ -246,10 +260,11 @@ export function QuickEntryPage() {
         setSaved(savedNow);
       } catch (e) {
         console.error("تعذّر فحص التكرار قبل الحفظ", e);
-        return setOutcome({
+        setOutcome({
           tone: "err",
           text: "لم يُحفظ شيء: تعذّر فحص التكرار. تحقق من الاتصال ثم أعد المحاولة.",
         });
+        return false;
       }
     }
     const final = checkRows(view, { ...checkCtx, saved: savedNow });
@@ -259,12 +274,13 @@ export function QuickEntryPage() {
       const first = view[bad[0] ?? dups[0] ?? 0];
       const firstErr = Object.keys(final[bad[0] ?? dups[0] ?? 0]?.errors ?? {})[0];
       if (first && firstErr && firstErr !== "dup") setFocusNext(`${first.key}:${firstErr}`);
-      return setOutcome({
+      setOutcome({
         tone: "err",
         text: `لم يُحفظ شيء. ${bad.length ? `${bad.length} صف فيه أخطاء. ` : ""}${
           dups.length ? `${dups.length} صف مكرر يحتاج تأكيداً وسبباً.` : ""
         }`,
       });
+      return false;
     }
     const entries: NewEntry[] = idx.map((i) => {
       const r = view[i] as BatchRow;
@@ -305,10 +321,11 @@ export function QuickEntryPage() {
       setShowAll(false);
       setPicked(new Set());
       setFocusNext(`${fresh.key}:date`);
-      return setOutcome({
+      setOutcome({
         tone: "ok",
         text: `حُفظت ${res.saved} حركة للمورد ${supplier.name}، وسُجّلت كلها في التدقيق.`,
       });
+      return true;
     }
     setRows((rs) => rs.filter((r) => !savedKeys.has(r.key)));
     const why =
@@ -322,6 +339,7 @@ export function QuickEntryPage() {
       tone: "err",
       text: `حُفظت ${res.saved} من ${entries.length} وأُزيلت من الجدول. توقف الحفظ: ${why}. الصفوف الباقية لم تُحفظ؛ صحّحها أو أعد المحاولة.`,
     });
+    return false;
   };
 
   const saveRef = useRef(save);
@@ -391,12 +409,7 @@ export function QuickEntryPage() {
           </Link>
         </div>
 
-        <p className={s.mobileNote}>
-          الإدخال السريع للحاسوب واللوحي. تصميم بطاقته على الجوال بانتظار الاعتماد؛ استخدم «حركة واحدة
-          بالنموذج».
-        </p>
-
-        <div className={s.desk}>
+        <div>
           <div className={s.qsup}>
             <div className={s.pick}>
               {suppliers.status === "ready" ? (
@@ -435,259 +448,295 @@ export function QuickEntryPage() {
           ) : null}
           {ctx.status === "error" ? <Banner tone="err">{ctx.message}</Banner> : null}
 
-          <div className={s.modes}>
-            <Segment
-              label="طريقة الإدخال"
-              value={mode}
-              onChange={(m) => {
-                setMode(m);
-                setFillMsg(null);
+          {phone ? (
+            <QuickEntryMobile
+              view={view}
+              checks={checks}
+              saved={saved}
+              lastRef={lastRef}
+              disabled={disabled}
+              progress={progress}
+              outcome={outcome}
+              shown={shown}
+              update={update}
+              touch={touch}
+              commitDate={commitDate}
+              commitAmount={commitAmount}
+              addRow={addRow}
+              removeRow={removeRow}
+              register={registerCell}
+              focus={setFocusNext}
+              save={save}
+              paste={{
+                text: pasteText,
+                setText: setPasteText,
+                preview,
+                previewChecks,
+                parse: (t) => setPreview(parsePasted(t)),
+                accept: acceptPaste,
+                cancel: () => {
+                  setPreview(null);
+                  setPasteText("");
+                },
               }}
-              options={[
-                { value: "seq", label: "1. المتتابع" },
-                { value: "fill", label: "2. التعبئة التسلسلية" },
-                { value: "paste", label: "3. اللصق من الإكسل" },
-              ]}
             />
-            <ol className={s.howto}>
-              {howto[mode].map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ol>
-          </div>
-
-          {mode === "fill" ? (
-            <div className={s.tool}>
-              <label className={s.fillField}>
-                <span className={s.fl}>ابدأ التسلسل من</span>
-                <input
-                  className={`${s.cell} num`}
-                  inputMode="numeric"
-                  value={fillStart}
-                  onChange={(e) => setFillStart(normalizeDigits(e.target.value).replace(/\D/g, ""))}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      doFill();
-                    }
+          ) : (
+            <>
+              <div className={s.modes}>
+                <Segment
+                  label="طريقة الإدخال"
+                  value={mode}
+                  onChange={(m) => {
+                    setMode(m);
+                    setFillMsg(null);
                   }}
+                  options={[
+                    { value: "seq", label: "1. المتتابع" },
+                    { value: "fill", label: "2. التعبئة التسلسلية" },
+                    { value: "paste", label: "3. اللصق من الإكسل" },
+                  ]}
                 />
-              </label>
-              <Button onClick={doFill} disabled={disabled}>
-                تعبئة المراجع للصفوف المحددة ({picked.size})
-              </Button>
-              <Button
-                variant="ghost"
-                disabled={disabled}
-                onClick={() =>
-                  setRows((rs) => {
-                    const last = rs[rs.length - 1];
-                    const add = Array.from({ length: 5 }, () =>
-                      blankRow(last ? { dateRaw: last.dateRaw, type: last.type } : undefined),
-                    );
-                    return [...rs, ...add];
-                  })
-                }
-              >
-                إضافة 5 صفوف فارغة
-              </Button>
-              {fillMsg ? (
-                <p className={fillMsg.tone === "err" ? s.msgErr : s.msgInfo} role="status">
-                  {fillMsg.text}
-                </p>
-              ) : null}
-            </div>
-          ) : null}
+                <ol className={s.howto}>
+                  {howto[mode].map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ol>
+              </div>
 
-          {mode === "paste" ? (
-            <div className={`${s.tool} ${s.col}`}>
-              <label className={s.fl} htmlFor="pasteZone">
-                انسخ الأعمدة من الإكسل والصقها هنا (Ctrl+V)
-              </label>
-              <textarea
-                id="pasteZone"
-                className={s.pz}
-                rows={3}
-                value={pasteText}
-                disabled={disabled}
-                onChange={(e) => setPasteText(e.target.value)}
-                onPaste={(e) => {
-                  e.preventDefault();
-                  const t = e.clipboardData.getData("text");
-                  setPasteText(t);
-                  setPreview(parsePasted(t));
-                }}
-                onBlur={() => {
-                  if (pasteText.trim() && !preview) setPreview(parsePasted(pasteText));
-                }}
-              />
-              {preview ? (
-                <div className={s.preview}>
-                  <h2 className={s.h2}>معاينة قبل النقل إلى الدفعة</h2>
-                  <div className={s.gridWrap}>
-                    <table className={s.pv}>
-                      <thead>
-                        <tr>
-                          <th scope="col">#</th>
-                          <th scope="col">التاريخ</th>
-                          <th scope="col">النوع</th>
-                          <th scope="col">المرجع</th>
-                          <th scope="col">الرقم المرجعي</th>
-                          <th scope="col" className={s.amt}>
-                            المبلغ
-                          </th>
-                          <th scope="col">البيان</th>
-                          <th scope="col">الحالة</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {preview.map((r, n) => {
-                          const c = previewChecks[n];
-                          const errs = Object.entries(c?.errors ?? {}).filter(([k]) => k !== "dup");
-                          return (
-                            <tr key={r.key}>
-                              <td className="num">{n + 1}</td>
-                              <td className="num">{c?.date ? formatDate(c.date) : r.dateRaw}</td>
-                              <td>{r.type === "inv" ? "فاتورة" : "قيد"}</td>
-                              <td className="num">{r.ref}</td>
-                              <td className="num">{c?.refNo}</td>
-                              <td className={`${s.amt} num`}>{r.amountRaw}</td>
-                              <td>{r.details}</td>
-                              <td>
-                                {errs.length ? (
-                                  <span className={`${s.qs} ${s.bad}`}>✗ {errs[0]?.[1]}</span>
-                                ) : c?.refNo && !saved.has(c.refNo) ? (
-                                  <span className={s.qs}>… جارٍ فحص التكرار</span>
-                                ) : c?.dupOf ? (
-                                  <span className={`${s.qs} ${s.dupS}`}>⚠ مسجّل لـ {c.dupOf.join("، ")}</span>
-                                ) : (
-                                  <span className={`${s.qs} ${s.good}`}>✓ صالح</span>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className={s.row}>
-                    <Button variant="primary" onClick={acceptPaste}>
-                      نقل إلى الدفعة للمراجعة ({preview.length})
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setPreview(null);
-                        setPasteText("");
+              {mode === "fill" ? (
+                <div className={s.tool}>
+                  <label className={s.fillField}>
+                    <span className={s.fl}>ابدأ التسلسل من</span>
+                    <input
+                      className={`${s.cell} num`}
+                      inputMode="numeric"
+                      value={fillStart}
+                      onChange={(e) => setFillStart(normalizeDigits(e.target.value).replace(/\D/g, ""))}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          doFill();
+                        }
                       }}
-                    >
-                      إلغاء
-                    </Button>
-                  </div>
+                    />
+                  </label>
+                  <Button onClick={doFill} disabled={disabled}>
+                    تعبئة المراجع للصفوف المحددة ({picked.size})
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    disabled={disabled}
+                    onClick={() =>
+                      setRows((rs) => {
+                        const last = rs[rs.length - 1];
+                        const add = Array.from({ length: 5 }, () =>
+                          blankRow(last ? { dateRaw: last.dateRaw, type: last.type } : undefined),
+                        );
+                        return [...rs, ...add];
+                      })
+                    }
+                  >
+                    إضافة 5 صفوف فارغة
+                  </Button>
+                  {fillMsg ? (
+                    <p className={fillMsg.tone === "err" ? s.msgErr : s.msgInfo} role="status">
+                      {fillMsg.text}
+                    </p>
+                  ) : null}
                 </div>
               ) : null}
-            </div>
-          ) : null}
 
-          {outcome ? (
-            <div className={s.outcome}>
-              <Banner tone={outcome.tone}>{outcome.text}</Banner>
-            </div>
-          ) : null}
-
-          <div className={s.gridWrap}>
-            <table className={`${s.qg} ${mode === "fill" ? s.fillmode : ""}`} aria-label="صفوف الدفعة">
-              <thead>
-                <tr>
-                  {mode === "fill" ? (
-                    <th scope="col" className={s.cs}>
-                      <span className="sr-only">تحديد</span>
-                    </th>
-                  ) : null}
-                  <th scope="col">#</th>
-                  <th scope="col">التاريخ</th>
-                  <th scope="col">النوع</th>
-                  <th scope="col">المرجع</th>
-                  <th scope="col">الرقم المرجعي</th>
-                  <th scope="col">السند</th>
-                  <th scope="col">التفاصيل</th>
-                  <th scope="col" className={s.amt}>
-                    مدين
-                  </th>
-                  <th scope="col" className={s.amt}>
-                    دائن
-                  </th>
-                  <th scope="col">الحالة</th>
-                </tr>
-              </thead>
-              <tbody>
-                {view.map((r, i) => (
-                  <Row
-                    key={r.key}
-                    r={r}
-                    i={i}
-                    c={checks[i] as RowCheck}
-                    blank={isBlank(r)}
-                    checking={Boolean(checks[i]?.refNo) && !saved.has(checks[i]?.refNo ?? "")}
-                    fill={mode === "fill"}
-                    picked={picked.has(r.key)}
+              {mode === "paste" ? (
+                <div className={`${s.tool} ${s.col}`}>
+                  <label className={s.fl} htmlFor="pasteZone">
+                    انسخ الأعمدة من الإكسل والصقها هنا (Ctrl+V)
+                  </label>
+                  <textarea
+                    id="pasteZone"
+                    className={s.pz}
+                    rows={3}
+                    value={pasteText}
                     disabled={disabled}
-                    shown={shown}
-                    register={registerCell}
-                    onPick={(shift) => {
-                      setPicked((p) => {
-                        const n = new Set(p);
-                        if (shift && anchor !== null) {
-                          const [a, z] = [Math.min(anchor, i), Math.max(anchor, i)];
-                          for (let k = a; k <= z; k++) {
-                            const key = view[k]?.key;
-                            if (key) n.add(key);
-                          }
-                        } else if (n.has(r.key)) n.delete(r.key);
-                        else n.add(r.key);
-                        return n;
-                      });
-                      setAnchor(i);
+                    onChange={(e) => setPasteText(e.target.value)}
+                    onPaste={(e) => {
+                      e.preventDefault();
+                      const t = e.clipboardData.getData("text");
+                      setPasteText(t);
+                      setPreview(parsePasted(t));
                     }}
-                    onChange={(patch) => update(r.key, patch)}
-                    onKey={(e, f) => onCellKey(e, i, f)}
-                    onBlur={(f) =>
-                      f === "date" ? commitDate(i) : f === "amount" ? commitAmount(i) : touch(r.key, f)
-                    }
-                    onRemove={() => {
-                      setRows((rs) => (rs.length > 1 ? rs.filter((x) => x.key !== r.key) : [blankRow()]));
+                    onBlur={() => {
+                      if (pasteText.trim() && !preview) setPreview(parsePasted(pasteText));
                     }}
                   />
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  {preview ? (
+                    <div className={s.preview}>
+                      <h2 className={s.h2}>معاينة قبل النقل إلى الدفعة</h2>
+                      <div className={s.gridWrap}>
+                        <table className={s.pv}>
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">التاريخ</th>
+                              <th scope="col">النوع</th>
+                              <th scope="col">المرجع</th>
+                              <th scope="col">الرقم المرجعي</th>
+                              <th scope="col" className={s.amt}>
+                                المبلغ
+                              </th>
+                              <th scope="col">البيان</th>
+                              <th scope="col">الحالة</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {preview.map((r, n) => {
+                              const c = previewChecks[n];
+                              const errs = Object.entries(c?.errors ?? {}).filter(([k]) => k !== "dup");
+                              return (
+                                <tr key={r.key}>
+                                  <td className="num">{n + 1}</td>
+                                  <td className="num">{c?.date ? formatDate(c.date) : r.dateRaw}</td>
+                                  <td>{r.type === "inv" ? "فاتورة" : "قيد"}</td>
+                                  <td className="num">{r.ref}</td>
+                                  <td className="num">{c?.refNo}</td>
+                                  <td className={`${s.amt} num`}>{r.amountRaw}</td>
+                                  <td>{r.details}</td>
+                                  <td>
+                                    {errs.length ? (
+                                      <span className={`${s.qs} ${s.bad}`}>✗ {errs[0]?.[1]}</span>
+                                    ) : c?.refNo && !saved.has(c.refNo) ? (
+                                      <span className={s.qs}>… جارٍ فحص التكرار</span>
+                                    ) : c?.dupOf ? (
+                                      <span className={`${s.qs} ${s.dupS}`}>
+                                        ⚠ مسجّل لـ {c.dupOf.join("، ")}
+                                      </span>
+                                    ) : (
+                                      <span className={`${s.qs} ${s.good}`}>✓ صالح</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className={s.row}>
+                        <Button variant="primary" onClick={acceptPaste}>
+                          نقل إلى الدفعة للمراجعة ({preview.length})
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          onClick={() => {
+                            setPreview(null);
+                            setPasteText("");
+                          }}
+                        >
+                          إلغاء
+                        </Button>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
 
-          <div className={s.qfoot}>
-            <span className={s.muted} aria-live="polite">
-              <b className="num">{summary.total}</b> صف في الدفعة · <b className="num">{summary.bad}</b> بها
-              أخطاء · <b className="num">{summary.dups}</b> مكررة تنتظر تأكيداً
-            </span>
-            <Button variant="ghost" disabled={disabled} onClick={() => setFocusNext(`${addRow()}:date`)}>
-              صف جديد
-            </Button>
-            <Button
-              variant="primary"
-              busy={progress !== null}
-              disabled={!supplier}
-              onClick={() => void save()}
-            >
-              حفظ الدفعة ({summary.total})<kbd className={s.kbd}>Ctrl+S</kbd>
-            </Button>
-            <span className={s.status} role="status">
-              {progress ? `جارٍ الحفظ: ${progress.done} من ${progress.of}…` : ""}
-            </span>
-          </div>
-          <p className={s.note}>
-            الحفظ بعد فحص كل الصفوف، على أجزاء من <span className="num">{BATCH_CHUNK}</span> حركات (كل جزء
-            يُحفظ كله أو لا شيء). إن تعثّر جزء يتوقف الحفظ، ويُزال المحفوظ من الجدول ويبقى غيره لإعادة
-            المحاولة.
-          </p>
+              {outcome ? (
+                <div className={s.outcome}>
+                  <Banner tone={outcome.tone}>{outcome.text}</Banner>
+                </div>
+              ) : null}
+
+              <div className={s.gridWrap}>
+                <table className={`${s.qg} ${mode === "fill" ? s.fillmode : ""}`} aria-label="صفوف الدفعة">
+                  <thead>
+                    <tr>
+                      {mode === "fill" ? (
+                        <th scope="col" className={s.cs}>
+                          <span className="sr-only">تحديد</span>
+                        </th>
+                      ) : null}
+                      <th scope="col">#</th>
+                      <th scope="col">التاريخ</th>
+                      <th scope="col">النوع</th>
+                      <th scope="col">المرجع</th>
+                      <th scope="col">الرقم المرجعي</th>
+                      <th scope="col">السند</th>
+                      <th scope="col">التفاصيل</th>
+                      <th scope="col" className={s.amt}>
+                        مدين
+                      </th>
+                      <th scope="col" className={s.amt}>
+                        دائن
+                      </th>
+                      <th scope="col">الحالة</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {view.map((r, i) => (
+                      <Row
+                        key={r.key}
+                        r={r}
+                        i={i}
+                        c={checks[i] as RowCheck}
+                        blank={isBlank(r)}
+                        checking={Boolean(checks[i]?.refNo) && !saved.has(checks[i]?.refNo ?? "")}
+                        fill={mode === "fill"}
+                        picked={picked.has(r.key)}
+                        disabled={disabled}
+                        shown={shown}
+                        register={registerCell}
+                        onPick={(shift) => {
+                          setPicked((p) => {
+                            const n = new Set(p);
+                            if (shift && anchor !== null) {
+                              const [a, z] = [Math.min(anchor, i), Math.max(anchor, i)];
+                              for (let k = a; k <= z; k++) {
+                                const key = view[k]?.key;
+                                if (key) n.add(key);
+                              }
+                            } else if (n.has(r.key)) n.delete(r.key);
+                            else n.add(r.key);
+                            return n;
+                          });
+                          setAnchor(i);
+                        }}
+                        onChange={(patch) => update(r.key, patch)}
+                        onKey={(e, f) => onCellKey(e, i, f)}
+                        onBlur={(f) =>
+                          f === "date" ? commitDate(i) : f === "amount" ? commitAmount(i) : touch(r.key, f)
+                        }
+                        onRemove={() => removeRow(r.key)}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className={s.qfoot}>
+                <span className={s.muted} aria-live="polite">
+                  <b className="num">{summary.total}</b> صف في الدفعة · <b className="num">{summary.bad}</b>{" "}
+                  بها أخطاء · <b className="num">{summary.dups}</b> مكررة تنتظر تأكيداً
+                </span>
+                <Button variant="ghost" disabled={disabled} onClick={() => setFocusNext(`${addRow()}:date`)}>
+                  صف جديد
+                </Button>
+                <Button
+                  variant="primary"
+                  busy={progress !== null}
+                  disabled={!supplier}
+                  onClick={() => void save()}
+                >
+                  حفظ الدفعة ({summary.total})<kbd className={s.kbd}>Ctrl+S</kbd>
+                </Button>
+                <span className={s.status} role="status">
+                  {progress ? `جارٍ الحفظ: ${progress.done} من ${progress.of}…` : ""}
+                </span>
+              </div>
+              <p className={s.note}>
+                الحفظ بعد فحص كل الصفوف، على أجزاء من <span className="num">{BATCH_CHUNK}</span> حركات (كل جزء
+                يُحفظ كله أو لا شيء). إن تعثّر جزء يتوقف الحفظ، ويُزال المحفوظ من الجدول ويبقى غيره لإعادة
+                المحاولة.
+              </p>
+            </>
+          )}
         </div>
       </main>
 
@@ -752,7 +801,7 @@ function Row(p: {
         if (f === "date") p.onChange({ dateRaw: v });
         else if (f === "ref") p.onChange({ ref: v, refAuto: false });
         else if (f === "voucher") p.onChange({ voucher: normalizeDigits(v).replace(/\D/g, "").slice(0, 12) });
-        else if (f === "amount") p.onChange({ amountRaw: cleanTyped(v) });
+        else if (f === "amount") p.onChange({ amountRaw: cleanTypedAmount(v) });
         else p.onChange({ details: v.slice(0, 200) });
       }}
       onKeyDown={(e) => p.onKey(e, f)}
@@ -887,13 +936,4 @@ function Row(p: {
       ) : null}
     </>
   );
-}
-
-/** المبلغ أثناء الكتابة: أرقام وفاصلة عشرية واحدة ومنزلتان، وفواصل آلاف (FIELDS «المبلغ»). */
-function cleanTyped(v: string): string {
-  const raw = normalizeDigits(v).replace(/[،٫]/g, ".");
-  const s = raw.replace(/,/g, "").replace(/[^0-9.]/g, "");
-  const [int = "", ...rest] = s.split(".");
-  const dec = rest.length ? "." + rest.join("").slice(0, 2) : "";
-  return int.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + dec;
 }

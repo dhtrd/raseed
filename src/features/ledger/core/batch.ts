@@ -220,3 +220,12 @@ export function batchSummary(rows: BatchRow[], checks: RowCheck[]) {
   });
   return { ready, bad, dups, total: ready + bad + dups };
 }
+
+/** المبلغ أثناء الكتابة: أرقام وفاصلة عشرية واحدة ومنزلتان، وفواصل آلاف (FIELDS «المبلغ»). */
+export function cleanTypedAmount(v: string): string {
+  const raw = normalizeDigits(v).replace(/[،٫]/g, ".");
+  const s = raw.replace(/,/g, "").replace(/[^0-9.]/g, "");
+  const [int = "", ...rest] = s.split(".");
+  const dec = rest.length ? "." + rest.join("").slice(0, 2) : "";
+  return int.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + dec;
+}

@@ -13,10 +13,6 @@
   margin: 0;
 }
 
-.mobileNote {
-  display: none;
-}
-
 .qsup {
   display: flex;
   justify-content: space-between;
@@ -469,19 +465,4 @@
   border-block-end-width: 2px;
   border-radius: var(--r-sm);
   opacity: 0.85;
-}
-
-/* الجوال: بطاقة الإدخال السريع بانتظار اعتماد نموذجها (DECISIONS 2026-10-11) */
-@media (width <= 600px) {
-  .desk {
-    display: none;
-  }
-
-  .mobileNote {
-    display: block;
-    padding: 14px 16px;
-    background: var(--wash-2);
-    border-inline-start: 4px solid var(--accent);
-    color: var(--ink);
-  }
 }
