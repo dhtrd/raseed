@@ -18,7 +18,7 @@ import {
 import { Amount, HeadSar, Money } from "./Amount";
 import { MobileSort, SortTh } from "./Sorting";
 import { SupplierIndex, useIndexCollapse } from "./SupplierIndex";
-import { useKeyedLoad, useVisibleSuppliers, type Loadable } from "./useLedgerData";
+import { useKeyedLoad, useLedgerVersion, useVisibleSuppliers, type Loadable } from "./useLedgerData";
 import l from "./Ledger.module.css";
 import s from "./Dashboard.module.css";
 
@@ -42,10 +42,13 @@ export function DashboardPage() {
   const idx = useIndexCollapse();
 
   const suppliers = useVisibleSuppliers(profile, reload);
-  const mgr = useManagerData(manager, reload);
+  const watchIds = suppliers.status === "ready" ? suppliers.data.map((x) => x.id) : null;
+  // الأرصدة التلقائية: المالك والإدارة يراقبون كل الحركات، ومدخل البيانات موردِيه المسندين فقط (القواعد)
+  const live = useLedgerVersion(watchIds === null ? null : manager ? "all" : watchIds);
+  const mgr = useManagerData(manager, `${reload}.${live.version}`);
   const balKey =
     suppliers.status === "ready"
-      ? `${suppliers.data.map((x) => x.id).join(",")}|${period.from}|${period.to}|${reload}`
+      ? `${suppliers.data.map((x) => x.id).join(",")}|${period.from}|${period.to}|${reload}.${live.version}`
       : null;
   const loaded = useKeyedLoad(
     balKey,
@@ -54,7 +57,11 @@ export function DashboardPage() {
       return { data: await balancesFor(suppliers.data, period), at: new Date() };
     },
     "حساب الأرصدة",
+    suppliers.status === "ready"
+      ? `${suppliers.data.map((x) => x.id).join(",")}|${period.from}|${period.to}`
+      : null,
   );
+  const refreshing = loaded.status === "ready" && loaded.stale === true;
   const balances: Loadable<SupplierBalance[]> =
     loaded.status === "ready" ? { status: "ready", data: loaded.data.data } : loaded;
   const updatedAt = loaded.status === "ready" ? loaded.data.at : null;
@@ -136,9 +143,16 @@ export function DashboardPage() {
           {loading
             ? "جارٍ حساب الأرصدة…"
             : updatedAt && balances.status === "ready"
-              ? `محدّثة ${updatedAt.toLocaleTimeString("ar-SA-u-nu-latn", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Riyadh" })}`
+              ? refreshing
+                ? "وصل تغيير جديد؛ جارٍ تحديث الأرصدة…"
+                : `تتحدث تلقائياً · آخر تحديث ${updatedAt.toLocaleTimeString("ar-SA-u-nu-latn", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Riyadh" })}`
               : ""}
         </p>
+        {live.error ? (
+          <div className={s.err}>
+            <Banner tone="info">التحديث التلقائي متوقف مؤقتاً: {live.error} استعمل زر «تحديث».</Banner>
+          </div>
+        ) : null}
         {supError || balError ? (
           <div className={s.err}>
             <Banner tone="err">{supError ?? balError}</Banner>
@@ -321,9 +335,7 @@ export function DashboardPage() {
         <section className={s.howto} aria-labelledby="how-h">
           <h2 id="how-h">قراءة الأرصدة</h2>
           <p>الرصيد = مدين − دائن. السالب مستحق للمورد علينا؛ والموجب رصيد مدين لنا لديه.</p>
-          <p>
-            الأرصدة تُحسب من الخادم عند تغيير الفترة أو الضغط على «تحديث»، ولا تتغير وحدها أثناء فتح الصفحة.
-          </p>
+          <p>الأرصدة تتحدث تلقائياً بعد أي إضافة أو تعديل. زر «تحديث» لإعادة الحساب يدوياً عند الحاجة.</p>
         </section>
       </aside>
     </div>
@@ -392,9 +404,9 @@ function BalanceRow(p: { r: SupplierBalance; open: boolean; flash: boolean; onTo
 }
 
 /** عدّادات المراجعة والإحصاءات للمالك والإدارة فقط (القواعد تمنعها عن مدخل البيانات). تُقرأ مرة لكل فتح أو تحديث. */
-function useManagerData(enabled: boolean, reloadKey: number) {
-  const review = useKeyedLoad(enabled ? `r${reloadKey}` : null, reviewCounts, "قراءة تنبيهات المراجعة");
-  const stats = useKeyedLoad(enabled ? `s${reloadKey}` : null, ledgerStats, "قراءة محتوى الدفتر");
+function useManagerData(enabled: boolean, reloadKey: string) {
+  const review = useKeyedLoad(enabled ? `r${reloadKey}` : null, reviewCounts, "قراءة تنبيهات المراجعة", "r");
+  const stats = useKeyedLoad(enabled ? `s${reloadKey}` : null, ledgerStats, "قراءة محتوى الدفتر", "s");
   return { review, stats };
 }
 

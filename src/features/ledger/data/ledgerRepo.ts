@@ -11,6 +11,7 @@ import {
   getCountFromServer,
   getDoc,
   getDocs,
+  limit,
   onSnapshot,
   orderBy,
   query,
@@ -134,4 +135,44 @@ export async function ledgerStats(): Promise<LedgerStats> {
     count(where("kind", "==", "untyped")),
   ]);
   return { entries, inv, misc, untyped };
+}
+
+/**
+ * إشارة تغيّر خفيفة للأرصدة التلقائية: تراقب آخر حركة عُدّلت فقط (قراءة عند الفتح وقراءة لكل تغيير)،
+ * بدل الاستماع لكل الحركات. كل إضافة أو تعديل يضع updatedAt = وقت الطلب (تفرضه القواعد).
+ * المالك والإدارة: استعلام واحد على كل الحركات. مدخل البيانات (أو كشف مورد واحد): استعلام لكل مورد.
+ * onChange يُستدعى مع كل لقطة؛ اللقطة الأولى تمثّل الحالة الحالية.
+ */
+export function watchLedgerChanges(
+  scope: { all: true } | { supplierIds: string[] },
+  onChange: (version: string) => void,
+  onError: (e: Error) => void,
+): Unsubscribe {
+  const { db } = firebase();
+  const base = collection(db, "entries");
+  const sign = (id: string, docs: { id: string; get: (f: string) => unknown }[]) => {
+    const d = docs[0];
+    const t = d?.get("updatedAt") as { toMillis?: () => number } | undefined;
+    return `${id}:${d?.id ?? "-"}:${typeof t?.toMillis === "function" ? t.toMillis() : 0}`;
+  };
+  if ("all" in scope) {
+    return onSnapshot(
+      query(base, orderBy("updatedAt", "desc"), limit(1)),
+      (snap) => onChange(sign("all", snap.docs)),
+      onError,
+    );
+  }
+  const parts = new Map<string, string>();
+  const unsubs = scope.supplierIds.map((sid) =>
+    onSnapshot(
+      query(base, where("supplierId", "==", sid), where("deleted", "==", false), orderBy("updatedAt", "desc"), limit(1)),
+      (snap) => {
+        parts.set(sid, sign(sid, snap.docs));
+        if (parts.size === scope.supplierIds.length) onChange([...parts.values()].join("|"));
+      },
+      onError,
+    ),
+  );
+  if (!scope.supplierIds.length) onChange("none");
+  return () => unsubs.forEach((u) => u());
 }
