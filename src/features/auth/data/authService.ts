@@ -42,14 +42,20 @@ export async function replaceTemporaryPassword(newPassword: string): Promise<voi
   const user = auth.currentUser;
   if (!user) throw Object.assign(new Error("لا جلسة"), { code: "auth/requires-recent-login" });
   await updatePassword(user, newPassword);
-  await clearTemporaryFlag(user.uid);
+  await recordPasswordChange(user.uid, "passwordChanged", true);
 }
 
-async function clearTemporaryFlag(uid: string): Promise<void> {
+/** سجل تدقيق لتغيير الكلمة، مع إزالة علم الكلمة المؤقتة إن طُلب (القواعد تسمح بهذين الإجراءين وحدهما قبل إزالته). */
+async function recordPasswordChange(
+  uid: string,
+  action: "passwordChanged" | "passwordReset",
+  clearFlag: boolean,
+): Promise<void> {
   const { db } = firebase();
   const batch = writeBatch(db);
-  const auditId = addAudit(batch, db, { actor: uid, action: "passwordChanged", entity: "users", entityId: uid });
-  batch.update(doc(db, "users", uid), { mustChangePassword: false, auditId, updatedAt: serverTimestamp() });
+  const auditId = addAudit(batch, db, { actor: uid, action, entity: "users", entityId: uid });
+  if (clearFlag)
+    batch.update(doc(db, "users", uid), { mustChangePassword: false, auditId, updatedAt: serverTimestamp() });
   await batch.commit();
 }
 
@@ -62,7 +68,8 @@ export function checkResetLink(code: string): Promise<string> {
 }
 
 /**
- * يعيّن الكلمة الجديدة ثم يدخل تلقائياً (قرار المستخدم)، ويزيل علم الكلمة المؤقتة إن وُجد بسجل تدقيق.
+ * يعيّن الكلمة الجديدة ثم يدخل تلقائياً (قرار المستخدم)، ويسجّل «passwordReset» في التدقيق دائماً
+ * (قرار المستخدم 2026-10-12) مع إزالة علم الكلمة المؤقتة إن وُجد.
  * إن نجح التعيين وفشل ما بعده يُرمى خطأ بالمرحلة كي لا يُظن أن الكلمة لم تتغير.
  */
 export async function completeReset(code: string, email: string, newPassword: string): Promise<void> {
@@ -71,7 +78,7 @@ export async function completeReset(code: string, email: string, newPassword: st
     const { auth, db } = firebase();
     const cred = await signInWithEmailAndPassword(auth, email, newPassword);
     const me = await getDoc(doc(db, "users", cred.user.uid));
-    if (me.get("mustChangePassword") === true) await clearTemporaryFlag(cred.user.uid);
+    await recordPasswordChange(cred.user.uid, "passwordReset", me.get("mustChangePassword") === true);
   } catch (e) {
     throw Object.assign(new Error("تغيّرت الكلمة وتعذّر الدخول التلقائي"), { stage: "afterReset", cause: e });
   }
