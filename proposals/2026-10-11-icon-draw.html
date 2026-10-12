@@ -1,0 +1,203 @@
+<title>رصيد · رسم الأيقونات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Readex+Pro:wght@600&display=swap">
+<style>
+/* نماذج «رسم الخط» لكل أيقونات النظام (بعد اختيار المستخدم ٤ب + ٤د). ألوان CHOSEN.md، نهاري كالنظام. */
+:root {
+  --paper: #eef2f5; --surface: #fff; --ink: #1b2a44; --ink-2: #46546d; --rule: #c9d3de;
+  --accent: #2b4c7e; --on-accent: #fff; --margin: #e2b6b9; --wash: #e3eaf4; --wash-2: #f5f8fb;
+  --mark-acc: #b8752a;
+  --f-text: "Noto Naskh Arabic", "Geeza Pro", "Times New Roman", serif;
+  --f-brand: "Readex Pro", var(--f-text);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { direction: rtl; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-text); font-size: 16.5px; line-height: 1.75; padding-inline: 16px; }
+.wrap { max-width: 1180px; margin-inline: auto; padding-block: 24px 130px; }
+h1 { margin: 0; font-size: 26px; line-height: 1.35; text-wrap: balance; }
+h2 { margin: 0; font-size: 19px; line-height: 1.4; }
+p { margin: 0; }
+.lead { color: var(--ink-2); max-width: 80ch; margin: 6px 0 14px; }
+.common { margin: 0 0 16px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-inline-start: 4px double var(--margin); font-size: 15px; }
+.common ul { margin: 4px 0 0; padding-inline-start: 20px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-bottom: 18px; }
+.chk { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; cursor: pointer; user-select: none; }
+.chk input { width: 18px; height: 18px; accent-color: var(--accent); }
+.btn { min-height: 38px; padding: 0 12px; border: 1.5px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--accent); font: 700 14px var(--f-text); cursor: pointer; }
+.btn:hover { background: var(--wash); }
+.btn.pick[aria-pressed="true"], .btn.pri { background: var(--accent); color: var(--on-accent); }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+section.var { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; margin-bottom: 22px; overflow: hidden; transition: box-shadow .2s, background .2s; }
+section.var.chosen { box-shadow: 0 0 0 2px var(--accent); }
+.var-head { padding: 12px 16px 10px; border-bottom: 3px double var(--ink); display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: center; }
+.var-head .why { color: var(--ink-2); font-size: 14.5px; max-width: 64ch; }
+.var-head .acts { display: flex; gap: 8px; }
+.num { font-family: var(--f-brand); color: var(--mark-acc); margin-inline-end: 6px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; padding: 14px; background: var(--wash-2); }
+.grp { grid-column: 1 / -1; font-size: 13px; color: var(--ink-2); padding-top: 4px; }
+.ib { position: relative; display: grid; justify-items: center; gap: 4px; padding: 10px 4px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-2); font: 13px var(--f-text); cursor: pointer; }
+.ib svg { width: 26px; height: 26px; overflow: visible; }
+.ib svg path { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ib .ov { display: none; }
+.ib:hover, .ib.demo { color: var(--accent); background: var(--surface); }
+.ib:active { background: var(--wash); }
+
+/* الخط التحتي (٤د) — يُطفأ بالمربع */
+.ib::after { content: ""; position: absolute; bottom: 4px; inset-inline: 22%; height: 2.5px; border-radius: 2px; background: var(--mark-acc); transform: scaleX(0); transition: transform .25s var(--ease); }
+body.under .ib:hover::after, body.under .ib.demo::after { transform: scaleX(1); }
+
+/* أ. رسم كامل */
+.V1 .ib:hover path, .V1 .ib.demo path { stroke-dasharray: 1; animation: draw .6s var(--ease) both; }
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+/* ب. رسم متتابع: كل جزء بعد الآخر */
+.V2 .ib:hover path, .V2 .ib.demo path { stroke-dasharray: 1; animation: draw .38s var(--ease) both; animation-delay: calc(var(--k) * 110ms); }
+/* ج. محو ثم رسم */
+.V3 .ib:hover path, .V3 .ib.demo path { stroke-dasharray: 1; animation: erase-draw .75s var(--ease) both; }
+@keyframes erase-draw { 0% { stroke-dashoffset: 0; } 45% { stroke-dashoffset: -1; } 46% { stroke-dashoffset: 1; } 100% { stroke-dashoffset: 0; } }
+/* د. حبر كهرماني يمر فوق الأيقونة */
+.V4 .ib .ov { display: inline; }
+.V4 .ib .ov path { stroke: var(--mark-acc); stroke-width: 2.2; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; }
+.V4 .ib:hover .ov path, .V4 .ib.demo .ov path { animation: amber .9s var(--ease) both; animation-delay: calc(var(--k) * 70ms); }
+@keyframes amber { 0% { stroke-dashoffset: 1; opacity: 1; } 55% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+/* هـ. الرسم عند الضغط (المرور يلوّن فقط) — يناسب الجوال حيث لا مرور */
+.V5 .ib.pressed path, .V5 .ib.demo path { stroke-dasharray: 1; animation: draw .45s var(--ease) both; animation-delay: calc(var(--k) * 80ms); }
+.V5 .ib:active svg { transform: scale(.92); transition: transform .08s; }
+
+@media (prefers-reduced-motion: reduce) { .ib path, .ib::after { animation: none !important; transition: none !important; } }
+body.reduce .ib path, body.reduce .ib::after { animation: none !important; transition: none !important; }
+
+.summary { position: fixed; inset-inline: 0; bottom: 0; background: var(--surface); border-top: 3px double var(--ink); box-shadow: 0 -6px 18px rgb(27 42 68 / 12%); padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 5; }
+.summary .in { max-width: 1180px; margin-inline: auto; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; }
+.picked { font-size: 14.5px; color: var(--ink-2); }
+.picked b { color: var(--ink); }
+#out { width: 100%; font: 14px var(--f-text); padding: 6px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--wash-2); }
+</style>
+
+<div class="wrap">
+  <h1>رسم الخط — لكل أيقونات «رصيد»</h1>
+  <p class="lead">بعد اختيارك «٤ب رسم الخط» و«٤د خط تحتي»: خمس طرق للرسم، كل منها على <b>كل</b> أيقونات النظام (القائمة والأدوات). مرّر الفأرة على أي أيقونة، أو اضغط «تشغيل الكل» لترى المجموعة ترسم معاً. يمكنك اختيار أكثر من طريقة.</p>
+  <div class="common">
+    <b>مشترك:</b>
+    <ul>
+      <li>الخط الكهرماني التحتي (٤د) مفعّل في كل الطرق، ويمكن إطفاؤه من المربع لترى الرسم وحده.</li>
+      <li>الرسم يحدث مرة عند المرور (أو الضغط)، لا يتكرر وأنت واقف على الأيقونة. ومن يفعّل «تقليل الحركة» يرى التلوين فقط.</li>
+      <li>على الجوال لا يوجد مرور، فتُرسم الأيقونة عند الضغط في كل الطرق.</li>
+    </ul>
+  </div>
+  <div class="toolbar">
+    <label class="chk"><input type="checkbox" id="under" checked> الخط التحتي (٤د)</label>
+    <label class="chk"><input type="checkbox" id="reduce"> محاكاة «تقليل الحركة»</label>
+  </div>
+  <div id="vars"></div>
+</div>
+
+<div class="summary" role="region" aria-label="اختياراتك">
+  <div class="in">
+    <span class="picked" id="picked">لم تختر بعد.</span>
+    <div style="display:flex;gap:8px"><button class="btn" type="button" id="clear">مسح</button><button class="btn pri" type="button" id="copy" disabled>نسخ الاختيارات</button></div>
+    <input id="out" readonly hidden aria-label="نص الاختيارات">
+  </div>
+</div>
+
+<script>
+(() => {
+  // أيقونات النظام: القائمة (24) من src/app/navIcons.tsx، والأدوات (20) من src/shared/ui/Icon.tsx (المستطيلات والدوائر محوّلة إلى مسارات)
+  const NAV = [
+    ["الأرصدة", "M4 4h16v16H4zM4 9h16M4 14h16M10 4v16"],
+    ["كشف الحساب", "M6 3h12v18H6zM9 8h6M9 12h6M9 16h3"],
+    ["الفواتير", "M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"],
+    ["القيود", "M4 8h13l-3-3M20 16H7l3 3"],
+    ["إضافة حركة", "M12 5v14M5 12h14"],
+    ["المراجعة", "M6 21V4h11l-2.5 4L17 12H6"],
+    ["قفل الفترات", "M6 11h12v9H6zM9 11V8a3 3 0 0 1 6 0v3"],
+    ["التدقيق", "M12 7v5l3 2M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4"],
+    ["المستخدمون", "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20a6 6 0 0 1 12 0M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 6"],
+    ["الإسناد", "M7 7h4v4H7zM13 13h4v4h-4zM11 9h3a2 2 0 0 1 2 2v2"],
+    ["القائمة", "M4 7h16M4 12h16M4 17h16"],
+    ["طيّ القائمة", "M15 6l-6 6 6 6"],
+  ];
+  const TOOLS = [
+    ["بحث", "M3 8.5a5.5 5.5 0 1 0 11 0a5.5 5.5 0 1 0-11 0M13 13l4.5 4.5"],
+    ["الإشعارات", "M5 14.5V9a5 5 0 0 1 10 0v5.5l1.5 1.5h-13zM8.5 18a1.5 1.5 0 0 0 3 0"],
+    ["تحديث", "M16 10a6 6 0 1 1-1.76-4.24M16.2 3.2v3.3h-3.3"],
+    ["تعديل", "M3.5 16.5h3.2L15.6 7.6l-3.2-3.2L3.5 13.3v3.2zM11.2 5.6l3.2 3.2"],
+    ["التقويم", "M2.5 4h15v13.5h-15zM2.5 8h15M6.5 2v4M13.5 2v4"],
+    ["إظهار", "M1.8 10S5 4 10 4s8.2 6 8.2 6-3.2 6-8.2 6-8.2-6-8.2-6zM7.4 10a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0-5.2 0"],
+    ["قفل", "M4.5 9h11v8h-11zM7 9V6.5a3 3 0 0 1 6 0V9"],
+    ["عكس", "M5 8a6 6 0 1 1 1 7M5 3v5h5"],
+    ["تم", "M4 10.5l4 4 8-9"],
+    ["التالي", "M12.5 3.75L6.25 10l6.25 6.25"],
+  ];
+  const VARS = [
+    ["رسم كامل", "الأيقونة كلها تُرسم دفعة واحدة كالقلم (٤ب كما اخترته)."],
+    ["رسم متتابع", "أجزاء الأيقونة تُرسم واحداً بعد الآخر، كمن يرسمها بيده."],
+    ["محو ثم رسم", "الخط يُمحى من بدايته ثم يُعاد رسمه، كتصحيح في الدفتر."],
+    ["حبر كهرماني", "خط كهرماني يُرسم فوق الأيقونة ثم يتلاشى، فتبقى بلون النظام."],
+    ["الرسم عند الضغط", "المرور يلوّن فقط، والرسم يحدث عند الضغط. الأهدأ على الحاسوب، والأوضح على الجوال."],
+  ];
+  const L = ["أ", "ب", "ج", "د", "هـ"];
+  const segs = (d) => d.split(/(?=M)/).filter(Boolean);
+  const svg = (d, box) => {
+    const ps = segs(d).map((s, k) => `<path d="${s}" pathLength="1" style="--k:${k}"/>`).join("");
+    return `<svg viewBox="0 0 ${box} ${box}" aria-hidden="true"><g>${ps}</g><g class="ov">${ps}</g></svg>`;
+  };
+  const btn = ([t, d], box) => `<button class="ib" type="button">${svg(d, box)}<span>${t}</span></button>`;
+
+  const KEY = "raseed-icon-draw-picks-v1";
+  let picks = [];
+  try { picks = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { picks = []; }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(picks)); } catch {} };
+
+  const root = document.getElementById("vars");
+  VARS.forEach(([t, why], i) => {
+    const s = document.createElement("section");
+    s.className = `var V${i + 1}`; s.dataset.i = i;
+    s.innerHTML = `<div class="var-head"><div><h2><span class="num">${L[i]}</span>${t}</h2><p class="why">${why}</p></div>
+      <div class="acts"><button class="btn play" type="button">تشغيل الكل ↺</button><button class="btn pick" type="button" aria-pressed="false">اختر هذا</button></div></div>
+      <div class="grid"><span class="grp">القائمة الجانبية والتنقل</span>${NAV.map((x) => btn(x, 24)).join("")}<span class="grp">الأدوات والأزرار</span>${TOOLS.map((x) => btn(x, 20)).join("")}</div>`;
+    root.appendChild(s);
+  });
+
+  const restart = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+  root.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const sec = b.closest(".var");
+    if (b.classList.contains("play")) sec.querySelectorAll(".ib").forEach((x) => restart(x, "demo"));
+    else if (b.classList.contains("pick")) {
+      const i = +sec.dataset.i;
+      picks = picks.includes(i) ? picks.filter((x) => x !== i) : [...picks, i].sort();
+      save(); render();
+    } else if (b.classList.contains("ib")) restart(b, "pressed");
+  });
+  root.addEventListener("mouseleave", (e) => e.target.classList?.remove("demo", "pressed"), true);
+  root.addEventListener("animationend", (e) => { const ib = e.target.closest?.(".ib"); if (ib && ib.classList.contains("demo")) setTimeout(() => ib.classList.remove("demo"), 600); });
+
+  const picked = document.getElementById("picked"), copy = document.getElementById("copy"), out = document.getElementById("out");
+  const text = () => `٤ الأيقونات (رسم الخط${document.getElementById("under").checked ? " + خط تحتي" : ""}): ${picks.map((i) => `${L[i]}. ${VARS[i][0]}`).join("، ")}`;
+  function render() {
+    document.querySelectorAll(".var").forEach((s) => {
+      const on = picks.includes(+s.dataset.i);
+      s.classList.toggle("chosen", on);
+      const b = s.querySelector(".pick"); b.setAttribute("aria-pressed", String(on)); b.textContent = on ? "مختار ✓" : "اختر هذا";
+    });
+    picked.innerHTML = picks.length ? `اخترت: <b>${picks.map((i) => `${L[i]}. ${VARS[i][0]}`).join("، ")}</b>` : "لم تختر بعد.";
+    copy.disabled = !picks.length;
+  }
+  copy.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(text()); copy.textContent = "نُسخ ✓"; }
+    catch { out.hidden = false; out.value = text(); out.select(); copy.textContent = "ظُلِّل، انسخه"; }
+    setTimeout(() => (copy.textContent = "نسخ الاختيارات"), 1800);
+  });
+  document.getElementById("clear").addEventListener("click", () => { picks = []; save(); out.hidden = true; render(); });
+  const under = document.getElementById("under");
+  const syncUnder = () => document.body.classList.toggle("under", under.checked);
+  under.addEventListener("change", syncUnder); syncUnder();
+  const r = document.getElementById("reduce");
+  r.addEventListener("change", () => document.body.classList.toggle("reduce", r.checked));
+  render();
+})();
+</script>

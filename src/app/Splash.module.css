@@ -1,0 +1,66 @@
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+  pointer-events: none;
+  animation: out 0.35s ease 1.25s both;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.mark {
+  inline-size: 84px;
+  block-size: 84px;
+  overflow: visible;
+}
+
+.mark rect:first-child {
+  animation: in-top 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.mark rect:last-child {
+  animation: in-bot 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.08s both;
+}
+
+.word {
+  font-family: var(--f-brand);
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--mark-ink);
+  animation: fade 0.4s ease 0.55s both;
+}
+
+@keyframes in-top {
+  from {
+    transform: translateX(-90px);
+    opacity: 0;
+  }
+}
+
+@keyframes in-bot {
+  from {
+    transform: translateX(90px);
+    opacity: 0;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}

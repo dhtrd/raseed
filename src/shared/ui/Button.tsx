@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { useHoldBusy } from "./busy";
 import s from "./Button.module.css";
 
 /** caution: إجراء استثنائي (كهرماني)، مثل استثناء الفترة المقفلة */
@@ -22,6 +23,7 @@ export function Button({
   disabled,
   ...rest
 }: ButtonProps) {
+  useHoldBusy(Boolean(busy));
   const cls = [s.btn, s[variant], size === "sm" ? s.sm : "", wide ? s.wide : ""].join(" ");
   return (
     <button

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dialog as AriaDialog, Modal, ModalOverlay } from "react-aria-components";
 import { NavLink, Outlet, useLocation } from "react-router";
 import { Mark } from "../shared/ui/Logo";
@@ -13,6 +13,7 @@ import { useMediaQuery } from "../shared/ui/useMediaQuery";
 import { AlertCenter } from "../features/alerts/ui/AlertCenter";
 import { ToastProvider } from "../shared/ui/Toast";
 import { BottomNav, type BottomItem } from "./BottomNav";
+import { Splash } from "./Splash";
 import { NavIcon } from "./navIcons";
 import { SideNav, type NavGroup } from "./SideNav";
 import { SearchPalette } from "../features/ledger/ui/SearchPalette";
@@ -52,6 +53,16 @@ export function AppShell() {
     setLastPath(pathname);
     if (drawer) setDrawer(false);
   }
+
+  // ٥ب «الحبر»: يُعاد تشغيل الكشف عند كل انتقال دون إعادة تركيب الصفحة (تبقى بياناتها وحالتها)
+  const pageRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = pageRef.current;
+    if (!el) return;
+    el.classList.remove("ink");
+    void el.offsetWidth;
+    el.classList.add("ink");
+  }, [pathname]);
 
   useEffect(
     () =>
@@ -108,6 +119,7 @@ export function AppShell() {
   return (
     <RoleNamesContext.Provider value={names}>
       <ToastProvider>
+        <Splash />
         <div className={`${s.app} ${rail ? s.isRail : ""}`}>
           {phone ? null : (
             <aside className={s.side}>
@@ -128,7 +140,7 @@ export function AppShell() {
                     <NavIcon name="menu" className={s.ic} />
                   </button>
                   <NavLink to="/" end className={s.brand} aria-label="رصيد، الأرصدة">
-                    <Mark className={s.mark} />
+                    <Mark className={s.mark} motion="live" />
                     <span className={s.word}>رصيد</span>
                   </NavLink>
                 </>
@@ -168,7 +180,7 @@ export function AppShell() {
               </div>
             </header>
             <TempLockBar enabled={profile.role === "owner"} />
-            <div className={s.shell}>
+            <div className={s.shell} ref={pageRef}>
               <Outlet />
             </div>
           </div>

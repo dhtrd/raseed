@@ -1,3 +1,5 @@
+import { splitPath } from "../shared/ui/drawable";
+
 /**
  * أيقونات التنقل (خطية، سماكة 1.8، مربع 24): من النموذج المعتمد direction-1 ونموذج القائمة الجانبية
  * proposals/2026-10-11-sidebar.html. مصدر واحد للقائمة الجانبية والتنقل السفلي.
@@ -21,8 +23,10 @@ export type NavIconName = keyof typeof NAV_ICON;
 
 export function NavIcon({ name, className }: { name: NavIconName; className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" className={className}>
-      <path d={NAV_ICON[name]} />
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" className={`draw-ic ${className ?? ""}`}>
+      {splitPath(NAV_ICON[name]).map((d) => (
+        <path key={d} d={d} pathLength={1} />
+      ))}
     </svg>
   );
 }

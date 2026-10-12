@@ -100,3 +100,64 @@ button {
     display: none;
   }
 }
+
+/*
+ * الحركة (DECISIONS 2026-10-11)
+ * ٤أ «رسم الخط»: أيقونات .draw-ic تُرسم كالقلم مرة عند المرور على الرابط أو الزر الحاوي (وعند الضغط على اللمس).
+ * ٥ب «الحبر»: محتوى الصفحة يُكشف من اليمين لليسار عند الانتقال (.ink يضيفها AppShell).
+ * «تقليل الحركة» يطفئ كل ذلك.
+ */
+@keyframes ic-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ink-in {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@media (hover: hover) {
+  :is(a, button, [role="button"]):hover .draw-ic :is(path, rect, circle) {
+    stroke-dasharray: 1;
+    animation: ic-draw 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+}
+
+:is(a, button, [role="button"]):active .draw-ic :is(path, rect, circle) {
+  stroke-dasharray: 1;
+  animation: ic-draw 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.ink > * > * {
+  animation: ink-in 0.42s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.ink > * > :nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.ink > * > :nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.ink > * > :nth-child(n + 4) {
+  animation-delay: 180ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .draw-ic :is(path, rect, circle),
+  .ink > * > * {
+    animation: none !important;
+  }
+}
