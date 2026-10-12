@@ -14,6 +14,8 @@
 | `settings/roleNames` | ثابت | `owner`, `admin`, `entry` (≤40) | كل مستخدم نشط | المالك فقط |
 | `migrationIssues` | معرّف الحركة المنقولة | `entryId`, `supplierId`, `supplierName`, `sheet`, `row`, `issues[]` {code, text}, `resolved`, `createdAt`؛ وحقول الحل `resolution` (ignored/fixed، أو reopened مع resolved=false)، `resolutionNote` (≤300)، `resolvedBy`، `resolvedAt`، `auditId` | المالك والإدارة | ينشئها سكربت النقل وحده؛ المالك والإدارة يغيّرون حقول الحل فقط بسجل تدقيق (`entity = migrationIssues`)، ولا إنشاء ولا حذف من التطبيق |
 | `settings/migration` | ثابت | `at`, `sha256`, `totals`, `auditId` | لا أحد من التطبيق | سكربت النقل (علامة اكتمال تمنع نقلاً ثانياً) |
+| `settings/backup` | ثابت | `lastRunAt`, `lastStatus` (ok/failed), `lastError` | المالك والإدارة | سير النسخ الاحتياطي وحده |
+| `backupRuns` | اليوم بتوقيت الرياض YYYY-MM-DD | `day`, `at`, `status` (ok/failed), `error`, `durationMs`؛ وعند النجاح `bytes`, `counts`, `authUsers`, `files[]` (≤120) | المالك والإدارة | سير النسخ الاحتياطي وحده (لا كتابة من التطبيق) |
 | `auditLog` | تلقائي | `actor`, `at`, `action`, `entity`, `entityId`, `before?`, `after?`, `reason?` | المالك والإدارة | إضافة فقط باسم الكاتب نفسه؛ لا تعديل ولا حذف |
 
 ## الحساب النشط

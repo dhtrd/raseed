@@ -32,6 +32,10 @@ initializeApp({
 });
 const db = getFirestore();
 const status = db.doc("settings/backup");
+const started = Date.now();
+const runDay = riyadhDay(new Date(started));
+// سجل تشغيل لكل يوم (نافذة «متابعة النسخ»، DECISIONS 2026-10-12): التشغيل الثاني في اليوم نفسه يحل محل الأول
+const run = db.doc(`backupRuns/${runDay}`);
 const withAuth = !env.emulator || Boolean(process.env.FIREBASE_AUTH_EMULATOR_HOST);
 
 try {
@@ -39,8 +43,8 @@ try {
   const outDir = process.env.BACKUP_OUT_DIR?.trim();
   const dropbox = outDir ? null : new Dropbox(credsFromEnv(process.env));
 
-  const takenAt = new Date();
-  const day = riyadhDay(takenAt);
+  const takenAt = new Date(started);
+  const day = runDay;
   const dump = await dumpFirestore(
     db,
     { projectId: env.projectId, takenAt, day },
@@ -52,6 +56,7 @@ try {
   const xlsx = encryptXlsx(Buffer.from(await buildBackupWorkbook(dump).xlsx.writeBuffer()), passphrase);
 
   let pruned: string[] = [];
+  let kept: string[] = [names.data, names.sheet];
   if (outDir) {
     mkdirSync(outDir, { recursive: true });
     writeFileSync(join(outDir, names.data), data);
@@ -59,8 +64,13 @@ try {
   } else if (dropbox) {
     await dropbox.upload(names.data, data);
     await dropbox.upload(names.sheet, xlsx);
-    pruned = toPrune(await dropbox.list(), day);
+    const all = await dropbox.list();
+    pruned = toPrune(all, day);
     for (const n of pruned) await dropbox.remove(n);
+    kept = all
+      .filter((n) => !pruned.includes(n))
+      .sort()
+      .reverse();
   }
 
   await status.set({
@@ -72,6 +82,17 @@ try {
     counts: manifest.collections,
     authUsers: manifest.authUsers,
     bytes: data.length + xlsx.length,
+  });
+  await run.set({
+    day,
+    at: FieldValue.serverTimestamp(),
+    status: "ok",
+    error: "",
+    durationMs: Date.now() - started,
+    bytes: data.length + xlsx.length,
+    counts: manifest.collections,
+    authUsers: manifest.authUsers,
+    files: kept.slice(0, 120),
   });
   console.log(
     `✓ نسخة ${day}: ${names.data} و${names.sheet} (${Math.round((data.length + xlsx.length) / 1024)} ك.ب)`,
@@ -88,6 +109,13 @@ try {
       { lastRunAt: FieldValue.serverTimestamp(), lastStatus: "failed", lastError: msg },
       { merge: true },
     );
+    await run.set({
+      day: runDay,
+      at: FieldValue.serverTimestamp(),
+      status: "failed",
+      error: msg,
+      durationMs: Date.now() - started,
+    });
   } catch (w) {
     console.error(`✗ وتعذّر تسجيل الفشل في settings/backup: ${safeError(w)}`);
   }
