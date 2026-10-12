@@ -112,6 +112,15 @@ test("مدخل البيانات: موردوه فقط، ومورد غير مسن�
   await loginOk(page, ENTRY.email, ENTRY.password);
   await page.goto("/add/s1");
   await expect(page.getByText("هذا المورد غير موجود أو مؤرشف أو غير مسند إليك.")).toBeVisible();
+  // «الحبر» يكشف النموذج بـ clip-path نحو 0.6 ث، والنقرة على جزء لم يُكشف بعد تضيع (سبب تقلّب هذا الاختبار)
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity)
+        .map((a) => a.finished.catch(() => null)),
+    ),
+  );
   await page.getByRole("combobox", { name: /المورد/ }).click();
   await expect(page.getByRole("option")).toHaveCount(1);
   await expect(page.getByRole("option").first()).toContainText("المورد (ب)");
