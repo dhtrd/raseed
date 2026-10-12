@@ -993,4 +993,15 @@ describe("حالة النسخ الاحتياطي (DECISIONS 2026-10-11)", () => 
     await assertFails(getDoc(doc(as("entry"), "settings/backup")));
     await assertFails(setDoc(doc(as("owner"), "settings/backup"), { lastStatus: "ok" }));
   });
+
+  it("سجل التشغيلات backupRuns: قراءة للمالك والإدارة فقط، ولا كتابة من التطبيق", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(asDb(ctx.firestore()), "backupRuns/2026-10-12"), { status: "ok" });
+    });
+    await assertSucceeds(getDoc(doc(as("owner"), "backupRuns/2026-10-12")));
+    await assertSucceeds(getDocs(query(collection(as("admin"), "backupRuns"), limit(30))));
+    await assertFails(getDoc(doc(as("entry"), "backupRuns/2026-10-12")));
+    await assertFails(setDoc(doc(as("owner"), "backupRuns/2026-10-13"), { status: "ok" }));
+    await assertFails(deleteDoc(doc(as("owner"), "backupRuns/2026-10-12")));
+  });
 });

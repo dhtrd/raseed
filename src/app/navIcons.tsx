@@ -15,6 +15,7 @@ export const NAV_ICON = {
   audit: "M12 7v5l3 2M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4",
   users: "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20a6 6 0 0 1 12 0M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 6",
   assign: "M7 7h4v4H7zM13 13h4v4h-4zM11 9h3a2 2 0 0 1 2 2v2",
+  backup: "M4 8h16v12H4zM3 4h18v4H3zM10 12h4",
   menu: "M4 7h16M4 12h16M4 17h16",
   fold: "M15 6l-6 6 6 6",
 } as const;

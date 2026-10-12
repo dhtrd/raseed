@@ -159,6 +159,11 @@ service cloud.firestore {
       allow read: if isManager();
       allow write: if false;
     }
+    // سجل تشغيلات النسخ (يوم لكل مستند) لنافذة «متابعة النسخ»: يكتبه سير النسخ وحده (DECISIONS 2026-10-12)
+    match /backupRuns/{day} {
+      allow read: if isManager();
+      allow write: if false;
+    }
     // مدة الخمول قبل إنهاء الجلسة (دقائق): يضبطها المالك (DECISIONS 2026-10-10)
     match /settings/session {
       allow read: if isActive();

@@ -106,6 +106,7 @@ export function AppShell() {
         { to: "/audit", label: "التدقيق", end: false, icon: "audit" },
         { to: "/users", label: "المستخدمون", end: false, icon: "users" },
         { to: "/assign", label: "الإسناد", end: false, icon: "assign" },
+        { to: "/backup", label: "النسخ الاحتياطي", end: false, icon: "backup" },
       ],
     });
   const bottom: BottomItem[] = [
