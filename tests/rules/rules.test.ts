@@ -846,8 +846,22 @@ describe("أول دخول بكلمة مؤقتة (DECISIONS 2026-10-10)", () => {
     await seedPending();
     await assertFails(clearFlag(as("pending"), "pending", "passwordChanged", { assigned: ["s1", "s2"] }));
     await assertFails(clearFlag(as("pending"), "pending", "update"));
+    // إعادة التعيين برابط البريد تزيل العلم أيضاً (DECISIONS 2026-10-12)
+    await assertSucceeds(clearFlag(as("pending"), "pending", "passwordReset"));
+    await seedPending();
     await assertSucceeds(clearFlag(as("pending"), "pending"));
     await assertFails(clearFlag(as("pending"), "pending"));
+  });
+  it("المستخدم النشط يسجّل إعادة التعيين برابط البريد بلا تغيير في حسابه", async () => {
+    await assertSucceeds(
+      setDoc(doc(as("entry"), `auditLog/${newAuditId()}`), {
+        actor: "entry",
+        at: serverTimestamp(),
+        action: "passwordReset",
+        entity: "users",
+        entityId: "entry",
+      }),
+    );
   });
   it("لا يزيل العلم عن غيره", async () => {
     await seedPending();

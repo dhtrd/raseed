@@ -79,7 +79,7 @@ test("الرابط: الفتح لا يستهلكه، «متابعة» تعرض �
   const me = await adminDb().doc(`users/${uid}`).get();
   expect(me.get("mustChangePassword")).toBe(false);
   const audit = await adminDb().collection("auditLog").where("actor", "==", uid).get();
-  expect(audit.docs.map((d) => d.get("action"))).toContain("passwordChanged");
+  expect(audit.docs.map((d) => d.get("action"))).toContain("passwordReset");
 
   // الرابط نفسه بعد الاستعمال
   await page.goto(url);

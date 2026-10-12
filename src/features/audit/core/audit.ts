@@ -51,6 +51,7 @@ const VERB: Record<string, string> = {
   deactivateUser: "أوقف حساب",
   assignSuppliers: "عدّل إسناد الموردين لـ",
   passwordChanged: "غيّر كلمة المرور لحسابه",
+  passwordReset: "أعاد تعيين كلمة المرور لحسابه برابط البريد",
   renameRoles: "غيّر مسميات الأدوار",
   setIdleMinutes: "غيّر مدة الخمول",
   lockSet: "غيّر تاريخ الإقفال",
@@ -164,7 +165,8 @@ export function describe(r: AuditRecord, n: Names): { who: string; verb: string;
       ? `${label} ${known}`
       : `${typeof kind === "string" ? (KIND_AR[kind] ?? "حركة") : "حركة"}${typeof refNo === "string" ? ` ${refNo}` : ""}`;
   } else if (r.entity === "suppliers") target = `المورد «${n.supplier(r.entityId)}»`;
-  else if (r.entity === "users") target = r.action === "passwordChanged" ? "" : `«${n.user(r.entityId)}»`;
+  else if (r.entity === "users")
+    target = r.action === "passwordChanged" || r.action === "passwordReset" ? "" : `«${n.user(r.entityId)}»`;
   return { who, verb, target };
 }
 

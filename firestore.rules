@@ -343,7 +343,7 @@ service cloud.firestore {
       allow read: if isManager();
       allow create: if (isActive()
           || (isEnabled() && request.resource.data.entity == 'users' && request.resource.data.entityId == request.auth.uid
-              && request.resource.data.action == 'passwordChanged'))
+              && request.resource.data.action in ['passwordChanged', 'passwordReset']))
         && request.resource.data.keys().hasOnly(['actor', 'at', 'action', 'entity', 'entityId', 'before', 'after', 'reason'])
         && request.resource.data.actor == request.auth.uid
         && request.resource.data.at == request.time
