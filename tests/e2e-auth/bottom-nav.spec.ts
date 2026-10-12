@@ -16,7 +16,7 @@ async function loginOk(page: Page, id: string, pw: string) {
 const side = (page: Page) => page.getByRole("navigation", { name: "أقسام الدفتر" });
 const bottom = (page: Page) => page.getByRole("navigation", { name: "التنقل الرئيسي" });
 const LEDGER = ["الأرصدة", "كشف الحساب", "الفواتير", "القيود", "إضافة حركة", "المراجعة"];
-const ADMIN = ["قفل الفترات", "التدقيق", "المستخدمون", "الإسناد"];
+const ADMIN = ["قفل الفترات", "التدقيق", "المستخدمون", "الإسناد", "النسخ الاحتياطي"];
 
 test("الحاسوب: قائمة يمنى بقسمين، والطيّ إلى أيقونات يُحفظ", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
