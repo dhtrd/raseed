@@ -174,3 +174,16 @@
     padding: 24px 16px 40px;
   }
 }
+
+/* صفحة الرابط: الحساب الذي ستتغير كلمته (الخيار ب) */
+.account {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 10px 12px;
+  border-inline-start: 4px solid var(--accent);
+  background: var(--wash-2);
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}

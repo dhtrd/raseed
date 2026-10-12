@@ -121,7 +121,8 @@ function SignInForm(p: { notice: { title: string; body: string } | null; onForgo
   );
 }
 
-function ForgotForm(p: { onBack: () => void }) {
+/** طلب رابط تعيين كلمة المرور؛ تستعمله أيضاً صفحة الرابط المنتهي (ResetPasswordPage). */
+export function ForgotForm(p: { onBack: () => void }) {
   const [id, setId] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [result, setResult] = useState<"emailSent" | null>(null);
