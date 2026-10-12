@@ -3,6 +3,13 @@
  * أي رمز غير معروف يظهر برمزه ولا يُبتلع (لا فشل صامت).
  */
 const GENERIC_BAD = "البريد أو كلمة المرور غير صحيحة.";
+const LINK_DEAD = "انتهى هذا الرابط أو استُعمل. الرابط صالح ساعة ولمرة واحدة، وأحدث رابط فقط يعمل.";
+
+/** رابط تعيين كلمة المرور منتهٍ أو مستعمل أو مقطوع */
+export function isDeadLink(err: unknown): boolean {
+  const code = (err as { code?: unknown } | null)?.code;
+  return code === "auth/expired-action-code" || code === "auth/invalid-action-code";
+}
 
 const MESSAGES: Record<string, string> = {
   "auth/invalid-credential": GENERIC_BAD,
@@ -20,6 +27,8 @@ const MESSAGES: Record<string, string> = {
     "كلمة المرور لا تطابق السياسة: 12 حرفاً على الأقل تجمع حروفاً لاتينية كبيرة وصغيرة وأرقاماً ورموزاً.",
   "auth/requires-recent-login": "لأمان حسابك، اخرج وادخل مرة أخرى ثم غيّر كلمة المرور.",
   "auth/email-already-in-use": "هذا الدخول مستخدم لحساب آخر.",
+  "auth/expired-action-code": LINK_DEAD,
+  "auth/invalid-action-code": LINK_DEAD,
 };
 
 export function authErrorMessage(err: unknown): string {
