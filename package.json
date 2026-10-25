@@ -31,10 +31,10 @@
   "dependencies": {
     "exceljs": "4.4.0",
     "firebase": "^12.19.0",
-    "react": "^19.3.0",
+    "react": "^19.3.1",
     "react-aria-components": "^1.22.1",
-    "react-dom": "^19.3.0",
-    "react-router": "^8.4.0"
+    "react-dom": "^19.3.1",
+    "react-router": "^8.5.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
